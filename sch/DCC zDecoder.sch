@@ -14924,8 +14924,8 @@ Types 233 and 234&lt;p&gt;
 <part name="IC1" library="v-reg" library_urn="urn:adsk.eagle:library:409" deviceset="78XXS" device="" package3d_urn="urn:adsk.eagle:package:30342/1" value="5V"/>
 <part name="B1" library="rectifier" library_urn="urn:adsk.eagle:library:336" deviceset="RB1A" device="" package3d_urn="urn:adsk.eagle:package:23866/1"/>
 <part name="LED1" library="led" library_urn="urn:adsk.eagle:library:259" deviceset="TLLG4400" device="" package3d_urn="urn:adsk.eagle:package:15797/1" value="green"/>
-<part name="C1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="E5-8.5" package3d_urn="urn:adsk.eagle:package:23374/1"/>
-<part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="0207/10" package3d_urn="urn:adsk.eagle:package:23491/2"/>
+<part name="C1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="CPOL-EU" device="E5-8.5" package3d_urn="urn:adsk.eagle:package:23374/1" value="2200u 35V"/>
+<part name="R1" library="rcl" library_urn="urn:adsk.eagle:library:334" deviceset="R-EU_" device="0207/10" package3d_urn="urn:adsk.eagle:package:23491/2" value="4.7k"/>
 <part name="GND1" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
 <part name="ESP1" library="_esp32" deviceset="ESP32-NODEMCU" device=""/>
 <part name="GND2" library="supply1" library_urn="urn:adsk.eagle:library:371" deviceset="GND" device=""/>
@@ -14990,7 +14990,7 @@ Types 233 and 234&lt;p&gt;
 </instance>
 <instance part="C1" gate="G$1" x="58.42" y="226.06" smashed="yes">
 <attribute name="NAME" x="59.563" y="226.5426" size="1.778" layer="95"/>
-<attribute name="VALUE" x="59.563" y="221.4626" size="1.778" layer="96"/>
+<attribute name="VALUE" x="55.3974" y="219.583" size="1.778" layer="96" rot="R90"/>
 </instance>
 <instance part="R1" gate="G$1" x="71.12" y="210.82" smashed="yes" rot="R90">
 <attribute name="NAME" x="69.6214" y="207.01" size="1.778" layer="95" rot="R90"/>
