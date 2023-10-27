@@ -542,8 +542,8 @@ void Fernseher::off() {
 //=======================================================
 Schweissen::Schweissen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint64_t minRandomPause_, uint64_t maxRandomPause_) :
 	Blinker(BaseAddress_, BaseChannel_, 0, 0, 0, 0, 81),
-	LED2(BaseChannel_ + 1, PWM_Set_Off, 0, 0),
-	LED3(BaseChannel_ + 2, PWM_Set_Off, 0, 0) {
+	LED2(BaseChannel_ + 1, PWM_Set_On, 0, 0),
+	LED3(BaseChannel_ + 2, PWM_Set_On, 0, 0) {
 
 	pauseMin = minRandomPause_ * 10;
 	pauseMax = maxRandomPause_ * 10;
@@ -862,8 +862,8 @@ void NatriumLampen::off() {
 //=======================================================
 Feuer::Feuer(uint16_t BaseAddress_, uint8_t BaseChannel_):
 	Blinker(BaseAddress_, BaseChannel_, 0, 0, 0, 0, 82),
-	LED2(BaseChannel_ + 1, PWM_Set_Off, 0, 0),
-	LED3(BaseChannel_ + 2, PWM_Set_Off, 0, 0) {
+	LED2(BaseChannel_ + 1, PWM_Set_On, 0, 0),
+	LED3(BaseChannel_ + 2, PWM_Set_On, 0, 0) {
 }
 
 void Feuer::notifyAddress(uint16_t Address_, uint8_t cmd_) {
