@@ -13,6 +13,7 @@
 # Files built by 
 /sch/*.b#*
 /sch/*.pro
+/sch/*.s#*
 
 
 # User-specific files (MonoDevelop/Xamarin Studio)
