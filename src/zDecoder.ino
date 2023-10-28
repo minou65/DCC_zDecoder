@@ -131,7 +131,7 @@ bool ChannelIsOn(uint8_t Channel_) {
 }
 
 void zDecoderInit(void) {
-	ActionGroup* _group = &actionGroup1;
+	ActionGroup* _group = &OutputGroup1;
 	uint8_t _Channel = 0;
 
 	// Decoderobjekte in decoder löschen
@@ -140,13 +140,16 @@ void zDecoderInit(void) {
 	Vector<accessories*>().Swap(decoder);
 
     while (_group != nullptr) {
+		if (_Channel > 15)
+			break;
+
         if (_group->isActive()) {
-            uint8_t _Modus = atoi(_group->ModusValue);
-            uint8_t _Count = atoi(_group->CountValue);
+            uint8_t _Mode = atoi(_group->ModeValue);
+            uint8_t _Count = atoi(_group->NumberValue);
             uint8_t _Address = atoi(_group->AddressValue);
             uint8_t _TimeOn = atoi(_group->TimeOnValue);
             uint8_t _TimeOff = atoi(_group->TimeOffValue);
-            uint8_t _TimeEinheit = atoi(_group->TimeEinheitValue); // Multiplikator
+            uint8_t _Multiplier = atoi(_group->MultiplierValue); // Multiplikator
             uint8_t _TimeOnFade = atoi(_group->TimeOnFadeValue);
             uint8_t _TimeOffFade = atoi(_group->TimeOffFadeValue);
 
@@ -158,41 +161,41 @@ void zDecoderInit(void) {
 			Serial.print(F("    Channels used: ")); Serial.println(_Count);
 
             // Einrichten des Ports
-			switch (_Modus) {
+			switch (_Mode) {
 			case 40:			// einfacher Ausgang
 				decoder.PushBack(new Ausgang(_Address, _Channel));
 				_Channel += 1;
 				break;
 
 			case 50:			// Blinker
-				decoder.PushBack(new Blinker(_Address, _Channel, _TimeEinheit * _TimeOff, _TimeEinheit * _TimeOn, _TimeOnFade, _TimeOffFade, _Modus));
-				// decoder.PushBack(new Blinker(_Address, _Channel, _TimeEinheit * _TimeOff, _TimeEinheit * _TimeOn, 150, 150, _Modus));
+				decoder.PushBack(new Blinker(_Address, _Channel, _Multiplier * _TimeOff, _Multiplier * _TimeOn, _TimeOnFade, _TimeOffFade, _Mode));
+				// decoder.PushBack(new Blinker(_Address, _Channel, _Multiplier * _TimeOff, _Multiplier * _TimeOn, 150, 150, _Mode));
 
 				_Channel += 1;
 				break;
 
 			case 51:			// Wechselblinker
-				decoder.PushBack(new Wechselblinker(_Address, _Channel, _TimeEinheit * _TimeOff, _TimeEinheit * _TimeOn, _TimeOnFade, _TimeOffFade));
+				decoder.PushBack(new Wechselblinker(_Address, _Channel, _Multiplier * _TimeOff, _Multiplier * _TimeOn, _TimeOnFade, _TimeOffFade));
 				_Channel += 2;
 				break;
 
 			case 52: case 53: case 54: case 55:			// diverse Lauflichter
-				decoder.PushBack(new Lauflicht(_Address, _Channel, _Count, _TimeEinheit * _TimeOff, _TimeEinheit * _TimeOn, _Modus));
+				decoder.PushBack(new Lauflicht(_Address, _Channel, _Count, _Multiplier * _TimeOff, _Multiplier * _TimeOn, _Mode));
 				_Channel += _Count;
 				break;
 
 			case 60:			// Hausbeleuchtung
-				decoder.PushBack(new Hausbeleuchtung(_Address, _Channel, _Count, _TimeEinheit * _TimeOff, _TimeEinheit * _TimeOn));
+				decoder.PushBack(new Hausbeleuchtung(_Address, _Channel, _Count, _Multiplier * _TimeOff, _Multiplier * _TimeOn));
 				_Channel += _Count;
 				break;
 
 			case 61:			// Neonröhren
-				decoder.PushBack(new NeonLampen(_Address, _Channel, _Count, _TimeEinheit));
+				decoder.PushBack(new NeonLampen(_Address, _Channel, _Count, _Multiplier));
 				_Channel += _Count;
 				break;
 
 			case 62:			// Natriumlampen
-				decoder.PushBack(new NatriumLampen(_Address, _Channel, _Count, _TimeEinheit, _TimeOnFade, _TimeOffFade));
+				decoder.PushBack(new NatriumLampen(_Address, _Channel, _Count, _Multiplier, _TimeOnFade, _TimeOffFade));
 				_Channel += _Count;
 				break;
 
@@ -202,7 +205,7 @@ void zDecoderInit(void) {
 				break;
 
 			case 81:            // Schweisslicht
-				decoder.PushBack(new Schweissen(_Address, _Channel, _TimeEinheit * _TimeOff, _TimeEinheit * _TimeOn));
+				decoder.PushBack(new Schweissen(_Address, _Channel, _Multiplier * _TimeOff, _Multiplier * _TimeOn));
 				_Channel += 3;
 				break;
 
@@ -243,12 +246,12 @@ void zDecoderInit(void) {
 				break;
 
 			case 201: // Spule, Entkuppler
-				decoder.PushBack(new UnCoupler(_Channel, _Address, _TimeEinheit * _TimeOn));
+				decoder.PushBack(new UnCoupler(_Channel, _Address, _Multiplier * _TimeOn));
 				_Channel += 1;
 				break;
 
 			case 202: // Weiche
-				decoder.PushBack(new Turnout(_Channel, _Channel + 1, _Address, _TimeEinheit * _TimeOn));
+				decoder.PushBack(new Turnout(_Channel, _Channel + 1, _Address, _Multiplier * _TimeOn));
 				_Channel += 2;
 				break;
 
@@ -261,8 +264,6 @@ void zDecoderInit(void) {
 			Serial.print(F("next free channel is ")); Serial.println(_Channel);
         }
         _group = (ActionGroup*)_group->getNext();
-
-		
     }
 };
 

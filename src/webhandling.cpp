@@ -49,16 +49,16 @@ WebServer server(80);
 
 // -- We need to declare an instance for all ActionGroup items, that can
 //    appear in the config portal
-ActionGroup actionGroup1 = ActionGroup("ag1");
-ActionGroup actionGroup2 = ActionGroup("ag2");
-ActionGroup actionGroup3 = ActionGroup("ag3");
-ActionGroup actionGroup4 = ActionGroup("ag4");
-ActionGroup actionGroup5 = ActionGroup("ag5");
-ActionGroup actionGroup6 = ActionGroup("ag6");
-ActionGroup actionGroup7 = ActionGroup("ag7");
-ActionGroup actionGroup8 = ActionGroup("ag8");
-ActionGroup actionGroup9 = ActionGroup("ag9");
-ActionGroup actionGroup10 = ActionGroup("ag10");
+ActionGroup OutputGroup1 = ActionGroup("og1");
+ActionGroup OutputGroup2 = ActionGroup("og2");
+ActionGroup OutputGroup3 = ActionGroup("og3");
+ActionGroup OutputGroup4 = ActionGroup("og4");
+ActionGroup OutputGroup5 = ActionGroup("og5");
+ActionGroup OutputGroup6 = ActionGroup("og6");
+ActionGroup OutputGroup7 = ActionGroup("og7");
+ActionGroup OutputGroup8 = ActionGroup("og8");
+ActionGroup OutputGroup9 = ActionGroup("og9");
+ActionGroup OutputGroup10 = ActionGroup("og10");
 
 IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 
@@ -79,28 +79,28 @@ void handleRoot(){
     uint8_t _i = 1;
     uint8_t _count = 0;
 
-    ActionGroup* group = &actionGroup1;
+    ActionGroup* group = &OutputGroup1;
     while (group != nullptr)
     {
         if (group->isActive()) {
-            s += "<div>Group:" + String(_i) + "</div>";
+            s += "<div>Output group " + String(_i) + "</div>";
             s += "<ul>";
-            s += "<li>Name: ";
-            s += group->DescriptionValue;
-            s += "<li>Modus: ";
-            s += group->ModusValue;
-            s += "<li>Ports used: ";
-            s += group->CountValue;
+            s += "<li>Designation: ";
+            s += group->DesignationValue;
+            s += "<li>Mode: ";
+            s += group->ModeValue;
+            s += "<li>Number of outputs: ";
+            s += group->NumberValue;
             s += "<li>DCC Address: ";
             s += group->AddressValue;
             s += "</ul>";
-            _count += atoi(group->CountValue);
+            _count += atoi(group->NumberValue);
             _i += 1;
         }
         group = (ActionGroup*)group->getNext();
     }
 
-    s += F("used channels ");
+    s += F("Total outputs used: ");
     s += String(_count);
     s += "<br><br>";
     s += F("Go to <a href='groups'>groups page</a> for enabling or disabling channels.");
@@ -175,14 +175,14 @@ void handle10() {
 
 void handleGroups() {
     String _s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-    _s += "<title>zDecoder</title></head><body><div>Enable / Disable Groups";
+    _s += "<title>zDecoder</title></head><body><div>Enable / Disable group for ";
     _s += iotWebConf.getThingName();
     _s += ".</div>";
     _s += "<form align=left action=\"/setgroup\" method=\"POST\">";
 
     uint8_t _i = 1;
 
-    ActionGroup* _group = &actionGroup1;
+    ActionGroup* _group = &OutputGroup1;
     while (_group != nullptr)
     {
         if (_group->isActive()) {
@@ -193,8 +193,8 @@ void handleGroups() {
             }
 
             _s += _b;
-            _s += _group->DescriptionValue;
-            _s += " (" + String(_group->ModusValue) + ")";
+            _s += _group->DesignationValue;
+            _s += " (" + String(_group->ModeValue) + ")";
             _s += "<br>";
             _i += 1;
         }
@@ -217,31 +217,31 @@ void websetup()
     Serial.println();
     Serial.println("Starting up...");
 
-    actionGroup1.setNext(&actionGroup2);
-    actionGroup2.setNext(&actionGroup3);
-    actionGroup3.setNext(&actionGroup4);
-    actionGroup4.setNext(&actionGroup5);
-    actionGroup5.setNext(&actionGroup6);
-    actionGroup6.setNext(&actionGroup7);
-    actionGroup7.setNext(&actionGroup8);
-    actionGroup8.setNext(&actionGroup9);
-    actionGroup9.setNext(&actionGroup10);
+    OutputGroup1.setNext(&OutputGroup2);
+    OutputGroup2.setNext(&OutputGroup3);
+    OutputGroup3.setNext(&OutputGroup4);
+    OutputGroup4.setNext(&OutputGroup5);
+    OutputGroup5.setNext(&OutputGroup6);
+    OutputGroup6.setNext(&OutputGroup7);
+    OutputGroup7.setNext(&OutputGroup8);
+    OutputGroup8.setNext(&OutputGroup9);
+    OutputGroup9.setNext(&OutputGroup10);
 
 
     iotWebConf.setStatusPin(STATUS_PIN);
     iotWebConf.setConfigPin(CONFIG_PIN);
     iotWebConf.setHtmlFormatProvider(&optionalGroupHtmlFormatProvider);
     // We also need to add all these parameter groups to iotWebConf
-    iotWebConf.addParameterGroup(&actionGroup1);
-    iotWebConf.addParameterGroup(&actionGroup2);
-    iotWebConf.addParameterGroup(&actionGroup3);
-    iotWebConf.addParameterGroup(&actionGroup4);
-    iotWebConf.addParameterGroup(&actionGroup5);
-    iotWebConf.addParameterGroup(&actionGroup6);
-    iotWebConf.addParameterGroup(&actionGroup7);
-    iotWebConf.addParameterGroup(&actionGroup8);
-    iotWebConf.addParameterGroup(&actionGroup9);
-    iotWebConf.addParameterGroup(&actionGroup10);
+    iotWebConf.addParameterGroup(&OutputGroup1);
+    iotWebConf.addParameterGroup(&OutputGroup2);
+    iotWebConf.addParameterGroup(&OutputGroup3);
+    iotWebConf.addParameterGroup(&OutputGroup4);
+    iotWebConf.addParameterGroup(&OutputGroup5);
+    iotWebConf.addParameterGroup(&OutputGroup6);
+    iotWebConf.addParameterGroup(&OutputGroup7);
+    iotWebConf.addParameterGroup(&OutputGroup8);
+    iotWebConf.addParameterGroup(&OutputGroup9);
+    iotWebConf.addParameterGroup(&OutputGroup10);
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
