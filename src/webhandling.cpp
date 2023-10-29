@@ -72,12 +72,18 @@ void handleRoot(){
         // -- Captive portal request were already served.
         return;
     }
-    String s = F("<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>");
-    s += F("<title>zDecoder</title></head><body><div>Status page of ");
-    s += iotWebConf.getThingName();
-    s += ".</div>";
+    //String s = F("<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>");
+    String s = HTML_Start_Doc;
+    s += HTML_Style;
+    s.replace("center", "left");
+    s.replace("{v}", iotWebConf.getThingName());
+
     uint8_t _i = 1;
     uint8_t _count = 0;
+
+    s += HTML_Start_Body;
+
+    s += "<h2>Overview for " + String(iotWebConf.getThingName()) + "</h2>";
 
     ActionGroup* group = &OutputGroup1;
     while (group != nullptr)
@@ -85,14 +91,10 @@ void handleRoot(){
         if (group->isActive()) {
             s += "<div>Output group " + String(_i) + "</div>";
             s += "<ul>";
-            s += "<li>Designation: ";
-            s += group->DesignationValue;
-            s += "<li>Mode: ";
-            s += group->ModeValue;
-            s += "<li>Number of outputs: ";
-            s += group->NumberValue;
-            s += "<li>DCC Address: ";
-            s += group->AddressValue;
+                s += "<li>Designation: " + String(group->DesignationValue) + "</li>";
+                s += "<li>Mode: " + String(group->ModeValue) + "</li>";
+                s += "<li>Number of outputs: " + String(group->NumberValue) + "</li>";
+                s += "<li>DCC Address: " + String(group->AddressValue) + +"</li>";
             s += "</ul>";
             _count += atoi(group->NumberValue);
             _i += 1;
@@ -106,22 +108,14 @@ void handleRoot(){
     s += F("Go to <a href='groups'>groups page</a> for enabling or disabling channels.");
     s += "<br>";
     s += F("Go to <a href='config'>configure page</a> to change values.");
-    s += "</body></html>\n";
+    s += "<br>";
+    s += "<font size = 1>Version: " + String(Version) + "</font>";
+
+    s += HTML_End_Body;
+    s += HTML_End_Doc;
 
     server.send(200, "text/html", s);
 }
-
-#define ButtonResponse \
-"<!DOCTYPE html>\
-    <html><head>\
-        <meta\
-             http-equiv=\"refresh\"\
-             content=\"1; url='/groups'\"/>\
-    </head>\
-    <body><p>Group enabled/disabled</p></body></html>\
-"
-
-
 
 void handle1() {
     server.send(200, "text/html", ButtonResponse);
@@ -174,10 +168,23 @@ void handle10() {
 }
 
 void handleGroups() {
-    String _s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-    _s += "<title>zDecoder</title></head><body><div>Enable / Disable group for ";
-    _s += iotWebConf.getThingName();
-    _s += ".</div>";
+    // String _s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
+    String _s = HTML_Style;
+    _s.replace("center", "left");
+    //_s += "<title>zDecoder</title></head><body><div>Enable / Disable group for ";
+    //_s += iotWebConf.getThingName();
+    //_s += ".</div>";
+
+    _s += HTML_Start_Body;
+    _s += "<table border=0 align=center>";
+    _s += "<tr><td>";
+
+    _s += HTML_Start_Fieldset;
+    _s += HTML_Fieldset_Legend;
+    _s.replace("{l}", String(iotWebConf.getThingName()) + " groups");
+
+    _s += HTML_Start_Table;
+
     _s += "<form align=left action=\"/setgroup\" method=\"POST\">";
 
     uint8_t _i = 1;
@@ -186,28 +193,41 @@ void handleGroups() {
     while (_group != nullptr)
     {
         if (_group->isActive()) {
-            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">Enable</button>";
+            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
             if (ChannelIsOn(_i - 1)) {
                 _b.replace("red", "green");
-                _b.replace("Enable", "Disable");
             }
+            String _bText = String(_group->DesignationValue) + " (" + String(_group->ModeValue) + ")";
+                _b.replace("[Text]", _bText);
 
             _s += _b;
-            _s += _group->DesignationValue;
-            _s += " (" + String(_group->ModeValue) + ")";
-            _s += "<br>";
+            _s += "<br><br>";
             _i += 1;
         }
         _group = (ActionGroup*)_group->getNext();
     }
 
-    _s += "<br>";
-    _s += "<br>";
-    _s += F("Go to <a href='/'>main page</a>.");
-    _s += "<br>";
-    _s += F("Go to <a href='\config'>configure page</a> to change values.");
-
     _s += "</form>";
+
+    _s += HTML_End_Table;
+    _s += HTML_End_Fieldset;
+
+    _s += "</td></tr>";
+    _s += HTML_End_Table;
+
+    _s += "<br>";
+    _s += "<br>";
+
+    _s += HTML_Start_Table;
+    _s += "<tr><td align=left>Go to <a href = 'config'>configure page</a> to change configuration.</td></tr>";
+    _s += "<tr><td align=left>Go to <a href='/'>main page</a> to change runtime data.</td></tr>";
+    _s += "<tr><td><font size=1>Version: " + String(Version) + "</font></td></tr>";
+    _s += HTML_End_Table;
+    _s += HTML_End_Body;
+
+    _s += HTML_End_Doc;
+
+
     server.send(200, "text/html", _s);
 }
 
