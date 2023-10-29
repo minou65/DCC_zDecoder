@@ -9,7 +9,7 @@ LED::LED(const uint8_t Channel_) :
 	Channel(Channel_) {
 
 	PWMResolution = 8;
-	PWMFrequency = 1000;
+	PWMFrequency = 5000;
 
 	GPIO = ChannelToGPIOMapping[Channel];
 
