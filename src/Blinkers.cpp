@@ -118,7 +118,7 @@ void Blinker::on() {
 	Serial.print("   timeOff: "); Serial.println(timeOff);
 	IsActive = true;
 	Status = true;
-	BlinkTimer.start(timeOn);
+	BlinkTimer.start(0);
 }
 
 void Blinker::off() {	
