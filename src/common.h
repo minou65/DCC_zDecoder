@@ -13,6 +13,7 @@
 #define NUMBER_LEN 5
 
 extern bool ResetDCCDecoder;
+extern char Version[];
 
 static char DecoderModeValues[][STRING_LEN] = {
     "40",
@@ -35,7 +36,8 @@ static char DecoderModeValues[][STRING_LEN] = {
     "110",
     "70",
     "201",
-    "202"
+    "202",
+    "230"
 };
 
 static char DecoderModeNames[][STRING_LEN] = {
@@ -60,7 +62,8 @@ static char DecoderModeNames[][STRING_LEN] = {
     "SBB_Zwergsignal_110 (3)",
     "Strassen_Signal_70 (3)",
     "Entkuppler (1)", // ok
-    "Weiche (2)"  // ok
+    "Weiche (2)",  // ok
+    "Servo (1)"
 };
 
 #endif
