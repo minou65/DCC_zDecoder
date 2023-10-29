@@ -43,6 +43,7 @@ void handleRoot();
 // -- Callback methods.
 void configSaved();
 void wifiConnected();
+bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper);
 
 DNSServer dnsServer;
 WebServer server(80);
@@ -62,8 +63,19 @@ ActionGroup OutputGroup10 = ActionGroup("og10");
 
 IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
 
+class CustomHtmlFormatProvider : public iotwebconf::OptionalGroupHtmlFormatProvider {
+protected:
+    String getScriptInner() override {
+        return
+            HtmlFormatProvider::getScriptInner() + String(FPSTR(IOTWEBCONF_HTML_FORM_OPTIONAL_GROUP_JAVASCRIPT));
+    }
+};
+
+CustomHtmlFormatProvider customHtmlFormatProvider;
+
 // -- An instance must be created from the class defined above.
-iotwebconf::OptionalGroupHtmlFormatProvider optionalGroupHtmlFormatProvider;
+// iotwebconf::OptionalGroupHtmlFormatProvider optionalGroupHtmlFormatProvider;
+
 
 void handleRoot(){
     // -- Let IotWebConf test and handle captive portal requests.
@@ -250,7 +262,8 @@ void websetup()
 
     iotWebConf.setStatusPin(STATUS_PIN);
     iotWebConf.setConfigPin(CONFIG_PIN);
-    iotWebConf.setHtmlFormatProvider(&optionalGroupHtmlFormatProvider);
+    iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
+    // iotWebConf.setHtmlFormatProvider(&optionalGroupHtmlFormatProvider);
     // We also need to add all these parameter groups to iotWebConf
     iotWebConf.addParameterGroup(&OutputGroup1);
     iotWebConf.addParameterGroup(&OutputGroup2);
@@ -264,6 +277,7 @@ void websetup()
     iotWebConf.addParameterGroup(&OutputGroup10);
 
     iotWebConf.setConfigSavedCallback(&configSaved);
+    iotWebConf.setFormValidator(&formValidator);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
 
     iotWebConf.getApTimeoutParameter()->visible = true;
@@ -304,4 +318,8 @@ void wifiConnected() {
 void configSaved(){
     ResetDCCDecoder = true;
     Serial.println(F("Configuration was updated."));
+}
+
+bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper){
+    return true;
 }
