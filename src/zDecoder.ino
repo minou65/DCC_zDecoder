@@ -14,11 +14,16 @@
 #include "Turnouts.h"
 #include "NMRAhandling.h"
 
+char Version[] = "0.0.0.1 (2023-11-01)";
+
 // #include "NMRAhandling.h"
 #include "Vector.h"
 
 // Liste mit allen Decoderobjekten (Apps)
 Vector<accessories*> decoder;
+
+// Task handle (Core 0 on ESP32)
+TaskHandle_t TaskHandle;
 
 bool ResetDCCDecoder = false;
 
@@ -255,10 +260,10 @@ void zDecoderInit(void) {
 				_Channel += 2;
 				break;
 
-			//case 230: // Servo
-			//	decoder.PushBack(new TurnoutServo(_Channel, _Address, 0, 180, _TimeOn));
-			//	_Channel += 1;
-			//	break;
+			case 230: // Servo
+				decoder.PushBack(new TurnoutServo(_Channel, _Address, 0, 180, _TimeOn));
+				_Channel += 1;
+				break;
 			}
 
 			Serial.print(F("next free channel is ")); Serial.println(_Channel);
@@ -272,19 +277,33 @@ void setup() {
 	websetup();
 
     zDecoderInit();
+
+	xTaskCreatePinnedToCore(
+		loop2, /* Function to implement the task */
+		"TaskHandle", /* Name of the task */
+		10000,  /* Stack size in words */
+		NULL,  /* Task input parameter */
+		0,  /* Priority of the task */
+		&TaskHandle,  /* Task handle. */
+		0 /* Core where the task should run */
+	);
 }
 
 void loop() {
 	NMRAloop();
-
 	webloop();
+}
 
-	if (ResetDCCDecoder) {
-		zDecoderInit();
-		ResetDCCDecoder = false;
-	}
+void loop2(void* parameter) {
+	int _i = 0;
+	for (;;) {   // Endless loop
+		if (ResetDCCDecoder) {
+			zDecoderInit();
+			ResetDCCDecoder = false;
+		}
 
-	for (int i = 0; i < decoder.Size(); i++) {
-		decoder[i]->process();
+		for (int _i = 0; _i < decoder.Size(); _i++) {
+			decoder[_i]->process();
+		}
 	}
 }
