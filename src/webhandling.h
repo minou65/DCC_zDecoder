@@ -100,7 +100,7 @@ public:
         iotwebconf::NumberParameter("Time on (ms)", TimeOnId, TimeOnValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter TimeOffParam =
-        iotwebconf::NumberParameter("time off (ms)", TimeOffId, TimeOffValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+        iotwebconf::NumberParameter("Time off (ms)", TimeOffId, TimeOffValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter MultiplierParam =
         iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
@@ -122,6 +122,17 @@ private:
     char TimeOnFadeId[STRING_LEN];
     char TimeOffFadeId[STRING_LEN];
     char ModeCustomHTML[STRING_LEN];
+
+    String getEndTemplate() override {
+
+        String result = "<script>hideClass('%s')</script>\n";
+        result.replace("%s", this->getId());
+
+        result += OptionalParameterGroup::getEndTemplate();
+
+        return result;
+
+    };
 };
 
 extern ActionGroup OutputGroup1;
