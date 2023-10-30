@@ -12,6 +12,7 @@
 
 #include <IotWebConf.h>
 #include <IotWebConfOptionalGroup.h>
+#include <IotWebConfParameter.h>
 #include "common.h"
 
 void websetup();
@@ -20,11 +21,25 @@ void webloop();
 extern void handleChannel(uint8_t Channel_);
 extern bool ChannelIsOn(uint8_t Channel_);
 
-class ActionGroup : public iotwebconf::ChainedParameterGroup
-{
+class MySelectParameter : public iotwebconf::SelectParameter {
 public:
-    ActionGroup(const char* id) : ChainedParameterGroup(id, "Output")
-    {
+    MySelectParameter(
+        const char* label,
+        const char* id,
+        char* valueBuffer,
+        int length,
+        const char* optionValues,
+        const char* optionNames,
+        size_t optionCount,
+        size_t nameLength,
+        const char* defaultValue,
+        const char* customHtml
+    );
+};
+
+class ActionGroup : public iotwebconf::ChainedParameterGroup {
+public:
+    ActionGroup(const char* id) : ChainedParameterGroup(id, "Output") {
         // -- Update parameter Ids to have unique ID for all parameters within the application.
         snprintf(DesignationId, STRING_LEN, "%s-designation", this->getId());
         snprintf(ModeId, STRING_LEN, "%s-mode", this->getId());
@@ -35,6 +50,7 @@ public:
         snprintf(MultiplierId, STRING_LEN, "%s-multiplier", this->getId());
         snprintf(TimeOnFadeId, STRING_LEN, "%s-onfade", this->getId());
         snprintf(TimeOffFadeId, STRING_LEN, "%s-offfade", this->getId());
+        snprintf(ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
 
         // -- Add parameters to this group.
         this->addItem(&this->DesignationParam);
@@ -60,8 +76,19 @@ public:
 
     iotwebconf::TextParameter DesignationParam =
         iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
-    iotwebconf::SelectParameter ModeParam =
-        iotwebconf::SelectParameter("Mode", ModeId, ModeValue, STRING_LEN, (char*)DecoderModeValues, (char*)DecoderModeNames, sizeof(DecoderModeValues) / STRING_LEN, STRING_LEN);
+    MySelectParameter ModeParam =
+        MySelectParameter(
+            "Mode",
+            ModeId,
+            ModeValue,
+            STRING_LEN,
+            (char*)DecoderModeValues,
+            (char*)DecoderModeNames,
+            sizeof(DecoderModeValues) / STRING_LEN,
+            STRING_LEN,
+            nullptr,
+            ModeCustomHTML
+        );
 
     iotwebconf::NumberParameter NumberParam =
         iotwebconf::NumberParameter("Number of outputs", NumberId, NumberValue, NUMBER_LEN, "1", "1..15", "min='1' max='15' step='1'");
@@ -94,6 +121,7 @@ private:
     char MultiplierId[STRING_LEN];
     char TimeOnFadeId[STRING_LEN];
     char TimeOffFadeId[STRING_LEN];
+    char ModeCustomHTML[STRING_LEN];
 };
 
 extern ActionGroup OutputGroup1;

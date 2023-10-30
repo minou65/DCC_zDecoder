@@ -61,13 +61,98 @@ ActionGroup OutputGroup8 = ActionGroup("og8");
 ActionGroup OutputGroup9 = ActionGroup("og9");
 ActionGroup OutputGroup10 = ActionGroup("og10");
 
-IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION);
+IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION); 
+
+const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM =
+"function hideClass(id) {\n"
+"   var dropdown = document.getElementById(id + '-mode');\n"
+"   var selectedValue = dropdown.options[dropdown.selectedIndex].value;\n"
+"   var numberClass = document.getElementsByClassName(id + '-number')[0];\n"
+"   var timeonClass = document.getElementsByClassName(id + '-timeon')[0];\n"
+"   var timeoffClass = document.getElementsByClassName(id + '-timeoff')[0];\n"
+"   var multiplierClass = document.getElementsByClassName(id + '-multiplier')[0];\n"
+"   var onfadeClass = document.getElementsByClassName(id + '-onfade')[0];\n"
+"   var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];\n"
+"\n"
+"	if ((selectedValue === \"40\") || (selectedValue === \"80\") || (selectedValue === \"82\")) {\n"
+"		numberClass.style.display = \"none\";\n"
+"		timeonClass.style.display = \"none\";\n"
+"		timeoffClass.style.display = \"none\";\n"
+"		multiplierClass.style.display = \"none\";\n"
+"		onfadeClass.style.display = \"none\";\n"
+"		offfadeClass.style.display = \"none\";	"
+"	} else if ((selectedValue === \"50\") || (selectedValue === \"51\")) {"
+"		numberClass.style.display = \"none\";\n"
+"		timeonClass.style.display = \"block\";\n"
+"		timeoffClass.style.display = \"block\";\n"
+"		multiplierClass.style.display = \"block\";\n"
+"		onfadeClass.style.display = \"block\";\n"
+"		offfadeClass.style.display = \"block\";\n"
+"	} else if ((selectedValue === \"52\") || (selectedValue === \"53\") || (selectedValue === \"54\") || (selectedValue === \"55\")) {\n"
+"		numberClass.style.display = \"block\";\n"
+"		timeonClass.style.display = \"block\";\n"
+"		timeoffClass.style.display = \"block\";\n"
+"		multiplierClass.style.display = \"block\";\n"
+"		onfadeClass.style.display = \"none\";\n"
+"		offfadeClass.style.display = \"none\";\n"
+"\n"
+"	} else if ((selectedValue === \"60\") || (selectedValue === \"61\")) {\n"
+"		numberClass.style.display = \"block\";\n"
+"		timeonClass.style.display = \"block\";\n"
+"		timeoffClass.style.display = \"block\";\n"
+"		multiplierClass.style.display = \"block\";\n"
+"		onfadeClass.style.display = \"none\";\n"
+"		offfadeClass.style.display = \"none\";\n"
+"\n"
+"	} else if ((selectedValue === \"62\")) {\n"
+"		numberClass.style.display = \"block\";\n"
+"		timeonClass.style.display = \"none\";\n"
+"		timeoffClass.style.display = \"none\";\n"
+"		multiplierClass.style.display = \"block\";\n"
+"		onfadeClass.style.display = \"block\";\n"
+"		offfadeClass.style.display = \"block\";	"
+"\n"
+"	} else if ((selectedValue === \"81\")) {\n"
+"		numberClass.style.display = \"none\";\n"
+"		timeonClass.style.display = \"block\";\n"
+"		timeoffClass.style.display = \"block\";\n"
+"		multiplierClass.style.display = \"block\";\n"
+"		onfadeClass.style.display = \"none\";\n"
+"		offfadeClass.style.display = \"none\";\n"
+"\n"
+"	} else {\n"
+"		numberClass.style.display = \"block\";\n"
+"		timeonClass.style.display = \"block\";\n"
+"		timeoffClass.style.display = \"block\";\n"
+"		multiplierClass.style.display = \"block\";\n"
+"		onfadeClass.style.display = \"block\";\n"
+"		offfadeClass.style.display = \"block\";\n"
+"	}\n"
+"}\n";
+
+MySelectParameter::MySelectParameter(
+        const char* label,
+        const char* id,
+        char* valueBuffer,
+        int length,
+        const char* optionValues,
+        const char* optionNames,
+        size_t optionCount,
+        size_t nameLength,
+        const char* defaultValue,
+        const char* customHtml
+    ) : iotwebconf::SelectParameter(label, id, valueBuffer, length, optionValues, optionNames, optionCount, nameLength, defaultValue) {
+        this->customHtml = customHtml;
+};
+
 
 class CustomHtmlFormatProvider : public iotwebconf::OptionalGroupHtmlFormatProvider {
 protected:
     String getScriptInner() override {
         return
-            HtmlFormatProvider::getScriptInner() + String(FPSTR(IOTWEBCONF_HTML_FORM_OPTIONAL_GROUP_JAVASCRIPT));
+            HtmlFormatProvider::getScriptInner() + 
+            String(FPSTR(IOTWEBCONF_HTML_FORM_OPTIONAL_GROUP_JAVASCRIPT)) +
+            String(FPSTR(IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT));
     }
 };
 
@@ -75,6 +160,7 @@ CustomHtmlFormatProvider customHtmlFormatProvider;
 
 // -- An instance must be created from the class defined above.
 // iotwebconf::OptionalGroupHtmlFormatProvider optionalGroupHtmlFormatProvider;
+
 
 
 void handleRoot(){
