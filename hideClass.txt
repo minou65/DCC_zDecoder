@@ -10,57 +10,57 @@ function hideClass(id) {
   var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];  
 
 	if ((selectedValue === "40") || (selectedValue === "80") || (selectedValue === "82")) {
-		numberClass.style.display = "none";
-		timeonClass.style.display = "none";
-		timeoffClass.style.display = "none";
-		multiplierClass.style.display = "none";
-		onfadeClass.style.display = "none";
-		offfadeClass.style.display = "none";	
+		numberClass.style.display = \"none\";
+		timeonClass.style.display = \"none\";
+		timeoffClass.style.display = \"none\";
+		multiplierClass.style.display = \"none\";
+		onfadeClass.style.display = \"none\";
+		offfadeClass.style.display = \"none\";	
 	} else if ((selectedValue === "50") || (selectedValue === "51")) {
-		numberClass.style.display = "none";
-		timeonClass.style.display = "block";
-		timeoffClass.style.display = "block";
-		multiplierClass.style.display = "block";
-		onfadeClass.style.display = "block";
-		offfadeClass.style.display = "block";
+		numberClass.style.display = \"none\";
+		timeonClass.style.display = \"block\";
+		timeoffClass.style.display = \"block\";
+		multiplierClass.style.display = \"block\";
+		onfadeClass.style.display = \"block\";
+		offfadeClass.style.display = \"block\";
 	} else if ((selectedValue === "52") || (selectedValue === "53") || (selectedValue === "54") || (selectedValue === "55")) {
-		numberClass.style.display = "block";
-		timeonClass.style.display = "block";
-		timeoffClass.style.display = "block";
-		multiplierClass.style.display = "block";
-		onfadeClass.style.display = "none";
-		offfadeClass.style.display = "none";	
+		numberClass.style.display = \"block\";
+		timeonClass.style.display = \"block\";
+		timeoffClass.style.display = \"block\";
+		multiplierClass.style.display = \"block\";
+		onfadeClass.style.display = \"none\";
+		offfadeClass.style.display = \"none\";	
 		
 	} else if ((selectedValue === "60") || (selectedValue === "61")) {
-		numberClass.style.display = "block";
-		timeonClass.style.display = "block";
-		timeoffClass.style.display = "block";
-		multiplierClass.style.display = "block";
-		onfadeClass.style.display = "none";
-		offfadeClass.style.display = "none";
+		numberClass.style.display = \"block\";
+		timeonClass.style.display = \"block\";
+		timeoffClass.style.display = \"block\";
+		multiplierClass.style.display = \"block\";
+		onfadeClass.style.display = \"none\";
+		offfadeClass.style.display = \"none\";
 		
 	} else if ((selectedValue === "62")) {
-		numberClass.style.display = "block";
-		timeonClass.style.display = "none";
-		timeoffClass.style.display = "none";
-		multiplierClass.style.display = "block";
-		onfadeClass.style.display = "block";
-		offfadeClass.style.display = "block";	
+		numberClass.style.display = \"block\";
+		timeonClass.style.display = \"none\";
+		timeoffClass.style.display = \"none\";
+		multiplierClass.style.display = \"block\";
+		onfadeClass.style.display = \"block\";
+		offfadeClass.style.display = \"block\";	
 
 	} else if ((selectedValue === "81")) {
-		numberClass.style.display = "none";
-		timeonClass.style.display = "block";
-		timeoffClass.style.display = "block";
-		multiplierClass.style.display = "block";
-		onfadeClass.style.display = "none";
-		offfadeClass.style.display = "none";
+		numberClass.style.display = \"none\";
+		timeonClass.style.display = \"block\";
+		timeoffClass.style.display = \"block\";
+		multiplierClass.style.display = \"block\";
+		onfadeClass.style.display = \"none\";
+		offfadeClass.style.display = \"none\";
 		
 	} else {
-		numberClass.style.display = "block";
-		timeonClass.style.display = "block";
-		timeoffClass.style.display = "block";
-		multiplierClass.style.display = "block";
-		onfadeClass.style.display = "block";
-		offfadeClass.style.display = "block";	
+		numberClass.style.display = \"block\";
+		timeonClass.style.display = \"block\";
+		timeoffClass.style.display = \"block\";
+		multiplierClass.style.display = \"block\";
+		onfadeClass.style.display = \"block\";
+		offfadeClass.style.display = \"block\";	
 	}
 }
