@@ -12,6 +12,7 @@
 #include "Blinkers.h"
 #include "SBB_Signals.h"
 #include "Turnouts.h"
+#include "Watchdog.h"
 #include "NMRAhandling.h"
 
 char Version[] = "0.0.0.1 (2023-11-01)";
@@ -169,6 +170,10 @@ void zDecoderInit(void) {
 			switch (_Mode) {
 			case 0:
 				_Channel += _Count;
+				break;
+			case 1:			// einfacher Ausgang
+				decoder.PushBack(new Watchdog(_Address, _Channel, _Multiplier * _TimeOn));
+				_Channel += 1;
 				break;
 			case 40:			// einfacher Ausgang
 				decoder.PushBack(new Ausgang(_Address, _Channel));

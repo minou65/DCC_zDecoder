@@ -213,6 +213,9 @@ void handleRoot(){
             _count += atoi(group->NumberValue);
             _i += 1;
         }
+        else {
+            
+        }
         group = (ActionGroup*)group->getNext();
     }
 
@@ -306,7 +309,7 @@ void handleGroups() {
     ActionGroup* _group = &OutputGroup1;
     while (_group != nullptr)
     {
-        if ((_group->isActive()) && (_group->ModeValue != 0)) {
+        if ((_group->isActive()) && (_group->ModeValue >= 10)) {
             String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
             if (ChannelIsOn(_i - 1)) {
                 _b.replace("red", "green");

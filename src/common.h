@@ -17,6 +17,7 @@ extern char Version[];
 
 static char DecoderModeValues[][STRING_LEN] = {
     "0",
+    "1",
     "40",
     "50",
     "51",
@@ -42,7 +43,8 @@ static char DecoderModeValues[][STRING_LEN] = {
 };
 
 static char DecoderModeNames[][STRING_LEN] = {
-    "-"
+    "-",
+    "Watchdog",
     "einfacher Ausgang (1)",  // ok
     "Blinker (1)",  // ok, fading ok
     "Wechselblinker (2)", // ok
