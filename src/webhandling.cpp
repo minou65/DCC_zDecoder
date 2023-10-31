@@ -74,7 +74,14 @@ const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM =
 "   var onfadeClass = document.getElementsByClassName(id + '-onfade')[0];\n"
 "   var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];\n"
 "\n"
-"	if ((selectedValue === \"40\") || (selectedValue === \"80\") || (selectedValue === \"82\")) {\n"
+"   if (selectedValue === \"0\") {\n"
+"		numberClass.style.display = \"block\";\n"
+"		timeonClass.style.display = \"none\";\n"
+"		timeoffClass.style.display = \"none\";\n"
+"		multiplierClass.style.display = \"none\";\n"
+"		onfadeClass.style.display = \"none\";\n"
+"		offfadeClass.style.display = \"none\";\n"
+"	} else if ((selectedValue === \"40\") || (selectedValue === \"80\") || (selectedValue === \"82\")) {\n"
 "		numberClass.style.display = \"none\";\n"
 "		timeonClass.style.display = \"none\";\n"
 "		timeoffClass.style.display = \"none\";\n"
@@ -189,10 +196,19 @@ void handleRoot(){
         if (group->isActive()) {
             s += "<div>Output group " + String(_i) + "</div>";
             s += "<ul>";
+            if (_group->ModeValue != 0) {
                 s += "<li>Designation: " + String(group->DesignationValue) + "</li>";
-                s += "<li>Mode: " + String(group->ModeValue) + "</li>";
-                s += "<li>Number of outputs: " + String(group->NumberValue) + "</li>";
+            }
+            else {
+                s += "<li>Designation:  - </li>";
+            }
+
+            s += "<li>Mode: " + String(group->ModeValue) + "</li>";
+            s += "<li>Number of outputs: " + String(group->NumberValue) + "</li>";
+            if (_group->ModeValue != 0) {
                 s += "<li>DCC Address: " + String(group->AddressValue) + +"</li>";
+            }
+            
             s += "</ul>";
             _count += atoi(group->NumberValue);
             _i += 1;
@@ -290,7 +306,7 @@ void handleGroups() {
     ActionGroup* _group = &OutputGroup1;
     while (_group != nullptr)
     {
-        if (_group->isActive()) {
+        if ((_group->isActive()) && (_group->ModeValue != 0)) {
             String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
             if (ChannelIsOn(_i - 1)) {
                 _b.replace("red", "green");

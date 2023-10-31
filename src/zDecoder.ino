@@ -167,6 +167,9 @@ void zDecoderInit(void) {
 
             // Einrichten des Ports
 			switch (_Mode) {
+			case 0:
+				_Channel += _Count;
+				break;
 			case 40:			// einfacher Ausgang
 				decoder.PushBack(new Ausgang(_Address, _Channel));
 				_Channel += 1;

@@ -16,6 +16,7 @@ extern bool ResetDCCDecoder;
 extern char Version[];
 
 static char DecoderModeValues[][STRING_LEN] = {
+    "0",
     "40",
     "50",
     "51",
@@ -41,6 +42,7 @@ static char DecoderModeValues[][STRING_LEN] = {
 };
 
 static char DecoderModeNames[][STRING_LEN] = {
+    "-"
     "einfacher Ausgang (1)",  // ok
     "Blinker (1)",  // ok, fading ok
     "Wechselblinker (2)", // ok
