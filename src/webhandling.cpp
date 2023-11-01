@@ -31,7 +31,7 @@ const char wifiInitialApPassword[] = "123456789";
 
 // -- When CONFIG_PIN is pulled to ground on startup, the Thing will use the initial
 //      password to buld an AP. (E.g. in case of lost password)
-#define CONFIG_PIN GPIO_NUM_4
+#define CONFIG_PIN -1
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
@@ -203,7 +203,7 @@ void handleRoot(){
         if (group->isActive()) {
             s += "<div>Output group " + String(_i) + "</div>";
             s += "<ul>";
-            if (_group->ModeValue != 0) {
+            if (group->ModeValue != 0) {
                 s += "<li>Designation: " + String(group->DesignationValue) + "</li>";
             }
             else {
@@ -212,7 +212,7 @@ void handleRoot(){
 
             s += "<li>Mode: " + String(group->ModeValue) + "</li>";
             s += "<li>Number of outputs: " + String(group->NumberValue) + "</li>";
-            if (_group->ModeValue != 0) {
+            if (group->ModeValue != 0) {
                 s += "<li>DCC Address: " + String(group->AddressValue) + +"</li>";
             }
             
@@ -221,6 +221,14 @@ void handleRoot(){
             _i += 1;
         }
         else {
+            group->DesignationParam.applyDefaultValue();
+            group->ModeParam.applyDefaultValue();
+            group->NumberParam.applyDefaultValue();
+            group->AddressParam.applyDefaultValue();
+            group->TimeOnParam.applyDefaultValue();
+            group->TimeOffParam.applyDefaultValue();
+            group->TimeOnFadeParam.applyDefaultValue();
+            group->TimeOffFadeParam.applyDefaultValue();
             
         }
         group = (ActionGroup*)group->getNext();
@@ -316,13 +324,13 @@ void handleGroups() {
     ActionGroup* _group = &OutputGroup1;
     while (_group != nullptr)
     {
-        if ((_group->isActive()) && (_group->ModeValue >= 10)) {
+        if ((_group->isActive()) && (int(_group->ModeValue) >= 10)) {
             String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
             if (ChannelIsOn(_i - 1)) {
                 _b.replace("red", "green");
             }
             String _bText = String(_group->DesignationValue) + " (" + String(_group->ModeValue) + ")";
-                _b.replace("[Text]", _bText);
+            _b.replace("[Text]", _bText);
 
             _s += _b;
             _s += "<br><br>";
