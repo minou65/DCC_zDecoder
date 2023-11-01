@@ -128,7 +128,7 @@ private:
         String result = "<script>hideClass('%s')</script>\n";
         result.replace("%s", this->getId());
 
-        result += OptionalParameterGroup::getEndTemplate();
+        result += ChainedParameterGroup::getEndTemplate();
 
         return result;
 
