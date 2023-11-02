@@ -11,16 +11,17 @@
 
 #include "accessories.h"
 #include "neotimer.h"
-#include "LEDControl.h"
+#include "CoilControl.h"
 
 class Watchdog : public accessories {
 private:
 	Neotimer timer;
 	uint16_t Interval;
 
-	LED Output;
+	Coil Output;
 public:
 	Watchdog(uint16_t BaseAddress_, byte BaseChannel_, uint16_t Interval_);
+	~Watchdog();
 
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	void process();

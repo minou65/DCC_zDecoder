@@ -24,6 +24,11 @@ UnCoupler::UnCoupler(int8_t Port_, int8_t Address_, uint16_t PulsTime_) :
 	off();
 }
 
+UnCoupler::~UnCoupler() {
+	accessories::~accessories();
+	coil.~CoilPulsed();
+}
+
 void UnCoupler::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {
 	if ((Address_ >= BaseAddress) && (Address_ < (BaseAddress + 1)) && OutputPower_) {
 		if (Direction_) {
@@ -74,6 +79,12 @@ Turnout::Turnout(int8_t RPort_, int8_t GPort_, int8_t Address_, uint16_t PulsTim
 	Serial.println("Turnout::Turnout");
 }
 
+Turnout::~Turnout() {
+	accessories::~accessories();
+	coil1.~CoilPulsed();
+	coil2.~CoilPulsed();
+}
+
 void Turnout::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_){
 	if ((Address_ >= BaseAddress) && (Address_ < (BaseAddress + 1)) && OutputPower_) {
 		if (Direction_) {
@@ -110,17 +121,24 @@ void Turnout::off(){
 
 TurnoutServo::TurnoutServo(int8_t ServoPort_, int8_t Address_, int8_t limit1_, int8_t limit2_, int8_t travelTime_) :
 	accessories(Address_, ServoPort_, 230),
-	servo(ServoPort_, limit1_, limit2_, travelTime_, SERVO_INITMID) {
+	// servo(ServoPort_, limit1_, limit2_, travelTime_, SERVO_INITMID)
+	servo(ServoPort_, 1, 180, 5, SERVO_INITMID)
+{
+
+	Serial.println("TurnoutServo::TurnoutServo");
+	Serial.print("    Port: "); Serial.println(ServoPort_);
+
+	servo.setActive(true);
 
 }
 
+TurnoutServo::~TurnoutServo() {
+	accessories::~accessories();
+	servo.~ServoControl();	
+}
+
 void TurnoutServo::process(){
-	if (servo.isAbsolute()) {
-		servo.setPosition(percentage);
-	}
-	else {
-		servo.setSpeed(percentage, ForwardDir != 0);
-	}
+	servo.loop();
 }
 
 void TurnoutServo::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_){
@@ -141,11 +159,29 @@ void TurnoutServo::notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardD
 }
 
 void TurnoutServo::on(){
-	IsActive = true;
-	servo.setActive(IsActive);
+	accessories::on();
+	Serial.println("TurnoutServo::on");
+
+	percentage = 10;
+
+	if (servo.isAbsolute()) {
+		servo.setPosition(percentage);
+	}
+	else {
+		servo.setSpeed(percentage, true);
+	}
 }
 
 void TurnoutServo::off(){
-	IsActive = false;
-	servo.setActive(IsActive);
+	accessories::off();
+	Serial.println("TurnoutServo::off");
+
+	percentage = 90;
+
+	if (servo.isAbsolute()) {
+		servo.setPosition(percentage);
+	}
+	else {
+		servo.setSpeed(percentage, false);
+	}
 }

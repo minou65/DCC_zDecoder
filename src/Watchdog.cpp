@@ -12,6 +12,12 @@ Watchdog::Watchdog(uint16_t BaseAddress_, byte BaseChannel_, uint16_t Interval_)
 	timer.start(Interval);
 }
 
+Watchdog::~Watchdog() {
+	accessories::~accessories();
+	Output.~Coil();
+	timer.~Neotimer();
+}
+
 void Watchdog::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 	// Watchdog starten
 	if (Address_ == BaseAddress) {

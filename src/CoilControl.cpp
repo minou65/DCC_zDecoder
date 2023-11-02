@@ -3,15 +3,17 @@
 // 
 
 #include "CoilControl.h"
-
-static uint8_t ChannelToGPIOMapping[16] = { GPIO_NUM_16, GPIO_NUM_17, GPIO_NUM_18, GPIO_NUM_19, GPIO_NUM_21, GPIO_NUM_22, GPIO_NUM_23, GPIO_NUM_26, GPIO_NUM_27, GPIO_NUM_25, GPIO_NUM_33, GPIO_NUM_32, GPIO_NUM_35, GPIO_NUM_34, GPIO_NUM_39, GPIO_NUM_36 };
-
+#include "pinmapping.h"
 
 Coil::Coil() :
 	GPIO(ChannelToGPIOMapping[1]) {
 
 	pinMode(GPIO, OUTPUT);
 	digitalWrite(GPIO, LOW);
+}
+
+Coil::~Coil() {
+
 }
 
     
@@ -60,6 +62,7 @@ CoilPulsed::CoilPulsed(const int8_t GPIO_, const uint16_t PulsLength_) :
 }
 
 CoilPulsed::~CoilPulsed(){
+	Coil::~Coil();
 	Puls.~Neotimer();
 }
 
