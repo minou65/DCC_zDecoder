@@ -12,6 +12,10 @@
 #define STRING_LEN 30
 #define NUMBER_LEN 5
 
+// -- When CONFIG_PIN is pulled to ground on startup, the Thing will use the initial
+//      password to buld an AP. (E.g. in case of lost password)
+#define CONFIG_PIN GPIO_NUM_35
+
 extern bool ResetDCCDecoder;
 extern char Version[];
 
