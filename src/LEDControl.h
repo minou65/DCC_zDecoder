@@ -69,6 +69,7 @@ public:
 
 	LEDFader(const uint8_t Channel_);
 	LEDFader(const uint8_t Channel_, uint8_t Brightness_, uint16_t fadeUpTime_ = 1000, uint16_t fadeDownTime_ = 1000);
+	~LEDFader();
 
 	// Muss regelmässig aufgerufen werden
 	void process();
@@ -127,6 +128,7 @@ protected:
 
 public:
 	Natrium(const uint8_t Channel_, const bool MalFunction_, uint8_t fadeOnIntervall_, uint8_t fadeOffIntervall_);
+	~Natrium();
 	void process();
 	void on();
 	void off();
@@ -148,6 +150,7 @@ protected:
 
 public:
 	Neon(const uint8_t Channel_, const bool MalFunction_);
+	~Neon();
 	void process();
 	void on();
 	void off();

@@ -20,6 +20,7 @@ private:
 
 public:
 	Ausgang(uint16_t BaseAddress_, uint8_t BaseChannel_);
+	~Ausgang();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	void on();
 	void off();
@@ -45,6 +46,7 @@ public:
 	Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_);
 	Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t Mode_);
 	Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_, uint8_t Mode_);
+	~Blinker();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	void process();
 
@@ -64,6 +66,7 @@ private:
 public:
 	Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_);
 	Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_);
+	~Wechselblinker();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	void process();
 	void on();
@@ -137,6 +140,7 @@ public:
 class Fernseher : public Blinker {
 public:
 	Fernseher(uint16_t BaseAddress_, uint8_t BaseChannel_);
+	~Fernseher();
 	void process();
 	void on();
 	void off();
@@ -176,6 +180,7 @@ private:
 
 public:
 	Schweissen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint64_t minRandomPause_, uint64_t maxRandomPause_);
+	~Schweissen();
 	void process();
 	void on();
 	void off();
@@ -256,6 +261,7 @@ private:
 
 public:
 	Feuer(uint16_t BaseAddress_, uint8_t BaseChannel_);
+	~Feuer();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	void process();
 	void off();

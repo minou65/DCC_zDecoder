@@ -15,6 +15,10 @@ Ausgang::Ausgang(uint16_t BaseAddress_, uint8_t BaseChannel_):
 	off();
 };
 
+Ausgang::~Ausgang() {
+	Output.~LED();
+}
+
 void Ausgang::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 
 	// Einschalten
@@ -76,7 +80,11 @@ Blinker::Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_,
 	LED1(BaseChannel_, PWM_Set_On, fadeUpTime_, fadeDownTime_) {
 
 	off();
-};
+}
+Blinker::~Blinker(){
+	LED1.~LEDFader();
+	BlinkTimer.~Neotimer();
+}
 
 void Blinker::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 
@@ -137,6 +145,11 @@ Wechselblinker::Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint
 	Blinker(BaseAddress_, BaseChannel_, timeOff_, timeOn_, 51),
 	LED2(BaseChannel_ + 1, PWM_Set_On, 0, 0) {
 };
+
+Wechselblinker::~Wechselblinker() {
+	Blinker::~Blinker();
+	LED2.~LEDFader();
+}
 
 Wechselblinker::Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_) :
 	Blinker(BaseAddress_, BaseChannel_, timeOff_, timeOn_, 51),
@@ -239,6 +252,7 @@ Lauflicht::~Lauflicht() {
 	off();
 
 	for (int i = 0; i < LEDs.Size(); i++) {
+		LEDs[i]->~LEDFader();
 		delete LEDs[i];
 	};
 	
@@ -247,6 +261,9 @@ Lauflicht::~Lauflicht() {
 
 	// Speicher von decoder freigeben
 	Vector<LEDFader*>().Swap(LEDs);
+
+	OperationTimer.~Neotimer();
+	LEDs.~Vector();
 };
 
 void Lauflicht::notifyAddress(uint16_t Address_, uint8_t cmd_) {
@@ -412,6 +429,7 @@ Hausbeleuchtung::~Hausbeleuchtung() {
 	off();
 
 	for (int i = 0; i < LEDs.Size(); i++) {
+		LEDs[i]->~LED();
 		delete LEDs[i];
 	};
 
@@ -420,6 +438,9 @@ Hausbeleuchtung::~Hausbeleuchtung() {
 
 	// Speicher von decoder freigeben
 	Vector<LED*>().Swap(LEDs);
+
+	OperationTimer.~Neotimer();
+	LEDs.~Vector();
 };
 
 void Hausbeleuchtung::notifyAddress(uint16_t Address_, uint8_t cmd_) {
@@ -503,7 +524,10 @@ Fernseher::Fernseher(uint16_t BaseAddress_, uint8_t BaseChannel_) :
 	Blinker(BaseAddress_, BaseChannel_, 0, 0, 0, 0, 80) {
 
 	randomSeed(esp_random());
-};
+}
+Fernseher::~Fernseher(){
+	Blinker::~Blinker();
+}
 
 void Fernseher::process() {
 	LED1.process();
@@ -553,6 +577,12 @@ Schweissen::Schweissen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint64_t min
 	LED3.off();
 
 };
+
+Schweissen::~Schweissen() {
+	Blinker::~Blinker();
+	LED2.~LEDFader();
+	LED3.~LEDFader();
+}
 
 void Schweissen::process() {
 
@@ -704,6 +734,7 @@ NeonLampen::NeonLampen(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anz
 
 NeonLampen::~NeonLampen() {
 	for (int i = 0; i < Lampen.Size(); i++) {
+		Lampen[i]->~Neon();
 		delete Lampen[i];
 	}
 
@@ -712,6 +743,8 @@ NeonLampen::~NeonLampen() {
 
 	// Speicher von decoder freigeben
 	Vector<Neon*>().Swap(Lampen);
+	Lampen.~Vector();
+
 }
 
 void NeonLampen::notifyAddress(uint16_t Address_, uint8_t cmd_) {
@@ -805,6 +838,7 @@ NatriumLampen::~NatriumLampen() {
 	off();
 
 	for (int i = 0; i < Lampen.Size(); i++) {
+		Lampen[i]->~Natrium();
 		delete Lampen[i];
 	};
 
@@ -813,6 +847,7 @@ NatriumLampen::~NatriumLampen() {
 
 	// Speicher von decoder freigeben
 	Vector<Natrium*>().Swap(Lampen);
+	Lampen.~Vector();
 }
 
 void NatriumLampen::notifyAddress(uint16_t Address_, uint8_t cmd_) {
@@ -864,6 +899,12 @@ Feuer::Feuer(uint16_t BaseAddress_, uint8_t BaseChannel_):
 	Blinker(BaseAddress_, BaseChannel_, 0, 0, 0, 0, 82),
 	LED2(BaseChannel_ + 1, PWM_Set_On, 0, 0),
 	LED3(BaseChannel_ + 2, PWM_Set_On, 0, 0) {
+}
+
+Feuer::~Feuer() {
+	Blinker::~Blinker();
+	LED2.~LEDFader();
+	LED3.~LEDFader();
 }
 
 void Feuer::notifyAddress(uint16_t Address_, uint8_t cmd_) {

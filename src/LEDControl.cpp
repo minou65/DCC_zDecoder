@@ -1,25 +1,5 @@
 #include "LEDControl.h"
-
-static uint8_t ChannelToGPIOMapping[16] = { 
-	GPIO_NUM_16, 
-	GPIO_NUM_17, 
-	GPIO_NUM_18, 
-	GPIO_NUM_19, 
-	GPIO_NUM_21, 
-	GPIO_NUM_22, 
-	GPIO_NUM_23, 
-	GPIO_NUM_26,
-
-	GPIO_NUM_12,
-	GPIO_NUM_13, 
-	GPIO_NUM_14, 
-	GPIO_NUM_4, 
-	GPIO_NUM_25, 
-	GPIO_NUM_27, 
-	GPIO_NUM_32, 
-	GPIO_NUM_33
-
-};
+#include "pinmapping.h"
 
 // ===========================================
 // LED
@@ -77,6 +57,12 @@ LEDFader::LEDFader(const uint8_t Channel_) :
 	SetFadeTime(500, 500, fadeUpIntervall, fadeDownIntervall);
 
 	off();
+}
+
+LEDFader::~LEDFader() {
+	LED::~LED();
+	fadeUpTimer.~Neotimer();
+	fadeDownTimer.~Neotimer();
 }
 
 LEDFader::LEDFader(const uint8_t Channel_, uint8_t Brightness_, uint16_t fadeUpTime_, uint16_t fadeDownTime_) :
@@ -288,6 +274,12 @@ Natrium::Natrium(const uint8_t Channel_, const bool  IsMalFunction_, uint8_t fad
 	off(true);
 };
 
+Natrium::~Natrium() {
+	LEDFader::~LEDFader();
+	Malfunctiontimer.~Neotimer();
+	Operationtimer.~Neotimer();
+}
+
 void Natrium::process() {
 
 	LEDFader::process();
@@ -385,7 +377,11 @@ void Natrium::off(bool force_) {
 Neon::Neon(const uint8_t Channel_, const bool MalFunction_) :
 	LED(Channel_),
 	IsMalFunction(MalFunction_) {
-};
+}
+Neon::~Neon(){
+	LED::~LED();
+	Operationtimer.~Neotimer();
+}
 
 void Neon::process() {
 
