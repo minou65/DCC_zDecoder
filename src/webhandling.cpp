@@ -27,11 +27,7 @@ const char wifiInitialApPassword[] = "123456789";
 
 
 // -- Configuration specific key. The value should be modified if config structure was changed.
-#define CONFIG_VERSION "004"
-
-// -- When CONFIG_PIN is pulled to ground on startup, the Thing will use the initial
-//      password to buld an AP. (E.g. in case of lost password)
-#define CONFIG_PIN -1
+#define CONFIG_VERSION "005"
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
@@ -363,11 +359,7 @@ void handleGroups() {
     server.send(200, "text/html", _s);
 }
 
-void websetup()
-{
-    Serial.begin(115200);
-    Serial.println();
-    Serial.println("Starting up...");
+void websetup(){
 
     OutputGroup1.setNext(&OutputGroup2);
     OutputGroup2.setNext(&OutputGroup3);
@@ -408,7 +400,6 @@ void websetup()
     // -- Set up required URL handlers on the web server.
     server.on("/", handleRoot);
     server.on("/config", [] { iotWebConf.handleConfig(); });
-    server.on("/Groups", handleGroups);
     server.on("/groups", handleGroups);
     server.on("/1", HTTP_POST, handle1);
     server.on("/2", HTTP_POST, handle2);
@@ -421,8 +412,6 @@ void websetup()
     server.on("/9", HTTP_POST, handle9);
     server.on("/10", HTTP_POST, handle10);
     server.onNotFound([]() { iotWebConf.handleNotFound(); });
-
-    Serial.println("Ready.");
 }
 
 void webloop(){
