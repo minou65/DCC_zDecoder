@@ -13,7 +13,6 @@ Watchdog::Watchdog(uint16_t BaseAddress_, byte BaseChannel_, uint16_t Interval_)
 }
 
 Watchdog::~Watchdog() {
-	accessories::~accessories();
 	Output.~Coil();
 	timer.~Neotimer();
 }
