@@ -11,11 +11,6 @@ Coil::Coil() :
 	pinMode(GPIO, OUTPUT);
 	digitalWrite(GPIO, LOW);
 }
-
-Coil::~Coil() {
-
-}
-
     
 Coil::Coil(const int8_t GPIO_) :
 	GPIO(ChannelToGPIOMapping[GPIO_]) {
@@ -62,7 +57,6 @@ CoilPulsed::CoilPulsed(const int8_t GPIO_, const uint16_t PulsLength_) :
 }
 
 CoilPulsed::~CoilPulsed(){
-	Coil::~Coil();
 	Puls.~Neotimer();
 }
 

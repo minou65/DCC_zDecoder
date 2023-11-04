@@ -25,7 +25,6 @@ UnCoupler::UnCoupler(int8_t Port_, int8_t Address_, uint16_t PulsTime_) :
 }
 
 UnCoupler::~UnCoupler() {
-	accessories::~accessories();
 	coil.~CoilPulsed();
 }
 
@@ -80,7 +79,6 @@ Turnout::Turnout(int8_t RPort_, int8_t GPort_, int8_t Address_, uint16_t PulsTim
 }
 
 Turnout::~Turnout() {
-	accessories::~accessories();
 	coil1.~CoilPulsed();
 	coil2.~CoilPulsed();
 }
@@ -133,7 +131,6 @@ TurnoutServo::TurnoutServo(int8_t ServoPort_, int8_t Address_, int8_t limit1_, i
 }
 
 TurnoutServo::~TurnoutServo() {
-	accessories::~accessories();
 	servo.~ServoControl();	
 }
 

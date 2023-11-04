@@ -60,7 +60,6 @@ LEDFader::LEDFader(const uint8_t Channel_) :
 }
 
 LEDFader::~LEDFader() {
-	LED::~LED();
 	fadeUpTimer.~Neotimer();
 	fadeDownTimer.~Neotimer();
 }
@@ -275,7 +274,6 @@ Natrium::Natrium(const uint8_t Channel_, const bool  IsMalFunction_, uint8_t fad
 };
 
 Natrium::~Natrium() {
-	LEDFader::~LEDFader();
 	Malfunctiontimer.~Neotimer();
 	Operationtimer.~Neotimer();
 }
@@ -379,7 +377,6 @@ Neon::Neon(const uint8_t Channel_, const bool MalFunction_) :
 	IsMalFunction(MalFunction_) {
 }
 Neon::~Neon(){
-	LED::~LED();
 	Operationtimer.~Neotimer();
 }
 

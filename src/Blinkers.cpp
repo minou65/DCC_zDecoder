@@ -146,11 +146,6 @@ Wechselblinker::Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint
 	LED2(BaseChannel_ + 1, PWM_Set_On, 0, 0) {
 };
 
-Wechselblinker::~Wechselblinker() {
-	Blinker::~Blinker();
-	LED2.~LEDFader();
-}
-
 Wechselblinker::Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_) :
 	Blinker(BaseAddress_, BaseChannel_, timeOff_, timeOn_, 51),
 	LED2(BaseChannel_ + 1, PWM_Set_On, fadeUpTime_, fadeDownTime_) {
@@ -159,6 +154,10 @@ Wechselblinker::Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint
 	LED2.SetFadeMultiplikator(1);
 	LED1.SetFadeTime(fadeUpTime_, fadeDownTime_, 10, 10);
 	LED2.SetFadeTime(fadeUpTime_, fadeDownTime_, 10, 10);
+}
+
+Wechselblinker::~Wechselblinker() {
+	LED2.~LEDFader();
 }
 
 void Wechselblinker::notifyAddress(uint16_t Address_, uint8_t cmd_) {
@@ -526,7 +525,7 @@ Fernseher::Fernseher(uint16_t BaseAddress_, uint8_t BaseChannel_) :
 	randomSeed(esp_random());
 }
 Fernseher::~Fernseher(){
-	Blinker::~Blinker();
+
 }
 
 void Fernseher::process() {
@@ -579,7 +578,6 @@ Schweissen::Schweissen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint64_t min
 };
 
 Schweissen::~Schweissen() {
-	Blinker::~Blinker();
 	LED2.~LEDFader();
 	LED3.~LEDFader();
 }
@@ -902,7 +900,6 @@ Feuer::Feuer(uint16_t BaseAddress_, uint8_t BaseChannel_):
 }
 
 Feuer::~Feuer() {
-	Blinker::~Blinker();
 	LED2.~LEDFader();
 	LED3.~LEDFader();
 }
