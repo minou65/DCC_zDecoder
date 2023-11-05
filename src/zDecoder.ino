@@ -5,6 +5,7 @@
 */
 
 
+#include "pinmapping.h"
 #include "webhandling.h"
 #include "Vector.h"  // https://github.com/tomstewart89/Vector/fork
 #include <NmraDcc.h>
@@ -134,6 +135,21 @@ void handleChannel(uint8_t Channel_) {
 
 bool ChannelIsOn(uint8_t Channel_) {
 	return decoder[Channel_]->isOn();
+}
+
+void zDecoderReset() {
+	ActionGroup* _group = &OutputGroup1;
+	while (_group != nullptr) {
+		_group->DesignationParam.applyDefaultValue();
+		_group->ModeParam.applyDefaultValue();
+		_group->NumberParam.applyDefaultValue();
+		_group->AddressParam.applyDefaultValue();
+		_group->TimeOnParam.applyDefaultValue();
+		_group->TimeOffParam.applyDefaultValue();
+		_group->TimeOnFadeParam.applyDefaultValue();
+		_group->TimeOffFadeParam.applyDefaultValue();
+		_group = (ActionGroup*)_group->getNext();
+	}
 }
 
 void zDecoderInit(void) {
@@ -281,10 +297,27 @@ void zDecoderInit(void) {
 };
 
 void setup() {
+	Serial.begin(115200);
+	Serial.println();
+	Serial.println("Starting up...");
+
 	NMRAsetup();
+	Serial.println("NMRA initalized");
+
 	websetup();
+	Serial.println("web server initalized");
+
+	if (CONFIG_PIN >= 0) {
+		pinMode(CONFIG_PIN, INPUT_PULLUP);
+		if (digitalRead(CONFIG_PIN) == LOW) {
+			Serial.println("config pin was pressed, reset decoder");
+			zDecoderReset();
+		}
+	}
+
 
     zDecoderInit();
+	Serial.println("Decoder initalized");
 
 	xTaskCreatePinnedToCore(
 		loop2, /* Function to implement the task */
@@ -295,6 +328,8 @@ void setup() {
 		&TaskHandle,  /* Task handle. */
 		0 /* Core where the task should run */
 	);
+
+	Serial.println("Everything has been initialized");
 }
 
 void loop() {
@@ -303,9 +338,10 @@ void loop() {
 }
 
 void loop2(void* parameter) {
-	int _i = 0;
+
 	for (;;) {   // Endless loop
 		if (ResetDCCDecoder) {
+
 			zDecoderInit();
 			ResetDCCDecoder = false;
 		}
