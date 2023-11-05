@@ -27,7 +27,7 @@ const char wifiInitialApPassword[] = "123456789";
 
 
 // -- Configuration specific key. The value should be modified if config structure was changed.
-#define CONFIG_VERSION "005"
+#define CONFIG_VERSION "007"
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
@@ -56,6 +56,13 @@ ActionGroup OutputGroup7 = ActionGroup("og7");
 ActionGroup OutputGroup8 = ActionGroup("og8");
 ActionGroup OutputGroup9 = ActionGroup("og9");
 ActionGroup OutputGroup10 = ActionGroup("og10");
+
+ServoGroup ServoGroup1 = ServoGroup("sg1");
+ServoGroup ServoGroup2 = ServoGroup("sg2");
+ServoGroup ServoGroup3 = ServoGroup("sg3");
+ServoGroup ServoGroup4 = ServoGroup("sg4");
+ServoGroup ServoGroup5 = ServoGroup("sg5");
+ServoGroup ServoGroup6 = ServoGroup("sg6");
 
 IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION); 
 
@@ -230,6 +237,34 @@ void handleRoot(){
         group = (ActionGroup*)group->getNext();
     }
 
+    ServoGroup* _servogroup = &ServoGroup1;
+    while (_servogroup != nullptr)
+    {
+        if (_servogroup->isActive()) {
+            s += "<div>Servo group " + String(_i) + "</div>";
+            s += "<ul>";
+
+            s += "<li>DCC Address: " + String(_servogroup->AddressValue) + +"</li>";
+            s += "<li>Travel time: " + String(_servogroup->TravelTimeValue) + +"</li>";
+            s += "<li>Multiplier:  " + String(_servogroup->MultiplierValue) + +"</li>";
+            s += "<li>Limit 1:     " + String(_servogroup->Limit1Value) + +"</li>";
+            s += "<li>Limit 2:     " + String(_servogroup->Limit2Value) + +"</li>";
+
+            s += "</ul>";
+            _count += 1;
+            _i += 1;
+        }
+        else {
+            _servogroup->DesignationParam.applyDefaultValue();
+            _servogroup->AddressParam.applyDefaultValue();
+            _servogroup->TravelTimeParam.applyDefaultValue();
+            _servogroup->MultiplierParam.applyDefaultValue();
+            _servogroup->Limit1Param.applyDefaultValue();
+            _servogroup->Limit2Param.applyDefaultValue();
+
+        }
+        _servogroup = (ServoGroup*)_servogroup->getNext();
+    }
     s += F("Total outputs used: ");
     s += String(_count);
     s += "<br><br>";
@@ -335,6 +370,23 @@ void handleGroups() {
         _group = (ActionGroup*)_group->getNext();
     }
 
+    ServoGroup* _servogroup = &ServoGroup1;
+    while (_servogroup != nullptr) {
+        if (_servogroup->isActive()) {
+            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
+            if (ChannelIsOn(_i - 1)) {
+                _b.replace("red", "green");
+            }
+            String _bText = String(_servogroup->DesignationValue);
+            _b.replace("[Text]", _bText);
+
+            _s += _b;
+            _s += "<br><br>";
+            _i += 1;
+        }
+        _servogroup = (ServoGroup*)_servogroup->getNext();
+    }
+
     _s += "</form>";
 
     _s += HTML_End_Table;
@@ -371,6 +423,12 @@ void websetup(){
     OutputGroup8.setNext(&OutputGroup9);
     OutputGroup9.setNext(&OutputGroup10);
 
+    ServoGroup1.setNext(&ServoGroup2);
+    ServoGroup2.setNext(&ServoGroup3);
+    ServoGroup3.setNext(&ServoGroup4);
+    ServoGroup4.setNext(&ServoGroup5);
+    ServoGroup5.setNext(&ServoGroup6);
+
 
     iotWebConf.setStatusPin(STATUS_PIN);
     iotWebConf.setConfigPin(CONFIG_PIN);
@@ -387,6 +445,12 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup8);
     iotWebConf.addParameterGroup(&OutputGroup9);
     iotWebConf.addParameterGroup(&OutputGroup10);
+
+    iotWebConf.addParameterGroup(&ServoGroup1);
+    iotWebConf.addParameterGroup(&ServoGroup2);
+    iotWebConf.addParameterGroup(&ServoGroup3);
+    iotWebConf.addParameterGroup(&ServoGroup4);
+    iotWebConf.addParameterGroup(&ServoGroup5);
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setFormValidator(&formValidator);

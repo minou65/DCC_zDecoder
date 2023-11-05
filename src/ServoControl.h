@@ -28,54 +28,57 @@
 
 class ServoControl {
 private:
-    Servo servo;
+    Servo servo1;
     Neotimer TravelTimer;
 
-    int8_t GPIO;
+    uint8_t GPIO;
+    uint8_t Channel;
 
     bool IsActive;
 
-    int8_t limit1;     // Limit of travel in one direction
-    int8_t limit2;     // Limit of travel in the other direction
-    int8_t tlimit1;    // Limit of travel in one directionin tenths
-    int8_t tlimit2;    // Limit of travel in the other direction in tenths
-    uint16_t travelTime; // Total travel time between two limits in milliseconds
-    uint16_t interval;   // Time between steps of 1 degree in milliseconds
+    int limit1;     // Limit of travel in one direction
+    int limit2;     // Limit of travel in the other direction
+    int tlimit1;    // Limit of travel in one directionin tenths
+    int tlimit2;    // Limit of travel in the other direction in tenths
+    long travelTime; // Total travel time between two limits in milliseconds
+    int interval;   // Time between steps of 1 degree in milliseconds
 
     bool clockwise;  // Current direction is clockwise
-    int8_t percentage; // Current speed percentage
+    int percentage; // Current speed percentage
     bool moving;     // Servo is moving
 
-    int8_t angle;
+    int angle;
 
-    int8_t flags;	 // Configuration flags
+    unsigned int flags;	 // Configuration flags
 
-    int8_t blimit;
+    int blimit;
     bool bclockwise;
     bool bounced;
     bool bouncing;
-    int8_t bouncingSteps;
-    int8_t bouncingAngle;
-    int8_t bouncepoint;
+    int bouncingSteps;
+    int bouncingAngle;
+    int bouncepoint;
 
-    int8_t reported;
+    int reported;
 
 public:
     ServoControl() = default;
-    ServoControl(int8_t GPIO_, int8_t limit1_, int8_t limit2_, int8_t travelTime_, int8_t flags_);
-    void loop();
-    void setSpeed(int8_t percentage_, bool clockwise_);
+    ServoControl(int8_t Channel_, int limit1_, int limit2_, int travelTime_, unsigned int flags_ = SERVO_INITMID);
+    ~ServoControl();
+    void process();
     void setActive(bool active_);
-    void setStart(int8_t start_);
-    void setEnd(int8_t angle_);
-    void setFlags(int8_t flags_);
-    void setBounceAngle(int8_t angle_);
-    void setPosition(int8_t percentage_);
-    void setAngle(int8_t angle_);
-    int8_t getAngle();
-    void setTravelTime(int8_t time_);
+    void setStart(int start_);
+    void setEnd(int angle_);
+    void setFlags(int flags_);
+    void setBounceAngle(int angle_);
+    void setBouncingSteps(int steps_);
+    void setPosition(int percentage_);
+    void setPosition(int percentage_, bool clockwise_);
+    void setAngle(int angle_);
+    int getAngle();
+    void setTravelTime(int time_);
     boolean isAbsolute();
-    void writeTenths(int8_t tenth_);
+    void writeTenths(int tenth_);
 
 };
 

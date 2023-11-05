@@ -42,8 +42,7 @@ static char DecoderModeValues[][STRING_LEN] = {
     "110",
     "70",
     "201",
-    "202",
-    "230"
+    "202"
 };
 
 static char DecoderModeNames[][STRING_LEN] = {
@@ -71,7 +70,6 @@ static char DecoderModeNames[][STRING_LEN] = {
     "Strassen_Signal_70 (3)",
     "Entkuppler (1)", // ok
     "Weiche (2)",  // ok
-    "Servo (1)"
 };
 
 #endif

@@ -37,8 +37,8 @@ protected:
 public:
 	Turnout() = default;
 	Turnout(int8_t RPort_, int8_t GPort_);
-	Turnout(int8_t RPort_, int8_t GPort_, int8_t Address_);
-	Turnout(int8_t RPort_, int8_t GPort_, int8_t Address_, uint16_t PulsTime_);
+	Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_);
+	Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_, uint16_t PulsTime_);
 	~Turnout();
 	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
 	void process();
@@ -50,12 +50,12 @@ public:
 class TurnoutServo : public accessories {
 protected:
 	ServoControl servo;
-	uint16_t percentage;
-	uint8_t ForwardDir;
+
+	void MoveServo(uint16_t percentage_, bool clockwise_);
 
 public:
 	TurnoutServo() = default;
-	TurnoutServo(int8_t ServoPort_, int8_t Address_, int8_t limit1_, int8_t limit2_, int8_t travelTime_);
+	TurnoutServo(int8_t ServoPort_, uint16_t Address_, int16_t limit1_, int16_t limit2_, int16_t travelTime_);
 	~TurnoutServo();
 	void process();
 	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);

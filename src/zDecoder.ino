@@ -5,7 +5,6 @@
 */
 
 
-#include "pinmapping.h"
 #include "webhandling.h"
 #include "Vector.h"  // https://github.com/tomstewart89/Vector/fork
 #include <NmraDcc.h>
@@ -153,7 +152,7 @@ void zDecoderReset() {
 }
 
 void zDecoderInit(void) {
-	ActionGroup* _group = &OutputGroup1;
+
 	uint8_t _Channel = 0;
 
 	// Decoderobjekte in decoder löschen
@@ -161,28 +160,31 @@ void zDecoderInit(void) {
 	decoder.Clear();
 	Vector<accessories*>().Swap(decoder);
 
-    while (_group != nullptr) {
-		if (_Channel > 15)
+	ActionGroup* _group = &OutputGroup1;
+	while (_group != nullptr) {
+		if (_Channel > 15) {
+			Serial.println("no more free channels!");
 			break;
+		}
 
-        if (_group->isActive()) {
-            uint8_t _Mode = atoi(_group->ModeValue);
-            uint8_t _Count = atoi(_group->NumberValue);
-            uint8_t _Address = atoi(_group->AddressValue);
-            uint8_t _TimeOn = atoi(_group->TimeOnValue);
-            uint8_t _TimeOff = atoi(_group->TimeOffValue);
-            uint8_t _Multiplier = atoi(_group->MultiplierValue); // Multiplikator
-            uint8_t _TimeOnFade = atoi(_group->TimeOnFadeValue);
-            uint8_t _TimeOffFade = atoi(_group->TimeOffFadeValue);
+		if (_group->isActive()) {
+			uint8_t _Mode = atoi(_group->ModeValue);
+			uint8_t _Count = atoi(_group->NumberValue);
+			uint8_t _Address = atoi(_group->AddressValue);
+			uint8_t _TimeOn = atoi(_group->TimeOnValue);
+			uint8_t _TimeOff = atoi(_group->TimeOffValue);
+			uint8_t _Multiplier = atoi(_group->MultiplierValue); // Multiplikator
+			uint8_t _TimeOnFade = atoi(_group->TimeOnFadeValue);
+			uint8_t _TimeOffFade = atoi(_group->TimeOffFadeValue);
 
 			uint16_t _DayLightAddress = 0;
 			uint8_t _DayBrightness = 255;
 			uint8_t _NightBrightness = 150;
-            
+
 			Serial.print(F("Values for channel ")); Serial.print(_Channel); Serial.println(F(" preserved"));
 			Serial.print(F("    Channels used: ")); Serial.println(_Count);
 
-            // Einrichten des Ports
+			// Einrichten des Ports
 			switch (_Mode) {
 			case 0:
 				_Channel += _Count;
@@ -284,17 +286,43 @@ void zDecoderInit(void) {
 				_Channel += 2;
 				break;
 
-			case 230: // Servo
-				decoder.PushBack(new TurnoutServo(_Channel, _Address, 0, 180, _TimeOn));
-				_Channel += 1;
-				break;
-			}
 
-			Serial.print(F("next free channel is ")); Serial.println(_Channel);
-        }
-        _group = (ActionGroup*)_group->getNext();
-    }
-};
+				Serial.print(F("next channel is ")); Serial.println(_Channel);
+			}
+			
+		}
+		_group = (ActionGroup*)_group->getNext();
+	}
+
+	ServoGroup* _servogroup = &ServoGroup1;
+	while (_servogroup != nullptr) {
+		if (_Channel > 15) {
+			Serial.println("no more free channels!");
+			break;
+		}
+
+		if (_servogroup->isActive()) {
+
+			uint8_t _Address = atoi(_servogroup->AddressValue);
+			uint8_t _TravelTime = atoi(_servogroup->TravelTimeValue);
+			uint8_t _Multiplier = atoi(_servogroup->MultiplierValue); // Multiplikator
+			uint8_t _Limit1 = atoi(_servogroup->Limit1Value);
+			uint8_t _Limit2 = atoi(_servogroup->Limit2Value);
+			uint8_t _Count = 1;
+
+			Serial.print(F("Values for channel ")); Serial.print(_Channel); Serial.println(F(" preserved"));
+			Serial.print(F("    Channels used: ")); Serial.println(_Count);
+
+			decoder.PushBack(new TurnoutServo(_Channel, _Address, _Limit1, _Limit2, _Multiplier * _TravelTime));
+			_Channel += 1;
+
+			Serial.print(F("next channel is ")); Serial.println(_Channel);
+		}
+		_servogroup = (ServoGroup*)_servogroup->getNext();
+
+	}
+
+}
 
 void setup() {
 	Serial.begin(115200);

@@ -37,6 +37,73 @@ public:
     );
 };
 
+class ServoGroup : public iotwebconf::ChainedParameterGroup {
+public:
+    ServoGroup(const char* id) : ChainedParameterGroup(id, "Servo") {
+        // -- Update parameter Ids to have unique ID for all parameters within the application.
+        snprintf(DesignationId, STRING_LEN, "%s-designation", this->getId());
+        snprintf(AddressId, STRING_LEN, "%s-address", this->getId());
+        snprintf(TravelTimeId, STRING_LEN, "%s-traveltime", this->getId());
+        snprintf(MultiplierId, STRING_LEN, "%s-multiplier", this->getId());
+        snprintf(Limit1Id, STRING_LEN, "%s-limit1", this->getId());
+        snprintf(Limit2Id, STRING_LEN, "%s-limit2", this->getId());
+        snprintf(ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
+
+        // -- Add parameters to this group.
+        this->addItem(&this->DesignationParam);
+        this->addItem(&this->AddressParam);
+        this->addItem(&this->TravelTimeParam);
+        this->addItem(&this->MultiplierParam);
+        this->addItem(&this->Limit1Param);
+        this->addItem(&this->Limit2Param);
+    }
+
+    char DesignationValue[STRING_LEN];
+    char AddressValue[NUMBER_LEN];
+    char TravelTimeValue[NUMBER_LEN];
+    char MultiplierValue[NUMBER_LEN];
+    char Limit1Value[NUMBER_LEN];
+    char Limit2Value[NUMBER_LEN];
+
+    iotwebconf::TextParameter DesignationParam =
+        iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
+
+    iotwebconf::NumberParameter AddressParam =
+        iotwebconf::NumberParameter("DCC Address", AddressId, AddressValue, NUMBER_LEN, "3", "1..1024", "min='1' max='1024' step='1'");
+
+    iotwebconf::NumberParameter TravelTimeParam =
+        iotwebconf::NumberParameter("Travel time (ms)", TravelTimeId, TravelTimeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+
+    iotwebconf::NumberParameter MultiplierParam =
+        iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+
+    iotwebconf::NumberParameter Limit1Param =
+        iotwebconf::NumberParameter("Limit 1", Limit1Id, Limit1Value, NUMBER_LEN, "0", "0..180", "min='0' max='180' step='1'");
+
+    iotwebconf::NumberParameter Limit2Param =
+        iotwebconf::NumberParameter("Limit 2", Limit2Id, Limit2Value, NUMBER_LEN, "180", "1..180", "min='0' max='180' step='1'");
+
+private:
+    char DesignationId[STRING_LEN];
+    char AddressId[STRING_LEN];
+    char TravelTimeId[STRING_LEN];
+    char MultiplierId[STRING_LEN];
+    char Limit1Id[STRING_LEN];
+    char Limit2Id[STRING_LEN];
+    char ModeCustomHTML[STRING_LEN];
+
+    String getEndTemplate() override {
+
+        String result = "<script>hideClass('%s')</script>\n";
+        result.replace("%s", this->getId());
+
+        result += ChainedParameterGroup::getEndTemplate();
+
+        return result;
+
+    };
+};
+
 class ActionGroup : public iotwebconf::ChainedParameterGroup {
 public:
     ActionGroup(const char* id) : ChainedParameterGroup(id, "Output") {
@@ -145,6 +212,13 @@ extern ActionGroup OutputGroup7;
 extern ActionGroup OutputGroup8;
 extern ActionGroup OutputGroup9;
 extern ActionGroup OutputGroup10;
+
+extern ServoGroup ServoGroup1;
+extern ServoGroup ServoGroup2;
+extern ServoGroup ServoGroup3;
+extern ServoGroup ServoGroup4;
+extern ServoGroup ServoGroup5;
+extern ServoGroup ServoGroup6;
 
 #define HTML_Style \
 "<style>\
