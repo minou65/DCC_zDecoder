@@ -1,5 +1,5 @@
 #include "ServoControl.h"
-#include <Servo.h>
+#include "ESPServo.h"
 #include "pinmapping.h"
 
 ServoControl::ServoControl(int8_t Channel_, int limit1_, int limit2_, int travelTime_, unsigned int flags_) :
@@ -20,7 +20,7 @@ ServoControl::ServoControl(int8_t Channel_, int limit1_, int limit2_, int travel
     IsActive(false),
     flags(flags_) {
 
-
+   
     interval = travelTime / (max(tlimit1,tlimit2) - min(tlimit1, tlimit2));
 
     if (interval == 0)
@@ -28,16 +28,16 @@ ServoControl::ServoControl(int8_t Channel_, int limit1_, int limit2_, int travel
 
     switch (flags & (SERVO_INITL1 | SERVO_INITL2 | SERVO_INITMID)){
     case SERVO_INITL1:
-        servo1.attach(GPIO, Channel);
-        servo1.write(limit1);
+        espservo.attach(GPIO, Channel);
+        espservo.write(limit1);
         break;
     case SERVO_INITL2:
-        servo1.attach(GPIO, Channel);
-        servo1.write(limit2);
+        espservo.attach(GPIO, Channel);
+        espservo.write(limit2);
         break;
     case SERVO_INITMID:
-        servo1.attach(GPIO, Channel);
-        servo1.write(limit1 + (limit2 - limit1) / 2);
+        espservo.attach(GPIO, Channel);
+        espservo.write(limit1 + (limit2 - limit1) / 2);
         break;
     }
 
@@ -56,7 +56,7 @@ ServoControl::ServoControl(int8_t Channel_, int limit1_, int limit2_, int travel
 
 ServoControl::~ServoControl() {
     setActive(false);
-    servo1.~Servo();
+    espservo.~ESPServo();
     TravelTimer.~Neotimer();
 }
 
@@ -175,14 +175,14 @@ void ServoControl::setActive(bool active_){
     Serial.print("    active_: "); Serial.println(active_ ? "true" : "false");
         
     if ((active_ == true) && (IsActive == false)){
-        if (servo1.attach(GPIO, Channel)) {
+        if (espservo.attach(GPIO, Channel)) {
             Serial.println("    pin attached to channel");
             TravelTimer.start(interval);
         }
     }
     else if ((active_ == false) && (IsActive == true)) {
 
-        servo1.detach();
+        espservo.detach();
         TravelTimer.stop();
         Serial.println("    pin detattached from channel");
     }
@@ -287,6 +287,7 @@ void ServoControl::writeTenths(int tenth_) {
     Serial.println("ServoControl::writeTenths");
     Serial.print("    tenths: "); Serial.println(tenth_);
 
-    servo1.writeMicroseconds(map(tenth_, 0, 1800, SERVO_MIN(), SERVO_MAX()));
+    espservo.writeMicroseconds(map(tenth_, 0, 1800, SERVO_MIN(), SERVO_MAX()));
 }
+
 

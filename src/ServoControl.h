@@ -11,7 +11,7 @@
 
 #include "accessories.h"
 #include "neotimer.h"
-#include <Servo.h>
+#include "ESPServo.h"
 
 #define SERVO_INITL1		0x01
 #define SERVO_INITL2		0x02
@@ -28,7 +28,7 @@
 
 class ServoControl {
 private:
-    Servo servo1;
+    ESPServo espservo;
     Neotimer TravelTimer;
 
     uint8_t GPIO;
