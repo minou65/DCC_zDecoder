@@ -9,6 +9,8 @@
 	#include "WProgram.h"
 #endif
 
+// https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+// Recommend only the following pins 2,4,12-19,21-23,25-27,32-33
 static uint8_t ChannelToGPIOMapping[16] = {
 	GPIO_NUM_16,
 	GPIO_NUM_17,
