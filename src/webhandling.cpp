@@ -44,18 +44,18 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper);
 DNSServer dnsServer;
 WebServer server(80);
 
-// -- We need to declare an instance for all ActionGroup items, that can
+// -- We need to declare an instance for all OutputGroup items, that can
 //    appear in the config portal
-ActionGroup OutputGroup1 = ActionGroup("og1");
-ActionGroup OutputGroup2 = ActionGroup("og2");
-ActionGroup OutputGroup3 = ActionGroup("og3");
-ActionGroup OutputGroup4 = ActionGroup("og4");
-ActionGroup OutputGroup5 = ActionGroup("og5");
-ActionGroup OutputGroup6 = ActionGroup("og6");
-ActionGroup OutputGroup7 = ActionGroup("og7");
-ActionGroup OutputGroup8 = ActionGroup("og8");
-ActionGroup OutputGroup9 = ActionGroup("og9");
-ActionGroup OutputGroup10 = ActionGroup("og10");
+OutputGroup OutputGroup1 = OutputGroup("og1");
+OutputGroup OutputGroup2 = OutputGroup("og2");
+OutputGroup OutputGroup3 = OutputGroup("og3");
+OutputGroup OutputGroup4 = OutputGroup("og4");
+OutputGroup OutputGroup5 = OutputGroup("og5");
+OutputGroup OutputGroup6 = OutputGroup("og6");
+OutputGroup OutputGroup7 = OutputGroup("og7");
+OutputGroup OutputGroup8 = OutputGroup("og8");
+OutputGroup OutputGroup9 = OutputGroup("og9");
+OutputGroup OutputGroup10 = OutputGroup("og10");
 
 ServoGroup ServoGroup1 = ServoGroup("sg1");
 ServoGroup ServoGroup2 = ServoGroup("sg2");
@@ -200,41 +200,41 @@ void handleRoot(){
 
     s += "<h2>Overview for " + String(iotWebConf.getThingName()) + "</h2>";
 
-    ActionGroup* group = &OutputGroup1;
-    while (group != nullptr)
+    OutputGroup* _outputgroup = &OutputGroup1;
+    while (_outputgroup != nullptr)
     {
-        if (group->isActive()) {
+        if (_outputgroup->isActive()) {
             s += "<div>Output group " + String(_i) + "</div>";
             s += "<ul>";
-            if (group->ModeValue != 0) {
-                s += "<li>Designation: " + String(group->DesignationValue) + "</li>";
+            if (_outputgroup->ModeValue != 0) {
+                s += "<li>Designation: " + String(_outputgroup->DesignationValue) + "</li>";
             }
             else {
                 s += "<li>Designation:  - </li>";
             }
 
-            s += "<li>Mode: " + String(group->ModeValue) + "</li>";
-            s += "<li>Number of outputs: " + String(group->NumberValue) + "</li>";
-            if (group->ModeValue != 0) {
-                s += "<li>DCC Address: " + String(group->AddressValue) + +"</li>";
+            s += "<li>Mode: " + String(_outputgroup->ModeValue) + "</li>";
+            s += "<li>Number of outputs: " + String(_outputgroup->NumberValue) + "</li>";
+            if (_outputgroup->ModeValue != 0) {
+                s += "<li>DCC Address: " + String(_outputgroup->AddressValue) + +"</li>";
             }
             
             s += "</ul>";
-            _count += atoi(group->NumberValue);
+            _count += atoi(_outputgroup->NumberValue);
             _i += 1;
         }
         else {
-            group->DesignationParam.applyDefaultValue();
-            group->ModeParam.applyDefaultValue();
-            group->NumberParam.applyDefaultValue();
-            group->AddressParam.applyDefaultValue();
-            group->TimeOnParam.applyDefaultValue();
-            group->TimeOffParam.applyDefaultValue();
-            group->TimeOnFadeParam.applyDefaultValue();
-            group->TimeOffFadeParam.applyDefaultValue();
+            _outputgroup->DesignationParam.applyDefaultValue();
+            _outputgroup->ModeParam.applyDefaultValue();
+            _outputgroup->NumberParam.applyDefaultValue();
+            _outputgroup->AddressParam.applyDefaultValue();
+            _outputgroup->TimeOnParam.applyDefaultValue();
+            _outputgroup->TimeOffParam.applyDefaultValue();
+            _outputgroup->TimeOnFadeParam.applyDefaultValue();
+            _outputgroup->TimeOffFadeParam.applyDefaultValue();
             
         }
-        group = (ActionGroup*)group->getNext();
+        _outputgroup = (OutputGroup*)_outputgroup->getNext();
     }
 
     ServoGroup* _servogroup = &ServoGroup1;
@@ -352,22 +352,22 @@ void handleGroups() {
 
     uint8_t _i = 1;
 
-    ActionGroup* _group = &OutputGroup1;
-    while (_group != nullptr)
+    OutputGroup* _outputgroup = &OutputGroup1;
+    while (_outputgroup != nullptr)
     {
-        if ((_group->isActive()) && (int(_group->ModeValue) >= 10)) {
+        if ((_outputgroup->isActive()) && (int(_outputgroup->ModeValue) >= 10)) {
             String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
             if (ChannelIsOn(_i - 1)) {
                 _b.replace("red", "green");
             }
-            String _bText = String(_group->DesignationValue) + " (" + String(_group->ModeValue) + ")";
+            String _bText = String(_outputgroup->DesignationValue) + " (" + String(_outputgroup->ModeValue) + ")";
             _b.replace("[Text]", _bText);
 
             _s += _b;
             _s += "<br><br>";
             _i += 1;
         }
-        _group = (ActionGroup*)_group->getNext();
+        _outputgroup = (OutputGroup*)_outputgroup->getNext();
     }
 
     ServoGroup* _servogroup = &ServoGroup1;

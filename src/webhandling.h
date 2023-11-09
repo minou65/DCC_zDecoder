@@ -104,9 +104,9 @@ private:
     };
 };
 
-class ActionGroup : public iotwebconf::ChainedParameterGroup {
+class OutputGroup : public iotwebconf::ChainedParameterGroup {
 public:
-    ActionGroup(const char* id) : ChainedParameterGroup(id, "Output") {
+    OutputGroup(const char* id) : ChainedParameterGroup(id, "Output") {
         // -- Update parameter Ids to have unique ID for all parameters within the application.
         snprintf(DesignationId, STRING_LEN, "%s-designation", this->getId());
         snprintf(ModeId, STRING_LEN, "%s-mode", this->getId());
@@ -202,16 +202,16 @@ private:
     };
 };
 
-extern ActionGroup OutputGroup1;
-extern ActionGroup OutputGroup2;
-extern ActionGroup OutputGroup3;
-extern ActionGroup OutputGroup4;
-extern ActionGroup OutputGroup5;
-extern ActionGroup OutputGroup6;
-extern ActionGroup OutputGroup7;
-extern ActionGroup OutputGroup8;
-extern ActionGroup OutputGroup9;
-extern ActionGroup OutputGroup10;
+extern OutputGroup OutputGroup1;
+extern OutputGroup OutputGroup2;
+extern OutputGroup OutputGroup3;
+extern OutputGroup OutputGroup4;
+extern OutputGroup OutputGroup5;
+extern OutputGroup OutputGroup6;
+extern OutputGroup OutputGroup7;
+extern OutputGroup OutputGroup8;
+extern OutputGroup OutputGroup9;
+extern OutputGroup OutputGroup10;
 
 extern ServoGroup ServoGroup1;
 extern ServoGroup ServoGroup2;

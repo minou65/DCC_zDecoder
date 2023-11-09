@@ -137,7 +137,7 @@ bool ChannelIsOn(uint8_t Channel_) {
 }
 
 void zDecoderReset() {
-	ActionGroup* _outputgroup = &OutputGroup1;
+	OutputGroup* _outputgroup = &OutputGroup1;
 	while (_outputgroup != nullptr) {
 		_outputgroup->DesignationParam.applyDefaultValue();
 		_outputgroup->ModeParam.applyDefaultValue();
@@ -147,7 +147,7 @@ void zDecoderReset() {
 		_outputgroup->TimeOffParam.applyDefaultValue();
 		_outputgroup->TimeOnFadeParam.applyDefaultValue();
 		_outputgroup->TimeOffFadeParam.applyDefaultValue();
-		_outputgroup = (ActionGroup*)_outputgroup->getNext();
+		_outputgroup = (OutputGroup*)_outputgroup->getNext();
 		_outputgroup->setActive(false);
 	}
 
@@ -172,22 +172,22 @@ void zDecoderInit(void) {
 	decoder.Clear();
 	Vector<accessories*>().Swap(decoder);
 
-	ActionGroup* _group = &OutputGroup1;
-	while (_group != nullptr) {
+	OutputGroup* _outputgroup = &OutputGroup1;
+	while (_outputgroup != nullptr) {
 		if (_Channel > 15) {
 			Serial.println("no more free channels!");
 			break;
 		}
 
-		if (_group->isActive()) {
-			uint8_t _Mode = atoi(_group->ModeValue);
-			uint8_t _Count = atoi(_group->NumberValue);
-			uint8_t _Address = atoi(_group->AddressValue);
-			uint8_t _TimeOn = atoi(_group->TimeOnValue);
-			uint8_t _TimeOff = atoi(_group->TimeOffValue);
-			uint8_t _Multiplier = atoi(_group->MultiplierValue); // Multiplikator
-			uint8_t _TimeOnFade = atoi(_group->TimeOnFadeValue);
-			uint8_t _TimeOffFade = atoi(_group->TimeOffFadeValue);
+		if (_outputgroup->isActive()) {
+			uint8_t _Mode = atoi(_outputgroup->ModeValue);
+			uint8_t _Count = atoi(_outputgroup->NumberValue);
+			uint8_t _Address = atoi(_outputgroup->AddressValue);
+			uint8_t _TimeOn = atoi(_outputgroup->TimeOnValue);
+			uint8_t _TimeOff = atoi(_outputgroup->TimeOffValue);
+			uint8_t _Multiplier = atoi(_outputgroup->MultiplierValue); // Multiplikator
+			uint8_t _TimeOnFade = atoi(_outputgroup->TimeOnFadeValue);
+			uint8_t _TimeOffFade = atoi(_outputgroup->TimeOffFadeValue);
 
 			uint16_t _DayLightAddress = 0;
 			uint8_t _DayBrightness = 255;
@@ -300,7 +300,7 @@ void zDecoderInit(void) {
 			}
 			
 		}
-		_group = (ActionGroup*)_group->getNext();
+		_outputgroup = (OutputGroup*)_outputgroup->getNext();
 	}
 
 	ServoGroup* _servogroup = &ServoGroup1;
