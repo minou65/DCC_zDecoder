@@ -137,17 +137,29 @@ bool ChannelIsOn(uint8_t Channel_) {
 }
 
 void zDecoderReset() {
-	ActionGroup* _group = &OutputGroup1;
-	while (_group != nullptr) {
-		_group->DesignationParam.applyDefaultValue();
-		_group->ModeParam.applyDefaultValue();
-		_group->NumberParam.applyDefaultValue();
-		_group->AddressParam.applyDefaultValue();
-		_group->TimeOnParam.applyDefaultValue();
-		_group->TimeOffParam.applyDefaultValue();
-		_group->TimeOnFadeParam.applyDefaultValue();
-		_group->TimeOffFadeParam.applyDefaultValue();
-		_group = (ActionGroup*)_group->getNext();
+	ActionGroup* _outputgroup = &OutputGroup1;
+	while (_outputgroup != nullptr) {
+		_outputgroup->DesignationParam.applyDefaultValue();
+		_outputgroup->ModeParam.applyDefaultValue();
+		_outputgroup->NumberParam.applyDefaultValue();
+		_outputgroup->AddressParam.applyDefaultValue();
+		_outputgroup->TimeOnParam.applyDefaultValue();
+		_outputgroup->TimeOffParam.applyDefaultValue();
+		_outputgroup->TimeOnFadeParam.applyDefaultValue();
+		_outputgroup->TimeOffFadeParam.applyDefaultValue();
+		_outputgroup = (ActionGroup*)_outputgroup->getNext();
+		_outputgroup->setActive(false);
+	}
+
+	ServoGroup* _servogroup = &ServoGroup1;
+	while (_servogroup != nullptr) {
+		_servogroup->DesignationParam.applyDefaultValue();
+		_servogroup->AddressParam.applyDefaultValue();
+		_servogroup->TravelTimeParam.applyDefaultValue();
+		_servogroup->Limit1Param.applyDefaultValue();
+		_servogroup->Limit2Param.applyDefaultValue();
+		_servogroup = (ServoGroup*)_servogroup->getNext();
+		_servogroup->setActive(false);
 	}
 }
 
@@ -285,9 +297,6 @@ void zDecoderInit(void) {
 				decoder.PushBack(new Turnout(_Channel, _Channel + 1, _Address, _Multiplier * _TimeOn));
 				_Channel += 2;
 				break;
-
-
-				Serial.print(F("next channel is ")); Serial.println(_Channel);
 			}
 			
 		}
