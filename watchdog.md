@@ -1,23 +1,11 @@
-﻿# Watchdog
+﻿
+# Watchdog
 
 ## Inhalt
-- [Blinkers](#blinkers)
+
+- [Watchdog](#watchdog)
   - [Inhalt](#inhalt)
-  - [einfacher Ausgang](#einfacher-ausgang)
-  - [Blinker](#blinker)
-  - [Wechselblinker](#wechselblinker)
-  - [Fernseher](#fernseher)
-  - [Schweissen](#schweissen)
-  - [Feuer](#feuer)
-  - [Lauflicht 1](#lauflicht-1)
-  - [Lauflicht 2](#lauflicht-2)
-  - [Lauflicht 3](#lauflicht-3)
-  - [Lauflicht 4](#lauflicht-4)
-  - [Hausbeleuchtung](#hausbeleuchtung)
-  - [Natrium Lampe](#natrium-lampe)
-  - [Neon Lampe](#neon-lampe)
-
-
+  - [Watchdog](#watchdog-1)
 
 ## Watchdog
 Mit dem Watchdog kann überprüft werden ob innheralb einer bestimmten Zeit DCC Signale empfangen werden
