@@ -14,6 +14,7 @@
 #include "Turnouts.h"
 #include "Watchdog.h"
 #include "NMRAhandling.h"
+#include "pinmapping.h"
 
 char Version[] = "0.0.0.1 (2023-11-01)";
 
@@ -344,6 +345,11 @@ void setup() {
 	Serial.println();
 	Serial.println("Starting up...");
 
+	for (uint8_t _i = 0; _i < sizeof(ChannelToGPIOMapping) - 1; _i++) {
+		pinMode(ChannelToGPIOMapping[_i], OUTPUT);
+		digitalWrite(ChannelToGPIOMapping[_i], LOW);
+	}
+
 	NMRAsetup();
 	Serial.println("NMRA initalized");
 
@@ -357,7 +363,6 @@ void setup() {
 			zDecoderReset();
 		}
 	}
-
 
     zDecoderInit();
 	Serial.println("Decoder initalized");
