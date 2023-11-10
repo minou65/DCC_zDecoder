@@ -11,6 +11,12 @@
 
 // https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 // Recommend only the following pins 2,4,12-19,21-23,25-27,32-33
+// Ensure no pin assignments in your Sketch or Libraries are using 
+// the IO19 or IO20 to ensure the USB Debugging works correctly.
+
+// All boards support the vMicro Software Debugger which only requires 
+// the Serial interface to work
+
 static uint8_t ChannelToGPIOMapping[16] = {
 	GPIO_NUM_16,
 	GPIO_NUM_17,
