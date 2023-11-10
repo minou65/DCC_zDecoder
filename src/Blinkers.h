@@ -268,5 +268,20 @@ public:
 	void off();
 };
 
+
+class Blitzlicht : public Blinker {
+private:
+	Neotimer Blitztimer;
+	bool Status2;
+
+public:
+	Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_);
+	~Blitzlicht();
+
+	void process();
+	void on();
+};
+
+
 #endif
 

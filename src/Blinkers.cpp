@@ -974,3 +974,57 @@ void Feuer::off() {
 	LED2.off();
 	LED3.off();
 };
+
+//=======================================================
+//Blitzlicht
+//Mode 83
+//Type n/a
+// 
+//=======================================================
+
+
+Blitzlicht::Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_):
+	Blinker(BaseAddress_, BaseChannel_, 50, 25, 83),
+	Status2(false) {
+}
+
+Blitzlicht::~Blitzlicht() {
+}
+
+void Blitzlicht::process() {
+	LED1.process();
+
+	// do nothing if not active
+	if (!IsActive)
+		return;
+
+	if (!Blitztimer.done()) {
+		if (Status2) {
+			Blinker::process();
+		}
+		else {
+			LED1.off();
+		}
+	}
+	else {
+		
+		randomSeed(esp_random());
+		if (Status2) {
+			Blitztimer.start(random(5000, 10000)); // sleep time
+		}
+		else {
+			Blitztimer.start(random(200, 500)); // Blitztime
+		}
+		Status2 = !Status2;
+	}
+
+
+}
+
+void Blitzlicht::on() {
+	Blinker::on();
+	Serial.println(" Blitzlicht::on");
+	Status2 = true;
+	randomSeed(esp_random());
+	Blitztimer.start(random(200, 500));
+}

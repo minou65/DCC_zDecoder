@@ -258,6 +258,11 @@ void zDecoderInit(void) {
 				_Channel += 3;
 				break;
 
+			case 83:            // Blitzlicht
+				decoder.PushBack(new Blitzlicht(_Address, _Channel));
+				_Channel += 1;
+				break;
+
 			case 102:			// SBB_Hauptsignal_102
 				decoder.PushBack(new SBB_Hauptsignal_102(_Address, _Channel, _DayLightAddress, _DayBrightness, _NightBrightness, _TimeOnFade, _TimeOffFade));
 				_Channel += 2;
