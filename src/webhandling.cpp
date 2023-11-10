@@ -353,9 +353,8 @@ void handleGroups() {
     uint8_t _i = 1;
 
     OutputGroup* _outputgroup = &OutputGroup1;
-    while (_outputgroup != nullptr)
-    {
-        if ((_outputgroup->isActive()) && (int(_outputgroup->ModeValue) >= 10)) {
+    while (_outputgroup != nullptr){
+        if ((_outputgroup->isActive()) && (atoi(_outputgroup->ModeValue) >= 10)) {
             String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
             if (ChannelIsOn(_i - 1)) {
                 _b.replace("red", "green");
