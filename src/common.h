@@ -56,11 +56,11 @@ static char DecoderModeNames[][STRING_LEN] = {
     "Fernseher (1)",  // ok
     "Schweisslicht (3)", // ok
     "Feuer (3)", // ok
-    "Blitzlicht (1)",
+    "Blitzlicht (1)", // ok
     "Lauflicht 1 (1..16)", // ok
     "Lauflicht 2 (1..16)",  // ok
     "Lauflicht 3 (1..16)",  // ok
-    "Lauflicht 4 (1..16)", 
+    "Lauflicht 4 (1..16)",  // ok
 
     "Hausbeleuchtung (1..16)", // ok
     "Neonlampen (1..16)", // ok
