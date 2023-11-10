@@ -221,6 +221,7 @@ Lauflicht::Lauflicht(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzah
 	accessories(BaseAddress_, BaseChannel_, Mode_),
 	Anzahl(Anzahl_),
 	Status(false),
+	Direction(true),
 	timeOn(timeOn_),
 	timeOff(timeOff_) {
 
@@ -236,6 +237,7 @@ Lauflicht::Lauflicht(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzah
 	accessories(BaseAddress_, BaseChannel_, Mode_),
 	Anzahl(Anzahl_),
 	Status(false),
+	Direction(true),
 	timeOn(timeOn_),
 	timeOff(timeOff_) {
 
@@ -358,6 +360,30 @@ void Lauflicht::process() {
 			break;
 
 		case 55:
+			// Kette durchgehen und notwendige LED einschalten, die anderen aussschalten
+			if (LastStep != NextStep) {
+				LEDs[LastStep]->off();
+				LastStep = NextStep;
+			};
+
+			LEDs[NextStep]->on(PWM_Set_On);
+
+			if (Direction) {
+				NextStep++;
+			}
+			else {
+				NextStep--;
+			}
+
+			if (NextStep >= Anzahl && Direction) {
+				NextStep = Anzahl - 1;
+				Direction = false;
+			}
+
+			if (NextStep <= 0 && !Direction) {
+				NextStep = 1;
+				Direction = true;
+			}
 
 			break;
 

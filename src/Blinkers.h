@@ -87,6 +87,7 @@ private:
 	uint8_t Anzahl;		// Wieviele Ausgänge sollen verwendet werden
 
 	bool Status;
+	bool Direction;
 
 	uint16_t timeOff;
 	uint16_t timeOn;
