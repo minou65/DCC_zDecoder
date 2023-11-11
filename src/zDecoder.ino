@@ -203,7 +203,7 @@ void zDecoderInit(void) {
 				decoder.PushBack(new accessories(_Address, _Channel));
 				_Channel += _Count;
 				break;
-			case 1:			// einfacher Ausgang
+			case 1:			// Watchdog
 				decoder.PushBack(new Watchdog(_Address, _Channel, _Multiplier * _TimeOn));
 				_Channel += 1;
 				break;
