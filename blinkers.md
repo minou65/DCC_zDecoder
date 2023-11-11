@@ -9,6 +9,7 @@
   - [Fernseher](#fernseher)
   - [Schweissen](#schweissen)
   - [Feuer](#feuer)
+  - [Blitzlicht](#blitzlicht)
   - [Lauflicht 1](#lauflicht-1)
   - [Lauflicht 2](#lauflicht-2)
   - [Lauflicht 3](#lauflicht-3)
@@ -113,6 +114,19 @@ Simuliert ein flackerndes Feuer
 | 1 | gelb |
 | 2  | rot |
 | 3  | gelb |
+
+| Feld | Beschreibung | Wert |
+| --- | --- | --- |
+| Designation | | |
+| Modus |  |  Feuer |
+| Address | DCC Adresse des Ausgangs | default 3 |
+
+## Blitzlicht
+Simuliert einen Fotoblitz. Es wird ein Blitzlicht gewitter erzeugt und dann jeweils zwischen 5 und 10 sekunden gewartet, bis das nächste Gewitter erzeugt wird
+
+| Channel | Led Farbe |
+|:-:|---|
+| 1 | weiss |
 
 | Feld | Beschreibung | Wert |
 | --- | --- | --- |
