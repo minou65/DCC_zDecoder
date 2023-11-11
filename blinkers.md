@@ -173,6 +173,7 @@ Lampe für Lampe wird eingeschaltet. Sind alle eingeschaltet, wird mit der erste
 | Einheit | | |
 
 ## Lauflicht 4
+Funktion analaog Lauflicht 1, aber in beide richtungen (Knigth rider)
 
 | Channel | Led Farbe |
 |:-:|---|
