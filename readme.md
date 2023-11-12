@@ -24,24 +24,24 @@ Das ist ein NRMA DCC dekoder basirend auf einem ESP32 NodeMCU.
 ## Betriebsarten
 
 Der zDecoder untersützt folgende Betriebsarten
-- [Watchdog](watchdog.md)
-- [einfacher Ausgang](blinkers.md)
-- [Blinker](blinkers.md)
-- [Wechselblinker](blinkers.md)
-- [Fernseher](blinkers.md)
-- [Schweisslicht](blinkers.md)
-- [Feuer](blinkers.md)
-- [Blitzlicht](blinkers.md)
-- [Lauflicht 1](blinkers.md)
-- [Lauflicht 2](blinkers.md)
-- [Lauflicht 3](blinkers.md)
-- [Lauflicht 4](blinkers.md)
-- [Lausbeleuchtung](blinkers.md)
-- [Neonlampen](blinkers.md)
-- [Natriumlampen](blinkers.md)
+- [Watchdog](doc/watchdog.md)
+- [einfacher Ausgang](doc/blinkers.md)
+- [Blinker](doc/blinkers.md)
+- [Wechselblinker](doc/blinkers.md)
+- [Fernseher](doc/blinkers.md)
+- [Schweisslicht](doc/blinkers.md)
+- [Feuer](doc/blinkers.md)
+- [Blitzlicht](doc/blinkers.md)
+- [Lauflicht 1](doc/blinkers.md)
+- [Lauflicht 2](doc/blinkers.md)
+- [Lauflicht 3](doc/blinkers.md)
+- [Lauflicht 4](doc/blinkers.md)
+- [Lausbeleuchtung](doc/blinkers.md)
+- [Neonlampen](doc/blinkers.md)
+- [Natriumlampen](doc/blinkers.md)
 - Entkuppler
 - Weiche
-- [Servo](servo.md)
+- [Servo](doc/servo.md)
 
 ### in Vorbereitung
 - SBB Hauptsignal 2 flammig
