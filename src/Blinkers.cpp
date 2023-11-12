@@ -984,8 +984,21 @@ void Feuer::off() {
 
 
 Blitzlicht::Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_):
-	Blinker(BaseAddress_, BaseChannel_, 50, 25, 83),
-	Status2(false) {
+	Blinker(BaseAddress_, BaseChannel_, 50, 20, 83),
+	Status2(false),
+	sleeptimeMin(5000),
+	sleeptimeMax(10000),
+	blitztimeMin(200),
+	blitztimeMax(500) {
+}
+
+Blitzlicht::Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_, uint32_t sleeptimeMin_, uint32_t sleeptimeMax_, uint16_t blitztimeMin_, uint16_t blitztimeMax_) :
+	Blinker(BaseAddress_, BaseChannel_, 50, 20, 83),
+	Status2(false),
+	sleeptimeMin(sleeptimeMin_),
+	sleeptimeMax(sleeptimeMax_),
+	blitztimeMin(blitztimeMin_),
+	blitztimeMax(blitztimeMax_) {
 }
 
 Blitzlicht::~Blitzlicht() {
@@ -1007,18 +1020,15 @@ void Blitzlicht::process() {
 		}
 	}
 	else {
-		
 		randomSeed(esp_random());
 		if (Status2) {
-			Blitztimer.start(random(5000, 10000)); // sleep time
+			Blitztimer.start(random(sleeptimeMin, sleeptimeMax)); // sleep time
 		}
 		else {
-			Blitztimer.start(random(200, 500)); // Blitztime
+			Blitztimer.start(random(blitztimeMin, blitztimeMax)); // Blitztime
 		}
 		Status2 = !Status2;
 	}
-
-
 }
 
 void Blitzlicht::on() {
@@ -1026,5 +1036,5 @@ void Blitzlicht::on() {
 	Serial.println(" Blitzlicht::on");
 	Status2 = true;
 	randomSeed(esp_random());
-	Blitztimer.start(random(200, 500));
+	Blitztimer.start(random(blitztimeMin, blitztimeMax));
 }

@@ -122,7 +122,8 @@ Simuliert ein flackerndes Feuer
 | Address | DCC Adresse des Ausgangs | default 3 |
 
 ## Blitzlicht
-Simuliert einen Fotoblitz. Es wird ein Blitzlicht gewitter erzeugt und dann jeweils zwischen 5 und 10 sekunden gewartet, bis das nächste Gewitter erzeugt wird
+Simuliert einen Fotoblitz. Es wird ein Blitzlicht gewitter erzeugt und dann jeweils zwischen 5 und 30 sekunden gewartet, bis das nächste Blitzlicht Gewitter erzeugt wird
+Die flashtime sollte zwischen 100 und 300 ms sein, um gute Ergebinsse zu erreichen.
 
 | Channel | Led Farbe |
 |:-:|---|
@@ -131,8 +132,13 @@ Simuliert einen Fotoblitz. Es wird ein Blitzlicht gewitter erzeugt und dann jewe
 | Feld | Beschreibung | Wert |
 | --- | --- | --- |
 | Designation | | |
-| Modus |  |  Feuer |
+| Modus |  |  Blitzlicht |
 | Address | DCC Adresse des Ausgangs | default 3 |
+| Minimum pause time | minimale pausenzeit in milisekunden <br> wird mulitpliziert mit Multiplier | 10 |
+| Maximal pause time | maximale pausenzeit in milisekunden <br> wird mulitpliziert mit Multiplier | 30 |
+| Multiplier | Faktor mit welchem die min / max Pausenzeit mulitpliziert wird| 10 |
+| Minimum flash time | minimale pausenzeit in sekunden | 5 |
+| Maximal flash time | maximale pausenzeit in sekunden | 30 |
 
 ## Lauflicht 1
 Kette durchgehen und notwendige LED einschalten, die anderen aussschalten

@@ -274,8 +274,14 @@ private:
 	Neotimer Blitztimer;
 	bool Status2;
 
+	uint32_t sleeptimeMin;
+	uint32_t sleeptimeMax;
+	uint16_t blitztimeMin;
+	uint16_t blitztimeMax;
+
 public:
 	Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_);
+	Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_, uint32_t sleeptimeMin_, uint32_t sleeptimeMax_, uint16_t blitztimeMin_, uint16_t blitztimeMax_);
 	~Blitzlicht();
 
 	void process();

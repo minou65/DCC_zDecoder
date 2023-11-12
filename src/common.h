@@ -53,10 +53,10 @@ static char DecoderModeNames[][STRING_LEN] = {
     "einfacher Ausgang (1)",  // ok
     "Blinker (1)",  // ok, fading ok
     "Wechselblinker (2)", // ok
-    "Fernseher (1)",  // ok
-    "Schweisslicht (3)", // ok
-    "Feuer (3)", // ok
-    "Blitzlicht (1)", // ok
+    "Fernseher (1)",  // 80 ok
+    "Schweisslicht (3)", // 81 ok
+    "Feuer (3)", // 82 ok
+    "Blitzlicht (1)", // 83 ok   
     "Lauflicht 1 (1..16)", // ok
     "Lauflicht 2 (1..16)",  // ok
     "Lauflicht 3 (1..16)",  // ok

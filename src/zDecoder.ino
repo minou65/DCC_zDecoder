@@ -260,7 +260,7 @@ void zDecoderInit(void) {
 				break;
 
 			case 83:            // Blitzlicht
-				decoder.PushBack(new Blitzlicht(_Address, _Channel));
+				decoder.PushBack(new Blitzlicht(_Address, _Channel, _TimeOnFade * 1000, _TimeOffFade * 1000, _TimeOn * _Multiplier, _TimeOff * _Multiplier));
 				_Channel += 1;
 				break;
 
