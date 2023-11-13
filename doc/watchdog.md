@@ -21,3 +21,6 @@ Mit dem Watchdog kann überprüft werden ob innheralb einer bestimmten Zeit DCC 
 | Address | DCC Adresse des Ausgangs | default 3 |
 | Blinker time on | Zeit in ms in der ein DCC Signal empfangen werden musss | |
 | Multiplikator | Multiplikator mit welchem die ein Zeit multipliziert wird | |
+
+[Betriebsarten](../readme.md#betriebsarten) <br>
+[Top of document](#watchdog)

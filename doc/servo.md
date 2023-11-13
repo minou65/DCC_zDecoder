@@ -15,3 +15,6 @@ Dies ist ein Servo Ausgang. Er wird mittels einer Weichenadresse angesteuert
 | Multiplier | Multiplikator mit welchem die Zeit multipliziert wird | default 10 |
 | Limit 1 | Limite 1 in °. Es können Werte zwischen 0 und 180 eingestellt werden | default 0 |
 | Limit 2 | Limite 2 in °. Es können Werte zwischen 0 und 180 eingestellt werden | default 180 |
+
+[Betriebsarten](../readme.md#betriebsarten) <br>
+[Top of document](#servo)
