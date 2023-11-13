@@ -26,10 +26,14 @@ Der Decoder kann an einer Spannung von 8 - 28V DC oder 18 - 36V AC betrieben wer
 kann eine Last von 500mA geschaltet werden. Ist J1 auf der Stellung 5V, darf der gesamt Strom 1A
 nicht übersteigen.
 
+[Top of document](#dcc-zdecoder)
+
 ## Librarys
 Die folgenden Bibliotheken werden verwendet und müssen installiert werden
 - prampec/IotWebConf
 - NmraDcc
+
+[Top of document](#dcc-zdecoder)
 
 ## Pin mapping
 In der Header datei [pinmapping.h](src/pinmapping.h) können die Pins für die 16 Ausgänge an die eigenen Bedürfnisse angepasst werden.
@@ -56,6 +60,7 @@ static uint8_t ChannelToGPIOMapping[16] = {
 
 };
 ```
+[Top of document](#dcc-zdecoder)
 
 ## Betriebsarten
 
@@ -79,6 +84,8 @@ Der zDecoder untersützt folgende Betriebsarten
 - [Weiche](doc/coils.md#weiche)
 - [Servo](doc/servo.md#servo-1)
 
+[Top of document](#dcc-zdecoder)
+
 ### in Vorbereitung
 - SBB Hauptsignal 2 flammig
 - SBB Hauptsignal 3 flammig
@@ -87,12 +94,16 @@ Der zDecoder untersützt folgende Betriebsarten
 - SBB Zwergsignal
 - Strassensignal
 
+[Top of document](#dcc-zdecoder)
+
 ## Schema
 ![PCB Board](img/pcb-board.png)
 
 ![Schema](img/schema.png)
 
 [Partliste](sch/partlist.txt)
+
+[Top of document](#dcc-zdecoder)
 
 ## Anschlüsse
 
@@ -104,18 +115,26 @@ Der zDecoder untersützt folgende Betriebsarten
 | X6 | Anschluss versorgungspannung für Decoder und Verbraucher. 12 - 28VDC/AC |
 | X7 - X12 | Anschluss für Servos |
 
+[Top of document](#dcc-zdecoder)
+
 ## WiFi
 
 ### Default Password
 
 Wenn nicht mit einem AP verbunden, ist das Standardpasswort 123456789
 
+[Top of document](#dcc-zdecoder)
+
 ### Default IP address
 
 Wenn nicht mit einem AP verbunden, ist die IP Adresse 192.168.4.1
 
+[Top of document](#dcc-zdecoder)
+
 ### OTA 
 OTA ist aktiviert und kann verwenbdet werden. Die IP Adresse ist entweder die Default IP address oder die vom AP zugewissene. Port ist Standart
+
+[Top of document](#dcc-zdecoder)
 
 ### Configuration options
 Nach dem ersten Start müssen einige Werte eingerichtet werden.
@@ -127,6 +146,8 @@ Nach dem ersten Start müssen einige Werte eingerichtet werden.
 | WiFi SSID | Name des WLan mit welchem das thing verwendet werden soll. |
 | WiFi password | Das Passwort zum Netzwerk, mit welchem das Thing verbunden werden soll. |
 
+[Top of document](#dcc-zdecoder)
+
 ### Blinking codes
 
 In der nachfolgenden Tabelle fasst die verschiedenen Blinkcodes zusammen
@@ -137,6 +158,10 @@ In der nachfolgenden Tabelle fasst die verschiedenen Blinkcodes zusammen
 | wechsel blinken | Das Thing versucht mit einem AP zu verbinden |
 | langsames blinken | meistens aus mit kurzem blinken <br> Das Thing ist online und mit dem WLan verbunden |
 
+[Top of document](#dcc-zdecoder)
+
 ## Reset
 Wurde das Passwort vergessen oder funktioniert der Decoder nicht mehr kann durch schliessen des Jumpers Reset während dem booten, der Decoder auf die Werkseinstellungen zurückgesetzt werden.
+
+[Top of document](#dcc-zdecoder)
 
