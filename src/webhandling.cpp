@@ -337,12 +337,11 @@ void handle10() {
 }
 
 void handleGroups() {
-    // String _s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
-    String _s = HTML_Style;
+    String _s = HTML_Start_Doc;
+    _s = HTML_Style;
     _s.replace("center", "left");
-    //_s += "<title>zDecoder</title></head><body><div>Enable / Disable group for ";
-    //_s += iotWebConf.getThingName();
-    //_s += ".</div>";
+    _s.replace("{v}", iotWebConf.getThingName());
+    _s.replace("center", "left");
 
     _s += HTML_Start_Body;
     _s += "<table border=0 align=center>";
