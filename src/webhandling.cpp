@@ -27,7 +27,7 @@ const char wifiInitialApPassword[] = "123456789";
 
 
 // -- Configuration specific key. The value should be modified if config structure was changed.
-#define CONFIG_VERSION "007"
+#define CONFIG_VERSION "008"
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
@@ -130,12 +130,25 @@ const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM =
 "   document.querySelector('label[for=\"' + id + '-timeoff\"]').innerHTML = 'Time off (ms)';\n"
 "   document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'Fader on (ms)';\n"
 "   document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'Fader off (ms)';\n"
+"   document.querySelector('label[for=\"' + id + '-multiplier\"]').innerHTML = 'Multiplier';\n"
 "\n"
 "   if (selectedValue === \"83\") {\n"
 "       document.querySelector('label[for=\"' + id + '-timeon\"]').innerHTML = 'Minimum flash time (ms)';\n"
 "       document.querySelector('label[for=\"' + id + '-timeoff\"]').innerHTML = 'Maximal flash time (ms)';\n"
 "       document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'Minimum pause time (s)';\n"
 "       document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'Maximal pause time (s)';\n"
+"   }\n"
+"\n"
+"   var parameters = [\"61\", \"62\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       document.querySelector('label[for=\"' + id + '-multiplier\"]').innerHTML = 'Chance';\n"
+"   }\n"
+"\n"
+"   var parameters = [\"62\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'minimal glowing time (ms)';\n"
+"       document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'maximal glowing time (ms)';\n"
+
 "   }\n"
 "\n"
 "}\n";
@@ -421,12 +434,16 @@ void websetup(){
     ServoGroup4.setNext(&ServoGroup5);
     ServoGroup5.setNext(&ServoGroup6);
 
-
     iotWebConf.setStatusPin(STATUS_PIN);
     iotWebConf.setConfigPin(CONFIG_PIN);
     iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
-    // iotWebConf.setHtmlFormatProvider(&optionalGroupHtmlFormatProvider);
-    // We also need to add all these parameter groups to iotWebConf
+
+    iotWebConf.addParameterGroup(&ServoGroup1);
+    iotWebConf.addParameterGroup(&ServoGroup2);
+    iotWebConf.addParameterGroup(&ServoGroup3);
+    iotWebConf.addParameterGroup(&ServoGroup4);
+    iotWebConf.addParameterGroup(&ServoGroup5);
+
     iotWebConf.addParameterGroup(&OutputGroup1);
     iotWebConf.addParameterGroup(&OutputGroup2);
     iotWebConf.addParameterGroup(&OutputGroup3);
@@ -437,12 +454,6 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup8);
     iotWebConf.addParameterGroup(&OutputGroup9);
     iotWebConf.addParameterGroup(&OutputGroup10);
-
-    iotWebConf.addParameterGroup(&ServoGroup1);
-    iotWebConf.addParameterGroup(&ServoGroup2);
-    iotWebConf.addParameterGroup(&ServoGroup3);
-    iotWebConf.addParameterGroup(&ServoGroup4);
-    iotWebConf.addParameterGroup(&ServoGroup5);
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setFormValidator(&formValidator);
