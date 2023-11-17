@@ -148,8 +148,9 @@ void zDecoderReset() {
 		_outputgroup->TimeOffParam.applyDefaultValue();
 		_outputgroup->TimeOnFadeParam.applyDefaultValue();
 		_outputgroup->TimeOffFadeParam.applyDefaultValue();
-		_outputgroup = (OutputGroup*)_outputgroup->getNext();
 		_outputgroup->setActive(false);
+
+		_outputgroup = (OutputGroup*)_outputgroup->getNext();
 	}
 
 	ServoGroup* _servogroup = &ServoGroup1;
@@ -159,8 +160,9 @@ void zDecoderReset() {
 		_servogroup->TravelTimeParam.applyDefaultValue();
 		_servogroup->Limit1Param.applyDefaultValue();
 		_servogroup->Limit2Param.applyDefaultValue();
-		_servogroup = (ServoGroup*)_servogroup->getNext();
 		_servogroup->setActive(false);
+
+		_servogroup = (ServoGroup*)_servogroup->getNext();
 	}
 }
 
