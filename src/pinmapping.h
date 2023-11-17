@@ -18,8 +18,8 @@
 // the Serial interface to work
 
 static uint8_t ChannelToGPIOMapping[16] = {
-	GPIO_NUM_16,
 	GPIO_NUM_17,
+	GPIO_NUM_16,
 	GPIO_NUM_18,
 	GPIO_NUM_19,
 	GPIO_NUM_21,
