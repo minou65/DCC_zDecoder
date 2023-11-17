@@ -158,7 +158,7 @@ public:
         );
 
     iotwebconf::NumberParameter NumberParam =
-        iotwebconf::NumberParameter("Number of outputs", NumberId, NumberValue, NUMBER_LEN, "1", "1..15", "min='1' max='15' step='1'");
+        iotwebconf::NumberParameter("Number of outputs", NumberId, NumberValue, NUMBER_LEN, "1", "1..16", "min='1' max='16' step='1'");
 
     iotwebconf::NumberParameter AddressParam =
         iotwebconf::NumberParameter("DCC Address", AddressId, AddressValue, NUMBER_LEN, "3", "1..1024", "min='1' max='1024' step='1'");
