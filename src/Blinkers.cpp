@@ -381,7 +381,7 @@ void Lauflicht::process() {
 			}
 
 			if (NextStep <= 0 && !Direction) {
-				NextStep = 1;
+				NextStep = 0;
 				Direction = true;
 			}
 
