@@ -408,3 +408,4 @@ FodyWeavers.xsd
 *.sln.iml
 *.heic
 .vscode/settings.json
+sch/DCC zDecoder.zip
