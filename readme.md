@@ -6,6 +6,7 @@
 	- [Betriebsarten](#betriebsarten)
 		- [in Vorbereitung](#in-vorbereitung)
 	- [Schema](#schema)
+	- [Materialliste](#materialliste)
 	- [Anschlüsse](#anschlüsse)
 	- [WiFi](#wifi)
 		- [Default Password](#default-password)
@@ -100,6 +101,8 @@ Der zDecoder untersützt folgende Betriebsarten
 ![PCB Board](img/pcb-board.png)
 
 ![Schema](img/schema.png)
+
+## Materialliste
 
 [Partliste](sch/partlist.txt)
 
