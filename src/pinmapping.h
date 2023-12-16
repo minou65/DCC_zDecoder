@@ -28,7 +28,7 @@ static uint8_t ChannelToGPIOMapping[16] = {
 	GPIO_NUM_4,  // O18
 
 	GPIO_NUM_33, // O21
-	GPIO_NUM_21, // O22
+	GPIO_NUM_32, // O22
 	GPIO_NUM_25, // O23
 	GPIO_NUM_26, // O24
 	GPIO_NUM_27, // O25
