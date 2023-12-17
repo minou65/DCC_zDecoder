@@ -6,8 +6,9 @@ accessories::accessories(uint16_t BaseAddress_, byte BaseChannel_) :
 	BaseChannel(BaseChannel_),
 	IsActive(false) {
 }
+
 accessories::accessories(uint16_t BaseAddress_, byte BaseChannel_, byte Mode_):
-	BaseAddress(BaseAddress),
+	BaseAddress(BaseAddress_),
 	BaseChannel(BaseChannel_),
 	Mode(Mode_) {
 }
@@ -26,7 +27,7 @@ void accessories::off() {
 	IsActive = false;
 }
 
-void accessories::notifyAddress(uint16_t Address, uint8_t cmd_) {
+void accessories::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 }
 
 void accessories::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_){
