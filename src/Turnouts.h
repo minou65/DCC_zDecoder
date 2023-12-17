@@ -57,9 +57,9 @@ public:
 	TurnoutServo() = default;
 	TurnoutServo(int8_t ServoPort_, uint16_t Address_, int16_t limit1_, int16_t limit2_, int16_t travelTime_);
 	~TurnoutServo();
-	void process();
 	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
 	void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps);
+	void process();
 	void on();
 	void off();
 };

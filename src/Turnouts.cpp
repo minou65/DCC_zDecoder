@@ -29,8 +29,15 @@ UnCoupler::~UnCoupler() {
 }
 
 void UnCoupler::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {
-	if ((Address_ >= BaseAddress) && (Address_ < (BaseAddress + 1)) && OutputPower_) {
-		if (Direction_) {
+	
+	if ((Address_ == BaseAddress) && static_cast<bool>(OutputPower_)) {
+		Serial.println("UnCoupler::notifyTurnoutAddress");
+		Serial.print("    Address:     "); Serial.println(Address_, DEC);
+		Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
+		Serial.print("    Direction: "); Serial.println(Direction_ ? "Closed" : "Thrown");
+		Serial.print("    Output: "); Serial.println(OutputPower_ ? "On" : "Off");
+
+		if (static_cast<bool>(Direction_)) {
 			on();
 		}
 	}
@@ -83,9 +90,16 @@ Turnout::~Turnout() {
 	coil2.~CoilPulsed();
 }
 
-void Turnout::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_){
-	if ((Address_ >= BaseAddress) && (Address_ < (BaseAddress + 1)) && OutputPower_) {
-		if (Direction_) {
+void Turnout::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {
+
+	if ((Address_ == BaseAddress) && static_cast<bool>(OutputPower_)) {
+		Serial.println("Turnout::notifyTurnoutAddress");
+		Serial.print("    Address:     "); Serial.println(Address_, DEC);
+		Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
+		Serial.print("    Direction: "); Serial.println(Direction_ ? "Closed" : "Thrown");
+		Serial.print("    Output: "); Serial.println(OutputPower_ ? "On" : "Off");
+
+		if (static_cast<bool>(Direction_)) {
 			on();
 		}
 		else {
@@ -118,7 +132,6 @@ void Turnout::off(){
 }
 
 
-
 TurnoutServo::TurnoutServo(int8_t ServoPort_, uint16_t Address_, int16_t limit1_, int16_t limit2_, int16_t travelTime_) :
 	accessories(Address_, ServoPort_, 230),
 	servo(ServoPort_, limit1_, limit2_, travelTime_, SERVO_INITL1) {
@@ -132,13 +145,16 @@ TurnoutServo::~TurnoutServo() {
 	servo.~ServoControl();	
 }
 
-void TurnoutServo::process(){
-	servo.process();
-}
+void TurnoutServo::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {
 
-void TurnoutServo::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_){
-	if ((Address_ >= BaseAddress) && (Address_ < (BaseAddress + 1)) && OutputPower_) {
-		if (Direction_) {
+	if ((Address_ == BaseAddress) && static_cast<bool>(OutputPower_)) {
+		Serial.println("TurnoutServo::notifyTurnoutAddress");
+		Serial.print("    Address:     "); Serial.println(Address_, DEC);
+		Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
+		Serial.print("    Direction: "); Serial.println(Direction_ ? "Closed" : "Thrown");
+		Serial.print("    Output: "); Serial.println(OutputPower_ ? "On" : "Off");
+
+		if (static_cast<bool>(Direction_)) {
 			on();
 		}
 		else {
@@ -147,11 +163,16 @@ void TurnoutServo::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, u
 	}
 }
 
-void TurnoutServo::notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps){
+void TurnoutServo::notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps) {
 	if (Addr == BaseAddress) {
 		//percentage = ((Speed - 1) * 100) / SpeedSteps;
 	}
 }
+
+void TurnoutServo::process(){
+	servo.process();
+}
+
 
 void TurnoutServo::on(){
 	accessories::on();
