@@ -20,17 +20,21 @@ Ausgang::~Ausgang() {
 }
 
 void Ausgang::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-
-	// Einschalten
 	if (Address_ == BaseAddress) {
-		on();
-	};
+		if (IsActive != static_cast<bool>(cmd_)) {
+			Serial.println("Ausgang::notifyAddress");
+			Serial.print("    Address:     "); Serial.println(Address_, DEC);
+			Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
 
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
-	};
-};
+			if (static_cast<bool>(cmd_)) {
+				on();
+			}
+			else {
+				off();
+			}
+		}
+	}
+}
 
 void Ausgang::on() {
 	Serial.println("Ausgang::on");
@@ -87,17 +91,21 @@ Blinker::~Blinker(){
 }
 
 void Blinker::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-
-	// Einschalten
 	if (Address_ == BaseAddress) {
-		on();
-	}
+		if (IsActive != static_cast<bool>(cmd_)) {
+			Serial.println("Blinker::notifyAddress");
+			Serial.print("    Address:     "); Serial.println(Address_, DEC);
+			Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
 
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
+			if (static_cast<bool>(cmd_)) {
+				on();
+			}
+			else {
+				off();
+			}
+		}
 	}
-};
+}
 
 void Blinker::process() {
 
@@ -158,19 +166,6 @@ Wechselblinker::Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint
 
 Wechselblinker::~Wechselblinker() {
 	LED2.~LEDFader();
-}
-
-void Wechselblinker::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-	
-	// Einschalten
-	if (Address_ == BaseAddress) {
-		on();
-	}
-
-	// Ausschalten
-	if (Address_ ==  BaseAddress + 1) {
-		off();
-	}
 }
 
 void Wechselblinker::process() {
@@ -268,17 +263,21 @@ Lauflicht::~Lauflicht() {
 };
 
 void Lauflicht::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-	
-	// Einschalten
 	if (Address_ == BaseAddress) {
-		on();
-	}
+		if (IsActive != static_cast<bool>(cmd_)) {
+			Serial.println("Lauflicht::notifyAddress");
+			Serial.print("    Address:     "); Serial.println(Address_, DEC);
+			Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
 
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
+			if (static_cast<bool>(cmd_)) {
+				on();
+			}
+			else {
+				off();
+			}
+		}
 	}
-};
+}
 
 void Lauflicht::process() {
 
@@ -469,17 +468,21 @@ Hausbeleuchtung::~Hausbeleuchtung() {
 };
 
 void Hausbeleuchtung::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-
-	// Einschalten
 	if (Address_ == BaseAddress) {
-		on();
-	};
+		if (IsActive != static_cast<bool>(cmd_)) {
+			Serial.println("Hausbeleuchtung::notifyAddress");
+			Serial.print("    Address:     "); Serial.println(Address_, DEC);
+			Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
 
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
-	};
-};
+			if (static_cast<bool>(cmd_)) {
+				on();
+			}
+			else {
+				off();
+			}
+		}
+	}
+}
 
 void Hausbeleuchtung::process() {
 
@@ -772,17 +775,21 @@ NeonLampen::~NeonLampen() {
 }
 
 void NeonLampen::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-
-	// Einschalten
 	if (Address_ == BaseAddress) {
-		on();
-	}
+		if (IsActive != static_cast<bool>(cmd_)) {
+			Serial.println("Neonlampen::notifyAddress");
+			Serial.print("    Address:     "); Serial.println(Address_, DEC);
+			Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
 
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
+			if (static_cast<bool>(cmd_)) {
+				on();
+			}
+			else {
+				off();
+			}
+		}
 	}
-};
+}
 
 void NeonLampen::process() {
 
@@ -875,15 +882,19 @@ NatriumLampen::~NatriumLampen() {
 }
 
 void NatriumLampen::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-
-	// Einschalten
 	if (Address_ == BaseAddress) {
-		on();
-	}
+		if (IsActive != static_cast<bool>(cmd_)) {
+			Serial.println("Neonlampen::notifyAddress");
+			Serial.print("    Address:     "); Serial.println(Address_, DEC);
+			Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
 
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
+			if (static_cast<bool>(cmd_)) {
+				on();
+			}
+			else {
+				off();
+			}
+		}
 	}
 }
 
@@ -929,19 +940,6 @@ Feuer::~Feuer() {
 	LED2.~LEDFader();
 	LED3.~LEDFader();
 }
-
-void Feuer::notifyAddress(uint16_t Address_, uint8_t cmd_) {
-
-	// Einschalten
-	if (Address_ == BaseAddress) {
-		on();
-	};
-
-	// Ausschalten
-	if (Address_ == BaseAddress + 1) {
-		off();
-	};
-};
 
 void Feuer::process() {
 	LED1.process();
