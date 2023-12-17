@@ -2,9 +2,9 @@
 // 
 // 
 
-//#define NOTIFY_DCC_ACCSTATE_MSG
-//#define NOTIFY_DCC_MSG
-//#define NOTIFY_TURNOUT_MSG
+// #define NOTIFY_DCC_ACCSTATE_MSG
+// #define NOTIFY_DCC_MSG
+// #define NOTIFY_TURNOUT_MSG
 //#define NOTIFY_DCC_CV_WRITE_MSG
 //#define NOTIFY_DCC_CV_CHANGE_MSG
 //#define DEBUG_MSG
@@ -39,14 +39,9 @@ CVPair FactoryDefaultCVs[] = {
 
 };
 
-// This functions should be eriodically called
-extern void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputPower);
-extern void notifyDccAccState(uint16_t Addr, uint16_t BoardAddr, uint8_t OutputAddr, uint8_t State);
-extern void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps);
-extern void notifyDccFunc(uint16_t Addr, uint8_t FuncNum, uint8_t FuncState);
-extern void notifyDccMsg(DCC_MSG* Msg);
 
-extern uint8_t notifyCVWrite(uint16_t CV, uint8_t Value) {
+
+uint8_t notifyCVWrite(uint16_t CV, uint8_t Value) {
 
 #ifdef NOTIFY_DCC_CV_WRITE_MSG
 
@@ -62,7 +57,7 @@ extern uint8_t notifyCVWrite(uint16_t CV, uint8_t Value) {
 	return 0;
 };
 
-extern void notifyCVChange(uint16_t CV, uint8_t Value) {
+void notifyCVChange(uint16_t CV, uint8_t Value) {
 
 #ifdef NOTIFY_DCC_CV_CHANGE_MSG
 	Serial.print(F("notifyCVChange: CV: "));
@@ -72,23 +67,38 @@ extern void notifyCVChange(uint16_t CV, uint8_t Value) {
 #endif  
 };
 
-extern void notifyCVAck(void) {
+void notifyCVAck(void) {
 
 #ifdef NOTIFY_DCC_CV_ACK_MSG
 	Serial.println("notifyCVAck");
 #endif
 };
 
-extern void notifyCVResetFactoryDefault() {
+void notifyCVResetFactoryDefault() {
 	// Make FactoryDefaultCVIndex non-zero and equal to num CV's to be reset 
 	// to flag to the loop() function that a reset to Factory Defaults needs to be done
 	FactoryDefaultCVIndex = sizeof(FactoryDefaultCVs) / sizeof(CVPair);
 };
 
+void notifyDccMsg(DCC_MSG* Msg) {
+#ifdef  NOTIFY_DCC_MSG
+	int i;
+	if ((Msg->Data[0] == 0) && (Msg->Data[1] == 0)) return;  //reset packlet
+	if ((Msg->Data[0] == 0b11111111) && (Msg->Data[1] == 0)) return;  //idle packet
+
+	if (Msg->Data[0] == 100 && Msg->Data[1] == 63) return;
+
+	Serial.print(F("notifyDccMsg - ")); Serial.println(Msg->Size);
+	for (i = 0; i < Msg->Size; i++) {
+		Serial.print(Msg->Data[i], BIN);
+		Serial.print(F(" "));
+	}
+
+	Serial.println(F(" ")); Serial.println(F(" "));
+#endif
+}
+
 void NMRAsetup() {
-	// Configure the DCC CV Programing ACK pin for an output
-	pinMode(DccAckPin, OUTPUT);
-	digitalWrite(DccAckPin, 0);
 
 #if !defined(FORCE_RESET_FACTORY_DEFAULT_CV)
 	//if eeprom has 0xFF then assume it needs to be programmed
@@ -106,10 +116,10 @@ void NMRAsetup() {
 #endif 
 
 	// Setup which External Interrupt, the Pin it's associated with that we're using and enable the Pull-Up 
-	Dcc.pin(0, 2, 1);
+	Dcc.pin(digitalPinToInterrupt(GPIO_NUM_2), GPIO_NUM_2, 1);
 
 	// Call the main DCC Init function to enable the DCC Receiver
-	Dcc.init(MAN_ID_DIY, DCC_DECODER_VERSION_NUM, FLAGS_DCC_ACCESSORY_DECODER, CV_DCC_POM_PROG);
+	Dcc.init(MAN_ID_DIY, DCC_DECODER_VERSION_NUM, FLAGS_OUTPUT_ADDRESS_MODE | FLAGS_DCC_ACCESSORY_DECODER, 0);
 
 	// DCC-Adresse setzen wenn keine Adresse gespeichert ist
 	if (Dcc.getCV(CV_ACCESSORY_DECODER_ADDRESS_LSB) == 255) {

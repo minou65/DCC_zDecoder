@@ -35,5 +35,11 @@
 void NMRAsetup();
 void NMRAloop();
 
+// This functions should be eriodically called
+extern void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputPower);
+extern void notifyDccAccState(uint16_t Addr, uint16_t BoardAddr, uint8_t OutputAddr, uint8_t State);
+extern void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps);
+extern void notifyDccFunc(uint16_t Addr, uint8_t FuncNum, uint8_t FuncState);
+
 #endif
 
