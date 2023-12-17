@@ -29,9 +29,9 @@ public:
 	virtual void on();
 	virtual void off();
 
-	void notifyAddress(uint16_t Address, uint8_t cmd_);
-	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
-	void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps);
+	virtual void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	virtual void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
+	virtual void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps);
 
 	bool isOn() const;
 	uint16_t Address();
