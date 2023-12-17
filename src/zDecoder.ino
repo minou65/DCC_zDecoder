@@ -4,6 +4,12 @@
  Author:	andy
 */
 
+// #define NOTIFY_DCC_ACCSTATE_MSG
+// #define NOTIFY_DCC_MSG
+// #define NOTIFY_TURNOUT_MSG
+//#define NOTIFY_DCC_CV_WRITE_MSG
+//#define NOTIFY_DCC_CV_CHANGE_MSG
+//#define DEBUG_MSG
 
 #include "webhandling.h"
 #include "Vector.h"  // https://github.com/tomstewart89/Vector/fork
@@ -16,7 +22,7 @@
 #include "NMRAhandling.h"
 #include "pinmapping.h"
 
-char Version[] = "0.0.0.1 (2023-11-01)";
+char Version[] = "1.0.0.0 (17.12.2023)";
 
 // #include "NMRAhandling.h"
 #include "Vector.h"
@@ -29,29 +35,6 @@ TaskHandle_t TaskHandle;
 
 bool ResetDCCDecoder = false;
 
-void notifyDccMsg(DCC_MSG* Msg) {
-#ifdef  NOTIFY_DCC_MSG
-	int i;
-	if ((Msg->Data[0] == 0) && (Msg->Data[1] == 0)) return;  //reset packlet
-	if ((Msg->Data[0] == 0b11111111) && (Msg->Data[1] == 0)) return;  //idle packet
-
-	if (Msg->Data[0] == 100 && Msg->Data[1] == 63) return;
-
-	Serial.println(F(" "));
-	Serial.println(F("========================================= "));
-	Serial.print(F(" Free Memory: "));  Serial.println(freeMemory());
-	Serial.println(F(" "));
-
-	Serial.print(F("notifyDccMsg - ")); Serial.println(Msg->Size);
-	for (i = 0; i < Msg->Size; i++) {
-		Serial.print(Msg->Data[i], BIN);
-		Serial.print(F(" "));
-	}
-
-	Serial.println(F(" ")); Serial.println(F(" "));
-#endif
-}
-
 void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputPower) {
 #ifdef  NOTIFY_TURNOUT_MSG
 	Serial.print("notifyDccAccTurnoutOutput: Turnout: ");
@@ -59,11 +42,11 @@ void notifyDccAccTurnoutOutput(uint16_t Addr, uint8_t Direction, uint8_t OutputP
 	Serial.print(" Direction: ");
 	Serial.print(Direction ? "Closed" : "Thrown");
 	Serial.print(" Output: ");
-	Serial.print(OutputPower ? "On" : "Off");
+	Serial.println(OutputPower ? "On" : "Off");
 #endif
 
-	for (int i = 0; i < decoder.Size(); i++) {
-		decoder[i]->notifyTurnoutAddress(Addr, Direction, OutputPower);
+	for (int _i = 0; _i < decoder.Size(); _i++) {
+		decoder[_i]->notifyTurnoutAddress(Addr, Direction, OutputPower);
 	}
 }
 
@@ -78,8 +61,8 @@ void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t Sp
 }
 
 void notifyDccAccState(uint16_t Addr, uint16_t BoardAddr, uint8_t OutputAddr, uint8_t State) {
-	uint8_t OutputNum = OutputAddr >> 1;  //shift over the bits so the outputaddr is 0 to 3
-	uint8_t StateProper = OutputAddr & 0b00000001;  //JMRI puts out the state as the right most bit of pDccMsg->Data[1], the state argument doesnt change in JMRI Turnout.
+	uint8_t _OutputNum = OutputAddr >> 1;  //shift over the bits so the outputaddr is 0 to 3
+	uint8_t _Cmd = OutputAddr & 0b00000001;  //JMRI puts out the state as the right most bit of pDccMsg->Data[1], the state argument doesnt change in JMRI Turnout.
 
 #ifdef NOTIFY_DCC_ACCSTATE_MSG
 	Serial.print("AccState - ");
@@ -90,17 +73,23 @@ void notifyDccAccState(uint16_t Addr, uint16_t BoardAddr, uint8_t OutputAddr, ui
 	Serial.print(" OutputAddr: ");
 	Serial.print(OutputAddr, DEC);
 	Serial.print(" Output: ");
-	Serial.print(OutputNum);
+	Serial.print(_OutputNum);
 	Serial.print(" State: 0b");
 	Serial.print(State, BIN);
-	Serial.print(" Status: ");
-	Serial.print(StateProper == 1 ? "Closed" : "Thrown");
+	Serial.print(" Command: ");
+	Serial.print(_Cmd == 1 ? "Closed" : "Thrown");
 	Serial.println();
 	//Serial.print("    zDecoder: "); Serial.println(BoardAddr + OutputAddr);
 #endif 
 
-	for (int i = 0; i < decoder.Size(); i++) {
-		decoder[i]->notifyAddress(BoardAddr + OutputAddr, 1);
+#ifdef  NOTIFY_TURNOUT_MSG
+	Serial.print("zDecoder: Address"); Serial.print(Addr);
+	Serial.print(_Cmd == 1 ? " :Closed" : " :Thrown");
+	Serial.println();
+#endif
+
+	for (int _i = 0; _i < decoder.Size(); _i++) {
+		decoder[_i]->notifyAddress(Addr, _Cmd);
 	}
 }
 
@@ -185,7 +174,7 @@ void zDecoderInit(void) {
 		if (_outputgroup->isActive()) {
 			uint8_t _Mode = atoi(_outputgroup->ModeValue);
 			uint8_t _Count = atoi(_outputgroup->NumberValue);
-			uint8_t _Address = atoi(_outputgroup->AddressValue);
+			uint16_t _Address = atoi(_outputgroup->AddressValue);
 			uint8_t _TimeOn = atoi(_outputgroup->TimeOnValue);
 			uint8_t _TimeOff = atoi(_outputgroup->TimeOffValue);
 			uint8_t _Multiplier = atoi(_outputgroup->MultiplierValue); // Multiplikator
@@ -198,6 +187,7 @@ void zDecoderInit(void) {
 
 			Serial.print(F("Values for channel ")); Serial.print(_Channel); Serial.println(F(" preserved"));
 			Serial.print(F("    Channels used: ")); Serial.println(_Count);
+			Serial.print(F("    Address: ")); Serial.println(_Address);
 
 			// Einrichten des Ports
 			switch (_Mode) {
@@ -391,7 +381,6 @@ void loop2(void* parameter) {
 
 	for (;;) {   // Endless loop
 		if (ResetDCCDecoder) {
-
 			zDecoderInit();
 			ResetDCCDecoder = false;
 		}
