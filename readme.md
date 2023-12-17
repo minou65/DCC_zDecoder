@@ -1,6 +1,10 @@
 # DCC zDecoder
+
+<img src="img/zdecoder.jpg" width="500">
+
 - [DCC zDecoder](#dcc-zdecoder)
 	- [Beschreibung](#beschreibung)
+	- [Platinen](#platinen)
 	- [Librarys](#librarys)
 	- [Pin mapping](#pin-mapping)
 	- [Betriebsarten](#betriebsarten)
@@ -8,6 +12,11 @@
 	- [Schema](#schema)
 	- [Materialliste](#materialliste)
 	- [Anschlüsse](#anschlüsse)
+	- [Inbetriebnahme](#inbetriebnahme)
+	- [Web UI](#web-ui)
+		- [Overview](#overview)
+		- [Groups](#groups)
+		- [Config](#config)
 	- [WiFi](#wifi)
 		- [Default Password](#default-password)
 		- [Default IP address](#default-ip-address)
@@ -29,6 +38,10 @@ nicht übersteigen.
 
 [Top of document](#dcc-zdecoder)
 
+## Platinen
+Unbestückte Platinen sind bei mit erhältlich für CHF 5.00 / Stück plus Porto. Bestückte Platinen CHF 30.00 plus Porto
+[Top of document](#dcc-zdecoder)
+
 ## Librarys
 Die folgenden Bibliotheken werden verwendet und müssen installiert werden
 - prampec/IotWebConf
@@ -41,23 +54,23 @@ In der Header datei [pinmapping.h](src/pinmapping.h) können die Pins für die 1
 
 ```cpp
 static uint8_t ChannelToGPIOMapping[16] = {
-	GPIO_NUM_16,
-	GPIO_NUM_17,
-	GPIO_NUM_18,
-	GPIO_NUM_19,
-	GPIO_NUM_21,
-	GPIO_NUM_22,
-	GPIO_NUM_23,
-	GPIO_NUM_26,
+	GPIO_NUM_23, // O11
+	GPIO_NUM_22, // O12
+	GPIO_NUM_21, // O13
+	GPIO_NUM_19, // O14
+	GPIO_NUM_18, // O15
+	GPIO_NUM_17, // O16
+	GPIO_NUM_16, // O17
+	GPIO_NUM_4,  // O18
 
-	GPIO_NUM_12,
-	GPIO_NUM_13,
-	GPIO_NUM_14,
-	GPIO_NUM_4,
-	GPIO_NUM_25,
-	GPIO_NUM_27,
-	GPIO_NUM_32,
-	GPIO_NUM_33
+	GPIO_NUM_33, // O21
+	GPIO_NUM_32, // O22
+	GPIO_NUM_25, // O23
+	GPIO_NUM_26, // O24
+	GPIO_NUM_27, // O25
+	GPIO_NUM_14, // O26
+	GPIO_NUM_12, // O27
+	GPIO_NUM_13  // O28
 
 };
 ```
@@ -120,6 +133,41 @@ Der zDecoder untersützt folgende Betriebsarten
 
 [Top of document](#dcc-zdecoder)
 
+## Inbetriebnahme
+
+Nachdem alles zusammengebaut ist und alle Lötstellen sorgfältig überprüft wurden, kann das Program auf den ESP aufgespielt werden.
+Lauflicht 2
+
+[Top of document](#dcc-zdecoder)
+
+## Web UI
+
+Mittels des Web User interfaces kann der zDecoder einfach konfiguriert und bedient werden
+
+### Overview
+
+auf dieser Seite sind alle wichtigen Informationn zu zDecoder ersichtlich
+
+![Overview](img/webui-overview.png)
+
+[Top of document](#dcc-zdecoder)
+
+### Groups
+
+auf dieser Seite können die Gruppen ein und ausgescahltet werden. Wird über DCC geschaltet, ist auf dieser Seite auch der jeweilige Status ersichtlich. Rot ist ausgeschaltet, grün ist eingeschaltet
+
+![Alt text](img/webui-groups.png)
+
+[Top of document](#dcc-zdecoder)
+
+### Config
+
+auf dieser Seite können die Gruppen erstellt und konfiguriert werden. Die Bedeutung und Verwendung der Parameter ist beim jeweiligen Objekt unter [Betriebsarten](#betriebsarten) beschrieben.
+
+![Alt text](img/webui-config.png)
+
+[Top of document](#dcc-zdecoder)
+
 ## WiFi
 
 ### Default Password
@@ -135,7 +183,7 @@ Wenn nicht mit einem AP verbunden, ist die IP Adresse 192.168.4.1
 [Top of document](#dcc-zdecoder)
 
 ### OTA 
-OTA ist aktiviert und kann verwenbdet werden. Die IP Adresse ist entweder die Default IP address oder die vom AP zugewissene. Port ist Standart
+OTA ist aktiviert und kann verwenbdet werden. Damit ist es möglich, die Software des zDecoders zu updaten ohne unter die Anlage krichen zu müssen. Die IP Adresse ist entweder die Default IP address oder die vom AP zugewissene. Port ist Standart
 
 [Top of document](#dcc-zdecoder)
 
