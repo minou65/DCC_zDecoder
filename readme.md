@@ -23,6 +23,7 @@
 		- [OTA](#ota)
 		- [Configuration options](#configuration-options)
 		- [Blinking codes](#blinking-codes)
+	- [Firmware](#firmware)
 	- [Reset](#reset)
 
 ## Beschreibung
@@ -210,6 +211,9 @@ In der nachfolgenden Tabelle fasst die verschiedenen Blinkcodes zusammen
 | langsames blinken | meistens aus mit kurzem blinken <br> Das Thing ist online und mit dem WLan verbunden |
 
 [Top of document](#dcc-zdecoder)
+
+## Firmware
+Hier kann, eine entsprechende Datei vorausgesetzt, die Firmware des decoders aktualisiert werden
 
 ## Reset
 Wurde das Passwort vergessen oder funktioniert der Decoder nicht mehr kann durch schliessen des Jumpers Reset während dem booten, der Decoder auf die Werkseinstellungen zurückgesetzt werden.
