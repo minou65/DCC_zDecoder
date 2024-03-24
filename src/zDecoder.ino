@@ -22,7 +22,7 @@
 #include "NMRAhandling.h"
 #include "pinmapping.h"
 
-char Version[] = "1.0.0.0 (17.12.2023)";
+char Version[] = "1.0.0.1 (2024-03-21)";
 
 // #include "NMRAhandling.h"
 #include "Vector.h"

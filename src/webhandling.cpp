@@ -13,6 +13,7 @@
 #include "webhandling.h"
 #include <IotWebConf.h>
 #include <IotWebConfOptionalGroup.h>
+#include <IotWebConfESP32HTTPUpdateServer.h>
 #include <time.h>
 #include <DNSServer.h>
 #include <iostream>
@@ -43,6 +44,7 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper);
 
 DNSServer dnsServer;
 WebServer server(80);
+HTTPUpdateServer httpUpdater;
 
 // -- We need to declare an instance for all OutputGroup items, that can
 //    appear in the config portal
@@ -453,6 +455,11 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup8);
     iotWebConf.addParameterGroup(&OutputGroup9);
     iotWebConf.addParameterGroup(&OutputGroup10);
+
+    // -- Define how to handle updateServer calls.
+    iotWebConf.setupUpdateServer(
+        [](const char* updatePath) { httpUpdater.setup(&server, updatePath); },
+        [](const char* userName, char* password) { httpUpdater.updateCredentials(userName, password); });
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setFormValidator(&formValidator);
