@@ -36,8 +36,6 @@
  * 2017 Jul 5: Edited by Jaroslav Páral (jarekparal) - paral@robotikabrno.cz
  */
 
-#include <Servo.h>
-
 int ESPServo::channel_next_free = 0;
 
 ESPServo::ESPServo() {
