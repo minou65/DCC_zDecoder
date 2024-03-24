@@ -11,6 +11,7 @@
 //#define NOTIFY_DCC_CV_CHANGE_MSG
 //#define DEBUG_MSG
 
+
 #include "webhandling.h"
 #include "Vector.h"  // https://github.com/tomstewart89/Vector/fork
 #include <NmraDcc.h>
@@ -22,7 +23,7 @@
 #include "NMRAhandling.h"
 #include "pinmapping.h"
 
-char Version[] = "1.0.0.1 (2024-03-21)";
+char Version[] = "1.0.0.2 (2024-03-24)";
 
 // #include "NMRAhandling.h"
 #include "Vector.h"
