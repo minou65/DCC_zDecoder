@@ -39,7 +39,7 @@ nicht übersteigen.
 [Top of document](#dcc-zdecoder)
 
 ## Platinen
-Unbestückte Platinen sind bei mit erhältlich für CHF 5.00 / Stück plus Porto. Bestückte Platinen CHF 30.00 plus Porto
+Unbestückte Platinen sind bei mir erhältlich für CHF 5.00 / Stück plus Porto. Bestückte Platinen CHF 30.00 plus Porto
 [Top of document](#dcc-zdecoder)
 
 ## Librarys
