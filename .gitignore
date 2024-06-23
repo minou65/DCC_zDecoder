@@ -409,3 +409,4 @@ FodyWeavers.xsd
 *.heic
 .vscode/settings.json
 sch/DCC zDecoder.zip
+/src/board.txt
