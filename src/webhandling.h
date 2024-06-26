@@ -220,44 +220,5 @@ extern ServoGroup ServoGroup4;
 extern ServoGroup ServoGroup5;
 extern ServoGroup ServoGroup6;
 
-#define HTML_Style \
-"<style>\
-    .de{background-color:#ffaaaa;} \
-    .em{font-size:0.8em;color:#bb0000;padding-bottom:0px;} \
-    .c{text-align: center;} \
-    div,input,select{padding:5px;font-size:1em;} \
-    input{width:95%;} \
-    select{width:100%} \
-    input[type=checkbox]{width:auto;scale:1.5;margin:10px;} \
-    body{text-align: center;font-family:verdana;} \
-    button{border:0;border-radius:0.3rem;background-color:#16A1E7;color:#fff;line-height:2.4rem;font-size:1.2rem;width:100%;} \
-    fieldset{border-radius:0.3rem;margin: 0px;} \
-</style>";
-
-#define HTML_Start_Doc "<!DOCTYPE html>\
-    <html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>\
-    <title>{v}</title>\
-";
-
-#define HTML_Start_Body "</head><body>";
-#define HTML_Start_Fieldset "<fieldset align=left style=\"border: 1px solid\">";
-#define HTML_Start_Table "<table border=0 align=center>";
-#define HTML_End_Table "</table>";
-#define HTML_End_Fieldset "</fieldset>";
-#define HTML_End_Body "</body>";
-#define HTML_End_Doc "</html>";
-#define HTML_Fieldset_Legend "<legend>{l}</legend>"
-#define HTML_Table_Row "<tr><td>{n}</td><td>{v}</td></tr>";
-
-#define ButtonResponse \
-"<!DOCTYPE html>\
-    <html><head>\
-        <meta\
-             http-equiv=\"refresh\"\
-             content=\"1; url='/groups'\"/>\
-    </head>\
-    <body><p>processing group</p></body></html>\
-"
-
 #endif
 
