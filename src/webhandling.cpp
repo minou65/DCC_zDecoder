@@ -84,7 +84,6 @@ const char ButtonResponse[] PROGMEM = R"=====(
 )=====";
 
 const char html_button_code[] PROGMEM = R"=====(
-const char html_button_code[] PROGMEM = R"=====(
 <form action="/post" method="post">
     <input type="hidden" name="group" value="[value]">
     <button id="[id]" style="background-color: red;" type="submit">[name]</button>
