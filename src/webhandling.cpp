@@ -23,6 +23,7 @@
 #include <string.h>
 #include "version.h"
 #include "html.h"
+#include "favicon.h"
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
@@ -112,9 +113,9 @@ protected:
     }
 };
 
-void handleRoot(AsyncWebServerRequest* _request) {
+void handleRoot(AsyncWebServerRequest* request) {
 
-    AsyncWebRequestWrapper* _asyncWebRequestWrapper = new AsyncWebRequestWrapper(_request);
+    AsyncWebRequestWrapper* _asyncWebRequestWrapper = new AsyncWebRequestWrapper(request);
     if (iotWebConf.handleCaptivePortal(_asyncWebRequestWrapper)) {
         return;
     }
@@ -197,7 +198,7 @@ void handleRoot(AsyncWebServerRequest* _request) {
     _content += _fp.getHtmlTableEnd().c_str();
     _content += _fp.getHtmlEnd().c_str();
 
-    AsyncWebServerResponse* _response = _request->beginChunkedResponse("text/html", [_content](uint8_t* _buffer, size_t _maxLen, size_t _index) -> size_t {
+    AsyncWebServerResponse* _response = request->beginChunkedResponse("text/html", [_content](uint8_t* _buffer, size_t _maxLen, size_t _index) -> size_t {
 
         std::string _chunk = "";
         size_t _len = min(_content.length() - _index, _maxLen);
@@ -213,7 +214,7 @@ void handleRoot(AsyncWebServerRequest* _request) {
         }
     );
     _response->addHeader("Server", "ESP Async Web Server");
-    _request->send(_response);
+    request->send(_response);
 
 }
 
@@ -306,16 +307,16 @@ void handleSettings(AsyncWebServerRequest* request){
     request->send(_response);
 }
 
-void handlePost(AsyncWebServerRequest* _request) {
-    if (_request->hasParam("group", true)) {
-        String _number = _request->getParam("group", true)->value();
+void handlePost(AsyncWebServerRequest* request) {
+    if (request->hasParam("group", true)) {
+        String _number = request->getParam("group", true)->value();
         handleChannel(_number.toInt() - 1);
-        _request->send(200, "text/plain", html_button_response);
+        request->send(200, "text/plain", html_button_response);
     }
 
     // test if parameter all exists. If on enable all channels, if off disable all channels
-    if (_request->hasParam("all", true)) {
-        String _all = _request->getParam("all", true)->value();
+    if (request->hasParam("all", true)) {
+        String _all = request->getParam("all", true)->value();
         if (_all == "on") {
             for (int _i = 0; _i < 10; _i++) {
                 handleChannel(_i);
@@ -326,7 +327,7 @@ void handlePost(AsyncWebServerRequest* _request) {
                 handleChannel(_i);
             }
         }
-        _request->send(200, "text/plain", html_button_response);
+        request->send(200, "text/plain", html_button_response);
     }
 }
 
@@ -419,6 +420,11 @@ void websetup(){
     server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
         AsyncWebRequestWrapper asyncWebRequestWrapper(request);
         iotWebConf.handleConfig(&asyncWebRequestWrapper);
+        }
+    );
+    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", favicon_ico, sizeof(favicon_ico));
+        request->send(response);
         }
     );
     server.on("/data", HTTP_GET, [](AsyncWebServerRequest* request) { handleData(request); });
