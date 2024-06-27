@@ -184,7 +184,23 @@ void handleRoot(AsyncWebServerRequest* request) {
     _content += _fp.getHtmlTableEnd().c_str();
     _content += _fp.getHtmlFieldsetEnd().c_str();
 
+    String _b = html_button_code;
+    _b.replace("[value]", "allEnable");
+    _b.replace("[name]", "Enable all");
+    _b.replace("[id]", "allEnable");
+    _b.replace("red", "grey");
 
+    _b = html_button_code;
+    _b.replace("[value]", "allDisable");
+    _b.replace("[name]", "Disable all");
+    _b.replace("[id]", "allDisable");
+    _b.replace("red", "grey");
+
+    _content += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
+    _content += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+
+    _content += _fp.getHtmlTableEnd().c_str();
+    _content += _fp.getHtmlFieldsetEnd().c_str();
 
     _content += _fp.addNewLine(2).c_str();
 
@@ -319,12 +335,12 @@ void handlePost(AsyncWebServerRequest* request) {
         String _all = request->getParam("all", true)->value();
         if (_all == "on") {
             for (int _i = 0; _i < 10; _i++) {
-                handleChannel(_i);
+                handleChannel(_i, 1);
             }
         }
         if (_all == "off") {
             for (int _i = 0; _i < 10; _i++) {
-                handleChannel(_i);
+                handleChannel(_i, 0);
             }
         }
         request->send(200, "text/plain", html_button_response);

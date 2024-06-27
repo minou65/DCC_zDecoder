@@ -19,6 +19,7 @@ void websetup();
 void webloop();
 
 extern void handleChannel(uint8_t Channel_);
+extern void handleChannel(uint8_t Channel_, uint8_t Mode_);
 extern bool ChannelIsOn(uint8_t Channel_);
 
 class MySelectParameter : public iotwebconf::SelectParameter {
