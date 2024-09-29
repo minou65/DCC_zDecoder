@@ -410,3 +410,5 @@ FodyWeavers.xsd
 .vscode/settings.json
 sch/DCC zDecoder.zip
 /src/board.txt
+/src/zDecoder.ino.nodemcu-32s.bin
+/src/zDecoder.ino.nodemcu-32s.bin
