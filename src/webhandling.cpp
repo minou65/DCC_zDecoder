@@ -19,6 +19,8 @@
 #include <iostream>
 #include <string.h>
 #include "common.h"
+#include "html.h"
+#include "favicon.h"
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
@@ -68,92 +70,7 @@ ServoGroup ServoGroup6 = ServoGroup("sg6");
 
 IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION); 
 
-const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM =
-"function hideClass(id) {\n"
-"   var dropdown = document.getElementById(id + '-mode');\n"
-"   var selectedValue = dropdown.options[dropdown.selectedIndex].value;\n"
-"   var numberClass = document.getElementsByClassName(id + '-number')[0];\n"
-"   var timeonClass = document.getElementsByClassName(id + '-timeon')[0];\n"
-"   var timeoffClass = document.getElementsByClassName(id + '-timeoff')[0];\n"
-"   var multiplierClass = document.getElementsByClassName(id + '-multiplier')[0];\n"
-"   var onfadeClass = document.getElementsByClassName(id + '-onfade')[0];\n"
-"   var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];\n"
-"\n"
-// none is not visible, block is visible
-// The array parameters contains a list of items for which numberclass should be visible
-"   var parameters = [\"52\", \"53\", \"54\", \"55\", \"60\", \"61\", \"62\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       numberClass.style.display = \"block\";\n"
-"   } else {\n"
-"       numberClass.style.display = \"none\";\n"
-"   }\n"
-"\n"
-// The array parameters contains a list of items for which timeonClass should be visible
-"   var parameters = [\"1\", \"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"60\", \"81\", \"83\", \"201\", \"202\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       timeonClass.style.display = \"block\";\n"
-"   } else {\n"
-"       timeonClass.style.display = \"none\";\n"
-"   }\n"
-"\n"
-// The array parameters contains a list of items for which timeoffClass should be visible
-"   var parameters = [\"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"60\", \"83\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       timeoffClass.style.display = \"block\";\n"
-"   } else {\n"
-"       timeoffClass.style.display = \"none\";\n"
-"   }\n"
-"\n"
-// The array parameters contains a list of items for which multiplierClass should be visible
-"   var parameters = [\"1\", \"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"60\", \"61\", \"62\", \"81\", \"83\", \"201\", \"202\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       multiplierClass.style.display = \"block\";\n"
-"   } else {\n"
-"       multiplierClass.style.display = \"none\";\n"
-"   }\n"
-"\n"
-// The array parameters contains a list of items for which onfadeClass should be visible
-"   var parameters = [\"50\", \"51\", \"62\", \"83\", \"102\", \"103\", \"104\", \"105\", \"106\", \"110\", \"70\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       onfadeClass.style.display = \"block\";\n"
-"   } else {\n"
-"       onfadeClass.style.display = \"none\";\n"
-"   }\n"
-"\n"
-// The array parameters contains a list of items for which offfadeClass should be visible
-"   var parameters = [\"50\", \"51\", \"62\", \"83\", \"102\", \"103\", \"104\", \"105\", \"106\", \"110\", \"70\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       offfadeClass.style.display = \"block\";\n"
-"   } else {\n"
-"       offfadeClass.style.display = \"none\";\n"
-"   }\n"
-"\n"
-"   document.querySelector('label[for=\"' + id + '-timeon\"]').innerHTML = 'Time on (ms)';\n"
-"   document.querySelector('label[for=\"' + id + '-timeoff\"]').innerHTML = 'Time off (ms)';\n"
-"   document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'Fader on (ms)';\n"
-"   document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'Fader off (ms)';\n"
-"   document.querySelector('label[for=\"' + id + '-multiplier\"]').innerHTML = 'Multiplier';\n"
-"\n"
-"   if (selectedValue === \"83\") {\n"
-"       document.querySelector('label[for=\"' + id + '-timeon\"]').innerHTML = 'Minimum flash time (ms)';\n"
-"       document.querySelector('label[for=\"' + id + '-timeoff\"]').innerHTML = 'Maximal flash time (ms)';\n"
-"       document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'Minimum pause time (s)';\n"
-"       document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'Maximal pause time (s)';\n"
-"   }\n"
-"\n"
-"   var parameters = [\"61\", \"62\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       document.querySelector('label[for=\"' + id + '-multiplier\"]').innerHTML = 'Chance';\n"
-"   }\n"
-"\n"
-"   var parameters = [\"62\"];\n"
-"   if (parameters.includes(selectedValue)) {\n"
-"       document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'minimal glowing time (ms)';\n"
-"       document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'maximal glowing time (ms)';\n"
 
-"   }\n"
-"\n"
-"}\n";
 
 MySelectParameter::MySelectParameter(
         const char* label,
