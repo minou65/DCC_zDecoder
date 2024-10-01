@@ -141,8 +141,9 @@ public:
     char TimeOnFadeValue[NUMBER_LEN];
     char TimeOffFadeValue[NUMBER_LEN];
 
-    iotwebconf::TextParameter DesignationParam =
-        iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
+    iotwebconf::TextParameter DesignationParam = iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
+
+
     MySelectParameter ModeParam =
         MySelectParameter(
             "Mode",

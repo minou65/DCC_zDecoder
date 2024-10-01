@@ -93,39 +93,22 @@ input:checked + .slider:before {
 
 const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM = R"=====(
 function hideClass(id) {
-    var dropdown = document.getElementById(id + '-mode');
-    var selectedValue = dropdown.options[dropdown.selectedIndex].value;
-    var numberClass = document.getElementsByClassName(id + '-number')[0];
-    var timeonClass = document.getElementsByClassName(id + '-timeon')[0];
-    var timeoffClass = document.getElementsByClassName(id + '-timeoff')[0];
-    var multiplierClass = document.getElementsByClassName(id + '-multiplier')[0];
-    var onfadeClass = document.getElementsByClassName(id + '-onfade')[0];
-    var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];
+    var dropdown = document.getElementById(id + '-mode'),
+        selectedValue = dropdown.options[dropdown.selectedIndex].value,
+        numberClass = document.getElementsByClassName(id + '-number')[0],
+        timeonClass = document.getElementsByClassName(id + '-timeon')[0],
+        timeoffClass = document.getElementsByClassName(id + '-timeoff')[0],
+        multiplierClass = document.getElementsByClassName(id + '-multiplier')[0],
+        onfadeClass = document.getElementsByClassName(id + '-onfade')[0],
+        offfadeClass = document.getElementsByClassName(id + '-offfade')[0],
+        parameters;
 
-    // none is not visible, block is visible
-    // The array parameters contains a list of items for which numberclass should be visible
-    var parameters = ["52", "53", "54", "55", "60", "61", "62"];
-    numberClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
-
-    // The array parameters contains a list of items for which timeonClass should be visible
-    parameters = ["1", "50", "51", "52", "53", "54", "55", "60", "81", "83", "201", "202"];
-    timeonClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
-
-    // The array parameters contains a list of items for which timeoffClass should be visible
-    parameters = ["50", "51", "52", "53", "54", "55", "60", "83"];
-    timeoffClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
-
-    // The array parameters contains a list of items for which multiplierClass should be visible
-    parameters = ["1", "50", "51", "52", "53", "54", "55", "60", "61", "62", "81", "83", "201", "202"];
-    multiplierClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
-
-    // The array parameters contains a list of items for which onfadeClass should be visible
-    parameters = ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "70"];
-    onfadeClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
-
-    // The array parameters contains a list of items for which offfadeClass should be visible
-    parameters = ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "70"];
-    offfadeClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
+    numberClass.style.display = ["52", "53", "54", "55", "60", "61", "62"].includes(selectedValue) ? "block" : "none";
+    timeonClass.style.display = ["1", "50", "51", "52", "53", "54", "55", "60", "81", "83", "201", "202"].includes(selectedValue) ? "block" : "none";
+    timeoffClass.style.display = ["50", "51", "52", "53", "54", "55", "60", "83"].includes(selectedValue) ? "block" : "none";
+    multiplierClass.style.display = ["1", "50", "51", "52", "53", "54", "55", "60", "61", "62", "81", "83", "201", "202"].includes(selectedValue) ? "block" : "none";
+    onfadeClass.style.display = ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "70"].includes(selectedValue) ? "block" : "none";
+    offfadeClass.style.display = ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "70"].includes(selectedValue) ? "block" : "none";
 
     document.querySelector('label[for="' + id + '-timeon"]').innerHTML = 'Time on (ms)';
     document.querySelector('label[for="' + id + '-timeoff"]').innerHTML = 'Time off (ms)';
@@ -133,21 +116,18 @@ function hideClass(id) {
     document.querySelector('label[for="' + id + '-offfade"]').innerHTML = 'Fader off (ms)';
     document.querySelector('label[for="' + id + '-multiplier"]').innerHTML = 'Multiplier';
 
-    parameters = ["83"];
-    if (parameters.includes(selectedValue)) {
+    if (["83"].includes(selectedValue)) {
         document.querySelector('label[for="' + id + '-timeon"]').innerHTML = 'Minimum flash time (ms)';
         document.querySelector('label[for="' + id + '-timeoff"]').innerHTML = 'Maximal flash time (ms)';
         document.querySelector('label[for="' + id + '-onfade"]').innerHTML = 'Minimum pause time (s)';
         document.querySelector('label[for="' + id + '-offfade"]').innerHTML = 'Maximal pause time (s)';
     }
 
-    parameters = ["61", "62"];
-    if (parameters.includes(selectedValue)) {
+    if (["61", "62"].includes(selectedValue)) {
         document.querySelector('label[for="' + id + '-multiplier"]').innerHTML = 'Chance';
     }
 
-    parameters = ["62"];
-    if (parameters.includes(selectedValue)) {
+    if (["62"].includes(selectedValue)) {
         document.querySelector('label[for="' + id + '-onfade"]').innerHTML = 'minimal glowing time (ms)';
         document.querySelector('label[for="' + id + '-offfade"]').innerHTML = 'maximal glowing time (ms)';
     }
@@ -160,9 +140,7 @@ function updateData(jsonData) {
     for (var key in jsonData) {
         if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {
             var button = document.getElementById(key);
-            if (button) {
-                button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';
-            }
+            if (button) button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';
         }
     }
 }
