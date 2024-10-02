@@ -1,4 +1,4 @@
-#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
+//#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
 //#define IOTWEBCONF_DEBUG_TO_SERIAL
 
 #include <Arduino.h>
@@ -23,8 +23,8 @@
 #include <IotWebConfAsyncClass.h>
 #include <IotWebConfAsyncUpdateServer.h>
 #include <IotWebRoot.h>
-#include <AsyncJson.h>
-#include <ArduinoJson.h>
+#include "AsyncJson.h"
+#include "ArduinoJson.h"
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
@@ -42,8 +42,9 @@ const char wifiInitialApPassword[] = "123456789";
 #define STATUS_PIN LED_BUILTIN
 
 // -- Method declarations.
-void handleData(AsyncWebServerRequest* request);
 void handleRoot(AsyncWebServerRequest* request);
+void handlePost(AsyncWebServerRequest* request);
+void handleData(AsyncWebServerRequest* request);
 
 // -- Callback methods.
 void configSaved();
@@ -121,34 +122,164 @@ protected:
     }
 };
 
+void handleData(AsyncWebServerRequest* request) {
+    //AsyncJsonResponse* _response = new AsyncJsonResponse();
+    //_response->addHeader("Server", "ESP Async Web Server");
+    //JsonVariant& _json = _response->getRoot();
 
-void handleRoot(AsyncWebServerRequest* request) {
-    AsyncWebRequestWrapper asyncWebRequestWrapper(request);
-    if (iotWebConf.handleCaptivePortal(&asyncWebRequestWrapper)) {
+    //_json["rssi"] = WiFi.RSSI();
+
+    //uint8_t _i = 0;
+    //OutputGroup* _outputgroup = &OutputGroup1;
+    //while (_outputgroup != nullptr) {
+    //    if (_outputgroup->isActive()) {
+    //        _json["output" + String(_i)] = ChannelIsOn(_i);
+    //    }
+    //    _outputgroup = (OutputGroup*)_outputgroup->getNext();
+    //    _i += 1;
+    //}
+
+    //_i = 0;
+    //ServoGroup* _servogroup = &ServoGroup1;
+    //while (_servogroup != nullptr) {
+    //    if (_servogroup->isActive()) {
+    //        _json["servo" + String(_i)] = ChannelIsOn(_i);
+    //    }
+    //    _servogroup = (ServoGroup*)_servogroup->getNext();
+    //    _i += 1;
+    //}
+
+    //_response->setLength();
+    //request->send(_response);
+}
+
+void handlePost(AsyncWebServerRequest* _request) {
+    if (_request->hasParam("group", true)) {
+        String _number = _request->getParam("group", true)->value();
+        handleChannel(_number.toInt() - 1);
+        _request->send(200, "text/plain", ButtonResponse);
+    }
+
+    // test if parameter all exists. If on enable all channels, if off disable all channels
+    if (_request->hasParam("all", true)) {
+        String _all = _request->getParam("all", true)->value();
+        if (_all == "on") {
+            for (int _i = 0; _i < 10; _i++) {
+                handleChannel(_i);
+            }
+        }
+        if (_all == "off") {
+            for (int _i = 0; _i < 10; _i++) {
+                handleChannel(_i);
+            }
+        }
+        _request->send(200, "text/plain", ButtonResponse);
+    }
+}
+
+void handleRoot(AsyncWebServerRequest* _request) {
+
+    AsyncWebRequestWrapper* _asyncWebRequestWrapper = new AsyncWebRequestWrapper(_request);
+    if (iotWebConf.handleCaptivePortal(_asyncWebRequestWrapper)) {
         return;
     }
 
-    std::string content_;
-    MyHtmlRootFormatProvider fp_;
+    std::string _content;
+    MyHtmlRootFormatProvider _fp;
 
-    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
 
-    AsyncWebServerResponse* response = request->beginChunkedResponse("text/html", [content_](uint8_t* buffer, size_t maxLen, size_t index) -> size_t {
+    _content += _fp.getHtmlHead(iotWebConf.getThingName()).c_str();
+    _content += _fp.getHtmlStyle().c_str();
+    _content += _fp.getHtmlHeadEnd().c_str();
+    _content += _fp.getHtmlScript().c_str();
 
-        std::string chunk_ = "";
-        size_t len_ = min(content_.length() - index, maxLen);
-        if (len_ > 0) {
-            chunk_ = content_.substr(index, len_ - 1);
-            chunk_.copy((char*)buffer, chunk_.length());
+    _content += _fp.getHtmlTable().c_str();
+    _content += _fp.getHtmlTableRow().c_str();
+    _content += _fp.getHtmlTableCol().c_str();
+
+    _content += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
+    _content += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+    _content += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n")).c_str();
+    _content += _fp.getHtmlTableEnd().c_str();
+    _content += _fp.getHtmlFieldsetEnd().c_str();
+
+    _content += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
+    _content += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+
+    uint8_t _i = 1;
+
+    OutputGroup* _outputgroup = &OutputGroup1;
+    while (_outputgroup != nullptr) {
+        if ((_outputgroup->isActive()) && (atoi(_outputgroup->ModeValue) >= 10)) {
+            String _b = html_button_code;
+            _b.replace("[value]", String(_i));
+            _b.replace("[name]", String(_outputgroup->DesignationValue) + " (" + String(_outputgroup->ModeValue) + ")");
+            _b.replace("[id]", "output" + String(_i));
+            if (ChannelIsOn(_i - 1)) {
+                _b.replace("red", "green");
+            }
+
+            _content += _b.c_str();
+            _content += _fp.addNewLine(2).c_str();
+            _i += 1;
         }
-        if (index + len_ <= content_.length())
-            return chunk_.length();
+        _outputgroup = (OutputGroup*)_outputgroup->getNext();
+    }
+
+    ServoGroup* _servogroup = &ServoGroup1;
+    while (_servogroup != nullptr) {
+        if (_servogroup->isActive()) {
+            String _b = html_button_code;
+            _b.replace("[value]", String(_i));
+            _b.replace("[name]", String(_servogroup->DesignationValue));
+            _b.replace("[id]", "servo" + String(_i));
+            if (ChannelIsOn(_i - 1)) {
+                _b.replace("red", "green");
+            }
+
+            _content += _b.c_str();
+            _content += _fp.addNewLine(2).c_str();
+            _i += 1;
+
+        }
+        _servogroup = (ServoGroup*)_servogroup->getNext();
+    }
+
+    _content += _fp.getHtmlTableEnd().c_str();
+    _content += _fp.getHtmlFieldsetEnd().c_str();
+
+
+
+    _content += _fp.addNewLine(2).c_str();
+
+    _content += _fp.getHtmlTable().c_str();
+    _content += _fp.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
+    _content += _fp.getHtmlTableRowText(_fp.getHtmlVersion(Version)).c_str();
+    _content += _fp.getHtmlTableEnd().c_str();
+
+    _content += _fp.getHtmlTableColEnd().c_str();
+    _content += _fp.getHtmlTableRowEnd().c_str();
+    _content += _fp.getHtmlTableEnd().c_str();
+    _content += _fp.getHtmlEnd().c_str();
+
+    AsyncWebServerResponse* _response = _request->beginChunkedResponse("text/html", [_content](uint8_t* _buffer, size_t _maxLen, size_t _index) -> size_t {
+
+        std::string _chunk = "";
+        size_t _len = min(_content.length() - _index, _maxLen);
+        if (_len > 0) {
+            _chunk = _content.substr(_index, _len - 1);
+            _chunk.copy((char*)_buffer, _chunk.length());
+        }
+        if (_index + _len <= _content.length())
+            return _chunk.length();
         else
             return 0;
 
-        });
-    response->addHeader("Server", "ESP Async Web Server");
-    request->send(response);
+        }
+    );
+    _response->addHeader("Server", "ESP Async Web Server");
+    _request->send(_response);
+
 }
 
 void websetup(){
@@ -214,6 +345,14 @@ void websetup(){
     server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
         AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", favicon_ico, sizeof(favicon_ico));
         request->send(response);
+        }
+    );
+    server.on("/data", HTTP_GET, [](AsyncWebServerRequest* request) { 
+        handleData(request); 
+        }
+    );
+    server.on("/post", HTTP_POST, [](AsyncWebServerRequest* request) { 
+        handlePost(request); 
         }
     );
     server.onNotFound([](AsyncWebServerRequest* request) {
