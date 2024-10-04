@@ -1,5 +1,5 @@
-//#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
-//#define IOTWEBCONF_DEBUG_TO_SERIAL
+#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
+#define IOTWEBCONF_DEBUG_TO_SERIAL
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
@@ -11,20 +11,14 @@
 #endif
 
 #include "webhandling.h"
-#include "common.h"
-#include "html.h"
-#include "favicon.h"
-
+#include <IotWebConf.h>
+#include <IotWebConfOptionalGroup.h>
+#include <IotWebConfESP32HTTPUpdateServer.h>
 #include <time.h>
+#include <DNSServer.h>
 #include <iostream>
 #include <string.h>
-#include <DNSServer.h>
-#include <IotWebConfTParameter.h>
-#include <IotWebConfAsyncClass.h>
-#include <IotWebConfAsyncUpdateServer.h>
-#include <IotWebRoot.h>
-#include "AsyncJson.h"
-#include "ArduinoJson.h"
+#include "common.h"
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
@@ -42,21 +36,18 @@ const char wifiInitialApPassword[] = "123456789";
 #define STATUS_PIN LED_BUILTIN
 
 // -- Method declarations.
-void handleRoot(AsyncWebServerRequest* request);
-void handlePost(AsyncWebServerRequest* request);
-void handleData(AsyncWebServerRequest* request);
-
+void handleRoot();
 // -- Callback methods.
 void configSaved();
 void wifiConnected();
+bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper);
 
 DNSServer dnsServer;
-AsyncWebServer server(80);
-AsyncWebServerWrapper asyncWebServerWrapper(&server);
-AsyncUpdateServer AsyncUpdater;
+WebServer server(80);
+HTTPUpdateServer httpUpdater;
 
-IotWebConf iotWebConf(thingName, &dnsServer, &asyncWebServerWrapper, wifiInitialApPassword, CONFIG_VERSION);
-
+// -- We need to declare an instance for all OutputGroup items, that can
+//    appear in the config portal
 OutputGroup OutputGroup1 = OutputGroup("og1");
 OutputGroup OutputGroup2 = OutputGroup("og2");
 OutputGroup OutputGroup3 = OutputGroup("og3");
@@ -73,6 +64,96 @@ ServoGroup ServoGroup2 = ServoGroup("sg2");
 ServoGroup ServoGroup3 = ServoGroup("sg3");
 ServoGroup ServoGroup4 = ServoGroup("sg4");
 ServoGroup ServoGroup5 = ServoGroup("sg5");
+ServoGroup ServoGroup6 = ServoGroup("sg6");
+
+IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION); 
+
+const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM =
+"function hideClass(id) {\n"
+"   var dropdown = document.getElementById(id + '-mode');\n"
+"   var selectedValue = dropdown.options[dropdown.selectedIndex].value;\n"
+"   var numberClass = document.getElementsByClassName(id + '-number')[0];\n"
+"   var timeonClass = document.getElementsByClassName(id + '-timeon')[0];\n"
+"   var timeoffClass = document.getElementsByClassName(id + '-timeoff')[0];\n"
+"   var multiplierClass = document.getElementsByClassName(id + '-multiplier')[0];\n"
+"   var onfadeClass = document.getElementsByClassName(id + '-onfade')[0];\n"
+"   var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];\n"
+"\n"
+// none is not visible, block is visible
+// The array parameters contains a list of items for which numberclass should be visible
+"   var parameters = [\"52\", \"53\", \"54\", \"55\", \"60\", \"61\", \"62\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       numberClass.style.display = \"block\";\n"
+"   } else {\n"
+"       numberClass.style.display = \"none\";\n"
+"   }\n"
+"\n"
+// The array parameters contains a list of items for which timeonClass should be visible
+"   var parameters = [\"1\", \"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"60\", \"81\", \"83\", \"201\", \"202\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       timeonClass.style.display = \"block\";\n"
+"   } else {\n"
+"       timeonClass.style.display = \"none\";\n"
+"   }\n"
+"\n"
+// The array parameters contains a list of items for which timeoffClass should be visible
+"   var parameters = [\"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"60\", \"83\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       timeoffClass.style.display = \"block\";\n"
+"   } else {\n"
+"       timeoffClass.style.display = \"none\";\n"
+"   }\n"
+"\n"
+// The array parameters contains a list of items for which multiplierClass should be visible
+"   var parameters = [\"1\", \"50\", \"51\", \"52\", \"53\", \"54\", \"55\", \"60\", \"61\", \"62\", \"81\", \"83\", \"201\", \"202\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       multiplierClass.style.display = \"block\";\n"
+"   } else {\n"
+"       multiplierClass.style.display = \"none\";\n"
+"   }\n"
+"\n"
+// The array parameters contains a list of items for which onfadeClass should be visible
+"   var parameters = [\"50\", \"51\", \"62\", \"83\", \"102\", \"103\", \"104\", \"105\", \"106\", \"110\", \"70\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       onfadeClass.style.display = \"block\";\n"
+"   } else {\n"
+"       onfadeClass.style.display = \"none\";\n"
+"   }\n"
+"\n"
+// The array parameters contains a list of items for which offfadeClass should be visible
+"   var parameters = [\"50\", \"51\", \"62\", \"83\", \"102\", \"103\", \"104\", \"105\", \"106\", \"110\", \"70\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       offfadeClass.style.display = \"block\";\n"
+"   } else {\n"
+"       offfadeClass.style.display = \"none\";\n"
+"   }\n"
+"\n"
+"   document.querySelector('label[for=\"' + id + '-timeon\"]').innerHTML = 'Time on (ms)';\n"
+"   document.querySelector('label[for=\"' + id + '-timeoff\"]').innerHTML = 'Time off (ms)';\n"
+"   document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'Fader on (ms)';\n"
+"   document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'Fader off (ms)';\n"
+"   document.querySelector('label[for=\"' + id + '-multiplier\"]').innerHTML = 'Multiplier';\n"
+"\n"
+"   if (selectedValue === \"83\") {\n"
+"       document.querySelector('label[for=\"' + id + '-timeon\"]').innerHTML = 'Minimum flash time (ms)';\n"
+"       document.querySelector('label[for=\"' + id + '-timeoff\"]').innerHTML = 'Maximal flash time (ms)';\n"
+"       document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'Minimum pause time (s)';\n"
+"       document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'Maximal pause time (s)';\n"
+"   }\n"
+"\n"
+"   var parameters = [\"61\", \"62\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       document.querySelector('label[for=\"' + id + '-multiplier\"]').innerHTML = 'Chance';\n"
+"   }\n"
+"\n"
+"   var parameters = [\"62\"];\n"
+"   if (parameters.includes(selectedValue)) {\n"
+"       document.querySelector('label[for=\"' + id + '-onfade\"]').innerHTML = 'minimal glowing time (ms)';\n"
+"       document.querySelector('label[for=\"' + id + '-offfade\"]').innerHTML = 'maximal glowing time (ms)';\n"
+
+"   }\n"
+"\n"
+"}\n";
 
 MySelectParameter::MySelectParameter(
         const char* label,
@@ -89,6 +170,7 @@ MySelectParameter::MySelectParameter(
         this->customHtml = customHtml;
 };
 
+
 class CustomHtmlFormatProvider : public iotwebconf::OptionalGroupHtmlFormatProvider {
 protected:
     String getScriptInner() override {
@@ -98,188 +180,241 @@ protected:
             String(FPSTR(IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT));
     }
 };
+
 CustomHtmlFormatProvider customHtmlFormatProvider;
 
-class MyHtmlRootFormatProvider : public HtmlRootFormatProvider {
-protected:
-    virtual String getScriptInner() {
-        String _s = HtmlRootFormatProvider::getScriptInner();
-        _s.replace("{millisecond}", "1000");
-        _s += F("function updateData(jsonData) {\n");
-        _s += F("   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\";\n");
-        _s += F("   for (var key in jsonData) {\n");
-        _s += F("       if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {\n");
-        _s += F("           var button = document.getElementById(key);\n");
-        _s += F("           if (button) {\n");
-        _s += F("               button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';\n");
-        _s += F("           }\n");
-        _s += F("       }\n");
-        _s += F("   }\n");
-        _s += F("}\n");
-        _s += html_css_code;
-        return _s;
-    }
-};
+// -- An instance must be created from the class defined above.
+// iotwebconf::OptionalGroupHtmlFormatProvider optionalGroupHtmlFormatProvider;
 
-void handleData(AsyncWebServerRequest* request) {
-    //AsyncJsonResponse* _response = new AsyncJsonResponse();
-    //_response->addHeader("Server", "ESP Async Web Server");
-    //JsonVariant& _json = _response->getRoot();
 
-    //_json["rssi"] = WiFi.RSSI();
 
-    //uint8_t _i = 0;
-    //OutputGroup* _outputgroup = &OutputGroup1;
-    //while (_outputgroup != nullptr) {
-    //    if (_outputgroup->isActive()) {
-    //        _json["output" + String(_i)] = ChannelIsOn(_i);
-    //    }
-    //    _outputgroup = (OutputGroup*)_outputgroup->getNext();
-    //    _i += 1;
-    //}
-
-    //_i = 0;
-    //ServoGroup* _servogroup = &ServoGroup1;
-    //while (_servogroup != nullptr) {
-    //    if (_servogroup->isActive()) {
-    //        _json["servo" + String(_i)] = ChannelIsOn(_i);
-    //    }
-    //    _servogroup = (ServoGroup*)_servogroup->getNext();
-    //    _i += 1;
-    //}
-
-    //_response->setLength();
-    //request->send(_response);
-}
-
-void handlePost(AsyncWebServerRequest* _request) {
-    if (_request->hasParam("group", true)) {
-        String _number = _request->getParam("group", true)->value();
-        handleChannel(_number.toInt() - 1);
-        _request->send(200, "text/plain", ButtonResponse);
-    }
-
-    // test if parameter all exists. If on enable all channels, if off disable all channels
-    if (_request->hasParam("all", true)) {
-        String _all = _request->getParam("all", true)->value();
-        if (_all == "on") {
-            for (int _i = 0; _i < 10; _i++) {
-                handleChannel(_i);
-            }
-        }
-        if (_all == "off") {
-            for (int _i = 0; _i < 10; _i++) {
-                handleChannel(_i);
-            }
-        }
-        _request->send(200, "text/plain", ButtonResponse);
-    }
-}
-
-void handleRoot(AsyncWebServerRequest* _request) {
-
-    AsyncWebRequestWrapper* _asyncWebRequestWrapper = new AsyncWebRequestWrapper(_request);
-    if (iotWebConf.handleCaptivePortal(_asyncWebRequestWrapper)) {
+void handleRoot(){
+    // -- Let IotWebConf test and handle captive portal requests.
+    if (iotWebConf.handleCaptivePortal())
+    {
+        // -- Captive portal request were already served.
         return;
     }
+    //String s = F("<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>");
+    String s = HTML_Start_Doc;
+    s += HTML_Style;
+    s.replace("center", "left");
+    s.replace("{v}", iotWebConf.getThingName());
 
-    std::string _content;
-    MyHtmlRootFormatProvider _fp;
+    uint8_t _i = 1;
+    uint8_t _count = 0;
 
+    s += HTML_Start_Body;
 
-    _content += _fp.getHtmlHead(iotWebConf.getThingName()).c_str();
-    _content += _fp.getHtmlStyle().c_str();
-    _content += _fp.getHtmlHeadEnd().c_str();
-    _content += _fp.getHtmlScript().c_str();
+    s += "<h2>Overview for " + String(iotWebConf.getThingName()) + "</h2>";
 
-    _content += _fp.getHtmlTable().c_str();
-    _content += _fp.getHtmlTableRow().c_str();
-    _content += _fp.getHtmlTableCol().c_str();
-
-    _content += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
-    _content += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
-    _content += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n")).c_str();
-    _content += _fp.getHtmlTableEnd().c_str();
-    _content += _fp.getHtmlFieldsetEnd().c_str();
-
-    _content += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
-    _content += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
-
-    uint8_t _i = 0;
     OutputGroup* _outputgroup = &OutputGroup1;
-    while (_outputgroup != nullptr) {
-        if ((_outputgroup->isActive()) && (atoi(_outputgroup->ModeValue) >= 10)) {
-            String _b = html_button_code;
-            _b.replace("[value]", String(_i));
-            _b.replace("[name]", String(_outputgroup->DesignationValue) + " (" + String(_outputgroup->ModeValue) + ")");
-            _b.replace("[id]", "output" + String(_i));
-            if (ChannelIsOn(_i - 1)) {
-                _b.replace("red", "green");
+    while (_outputgroup != nullptr)
+    {
+        if (_outputgroup->isActive()) {
+            s += "<div>Output group " + String(_i) + "</div>";
+            s += "<ul>";
+            if (_outputgroup->ModeValue != 0) {
+                s += "<li>Designation: " + String(_outputgroup->DesignationValue) + "</li>";
+            }
+            else {
+                s += "<li>Designation:  - </li>";
             }
 
-            _content += _b.c_str();
-            _content += _fp.addNewLine(2).c_str();
+            s += "<li>Mode: " + String(_outputgroup->ModeValue) + "</li>";
+            s += "<li>Number of outputs: " + String(_outputgroup->NumberValue) + "</li>";
+            if (_outputgroup->ModeValue != 0) {
+                s += "<li>DCC Address: " + String(_outputgroup->AddressValue) + +"</li>";
+            }
+            
+            s += "</ul>";
+            _count += atoi(_outputgroup->NumberValue);
             _i += 1;
         }
+        else {
+            _outputgroup->DesignationParam.applyDefaultValue();
+            _outputgroup->ModeParam.applyDefaultValue();
+            _outputgroup->NumberParam.applyDefaultValue();
+            _outputgroup->AddressParam.applyDefaultValue();
+            _outputgroup->TimeOnParam.applyDefaultValue();
+            _outputgroup->TimeOffParam.applyDefaultValue();
+            _outputgroup->TimeOnFadeParam.applyDefaultValue();
+            _outputgroup->TimeOffFadeParam.applyDefaultValue();
+            
+        }
         _outputgroup = (OutputGroup*)_outputgroup->getNext();
-        _i += 1;
     }
 
-    _i = 0;
     ServoGroup* _servogroup = &ServoGroup1;
-    while (_servogroup != nullptr) {
+    while (_servogroup != nullptr)
+    {
         if (_servogroup->isActive()) {
-            String _b = html_button_code;
-            _b.replace("[value]", String(_i));
-            _b.replace("[name]", String(_servogroup->DesignationValue));
-            _b.replace("[id]", "servo" + String(_i));
-            if (ChannelIsOn(_i - 1)) {
-                _b.replace("red", "green");
-            }
+            s += "<div>Servo group " + String(_i) + "</div>";
+            s += "<ul>";
 
-            _content += _b.c_str();
-            _content += _fp.addNewLine(2).c_str();
+            s += "<li>DCC Address: " + String(_servogroup->AddressValue) + +"</li>";
+            s += "<li>Travel time: " + String(_servogroup->TravelTimeValue) + +"</li>";
+            s += "<li>Multiplier:  " + String(_servogroup->MultiplierValue) + +"</li>";
+            s += "<li>Limit 1:     " + String(_servogroup->Limit1Value) + +"</li>";
+            s += "<li>Limit 2:     " + String(_servogroup->Limit2Value) + +"</li>";
+
+            s += "</ul>";
+            _count += 1;
             _i += 1;
+        }
+        else {
+            _servogroup->DesignationParam.applyDefaultValue();
+            _servogroup->AddressParam.applyDefaultValue();
+            _servogroup->TravelTimeParam.applyDefaultValue();
+            _servogroup->MultiplierParam.applyDefaultValue();
+            _servogroup->Limit1Param.applyDefaultValue();
+            _servogroup->Limit2Param.applyDefaultValue();
 
         }
         _servogroup = (ServoGroup*)_servogroup->getNext();
     }
+    s += F("Total outputs used: ");
+    s += String(_count);
+    s += "<br><br>";
+    s += F("Go to <a href='groups'>groups page</a> for enabling or disabling channels.");
+    s += "<br>";
+    s += F("Go to <a href='config'>configure page</a> to change values.");
+    s += "<br>";
+    s += "<font size = 1>Version: " + String(Version) + "</font>";
 
-    _content += _fp.getHtmlTableEnd().c_str();
-    _content += _fp.getHtmlFieldsetEnd().c_str();
+    s += HTML_End_Body;
+    s += HTML_End_Doc;
 
+    server.send(200, "text/html", s);
+}
 
+void handle1() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(0);
+}
 
-    _content += _fp.addNewLine(2).c_str();
+void handle2() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(1);
+}
 
-    _content += _fp.getHtmlTable().c_str();
-    _content += _fp.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
-    _content += _fp.getHtmlTableRowText(_fp.getHtmlVersion(Version)).c_str();
-    _content += _fp.getHtmlTableEnd().c_str();
+void handle3() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(2);
+}
 
-    _content += _fp.getHtmlTableColEnd().c_str();
-    _content += _fp.getHtmlTableRowEnd().c_str();
-    _content += _fp.getHtmlTableEnd().c_str();
-    _content += _fp.getHtmlEnd().c_str();
+void handle4() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(3);
+}
 
-    AsyncWebServerResponse* _response = _request->beginChunkedResponse("text/html", [_content](uint8_t* _buffer, size_t _maxLen, size_t _index) -> size_t {
+void handle5() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(4);
+}
 
-        std::string _chunk = "";
-        size_t _len = min(_content.length() - _index, _maxLen);
-        if (_len > 0) {
-            _chunk = _content.substr(_index, _len - 1);
-            _chunk.copy((char*)_buffer, _chunk.length());
+void handle6() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(5);
+}
+
+void handle7() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(6);
+}
+
+void handle8() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(7);
+}
+
+void handle9() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(8);
+}
+
+void handle10() {
+    server.send(200, "text/html", ButtonResponse);
+    handleChannel(9);
+}
+
+void handleGroups() {
+    String _s = HTML_Start_Doc;
+    _s = HTML_Style;
+    _s.replace("center", "left");
+    _s.replace("{v}", iotWebConf.getThingName());
+    _s.replace("center", "left");
+
+    _s += HTML_Start_Body;
+    _s += "<table border=0 align=center>";
+    _s += "<tr><td>";
+
+    _s += HTML_Start_Fieldset;
+    _s += HTML_Fieldset_Legend;
+    _s.replace("{l}", String(iotWebConf.getThingName()) + " groups");
+
+    _s += HTML_Start_Table;
+
+    _s += "<form align=left action=\"/setgroup\" method=\"POST\">";
+
+    uint8_t _i = 1;
+
+    OutputGroup* _outputgroup = &OutputGroup1;
+    while (_outputgroup != nullptr){
+        if ((_outputgroup->isActive()) && (atoi(_outputgroup->ModeValue) >= 10)) {
+            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
+            if (ChannelIsOn(_i - 1)) {
+                _b.replace("red", "green");
+            }
+            String _bText = String(_outputgroup->DesignationValue) + " (" + String(_outputgroup->ModeValue) + ")";
+            _b.replace("[Text]", _bText);
+
+            _s += _b;
+            _s += "<br><br>";
+            _i += 1;
         }
-        if (_index + _len <= _content.length())
-            return _chunk.length();
-        else
-            return 0;
+        _outputgroup = (OutputGroup*)_outputgroup->getNext();
+    }
 
+    ServoGroup* _servogroup = &ServoGroup1;
+    while (_servogroup != nullptr) {
+        if (_servogroup->isActive()) {
+            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
+            if (ChannelIsOn(_i - 1)) {
+                _b.replace("red", "green");
+            }
+            String _bText = String(_servogroup->DesignationValue);
+            _b.replace("[Text]", _bText);
+
+            _s += _b;
+            _s += "<br><br>";
+            _i += 1;
         }
-    );
-    _response->addHeader("Server", "ESP Async Web Server");
-    _request->send(_response);
+        _servogroup = (ServoGroup*)_servogroup->getNext();
+    }
 
+    _s += "</form>";
+
+    _s += HTML_End_Table;
+    _s += HTML_End_Fieldset;
+
+    _s += "</td></tr>";
+    _s += HTML_End_Table;
+
+    _s += "<br>";
+    _s += "<br>";
+
+    _s += HTML_Start_Table;
+    _s += "<tr><td align=left>Go to <a href = 'config'>configure page</a> to change configuration.</td></tr>";
+    _s += "<tr><td align=left>Go to <a href='/'>main page</a> to change runtime data.</td></tr>";
+    _s += "<tr><td><font size=1>Version: " + String(Version) + "</font></td></tr>";
+    _s += HTML_End_Table;
+    _s += HTML_End_Body;
+
+    _s += HTML_End_Doc;
+
+
+    server.send(200, "text/html", _s);
 }
 
 void websetup(){
@@ -291,23 +426,24 @@ void websetup(){
     OutputGroup5.setNext(&OutputGroup6);
     OutputGroup6.setNext(&OutputGroup7);
     OutputGroup7.setNext(&OutputGroup8);
-    //OutputGroup8.setNext(&OutputGroup9);
-    //OutputGroup9.setNext(&OutputGroup10);
+    OutputGroup8.setNext(&OutputGroup9);
+    OutputGroup9.setNext(&OutputGroup10);
 
     ServoGroup1.setNext(&ServoGroup2);
     ServoGroup2.setNext(&ServoGroup3);
     ServoGroup3.setNext(&ServoGroup4);
     ServoGroup4.setNext(&ServoGroup5);
+    ServoGroup5.setNext(&ServoGroup6);
 
     iotWebConf.setStatusPin(STATUS_PIN);
     iotWebConf.setConfigPin(CONFIG_PIN);
     iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
 
-    //iotWebConf.addParameterGroup(&ServoGroup1);
-    //iotWebConf.addParameterGroup(&ServoGroup2);
-    //iotWebConf.addParameterGroup(&ServoGroup3);
-    //iotWebConf.addParameterGroup(&ServoGroup4);
-    //iotWebConf.addParameterGroup(&ServoGroup5);
+    iotWebConf.addParameterGroup(&ServoGroup1);
+    iotWebConf.addParameterGroup(&ServoGroup2);
+    iotWebConf.addParameterGroup(&ServoGroup3);
+    iotWebConf.addParameterGroup(&ServoGroup4);
+    iotWebConf.addParameterGroup(&ServoGroup5);
 
     iotWebConf.addParameterGroup(&OutputGroup1);
     iotWebConf.addParameterGroup(&OutputGroup2);
@@ -317,14 +453,16 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup6);
     iotWebConf.addParameterGroup(&OutputGroup7);
     iotWebConf.addParameterGroup(&OutputGroup8);
-    //iotWebConf.addParameterGroup(&OutputGroup9);
-    //iotWebConf.addParameterGroup(&OutputGroup10);
+    iotWebConf.addParameterGroup(&OutputGroup9);
+    iotWebConf.addParameterGroup(&OutputGroup10);
 
+    // -- Define how to handle updateServer calls.
     iotWebConf.setupUpdateServer(
-        [](const char* updatePath) { AsyncUpdater.setup(&server, updatePath); },
-        [](const char* userName, char* password) { AsyncUpdater.updateCredentials(userName, password); });
+        [](const char* updatePath) { httpUpdater.setup(&server, updatePath); },
+        [](const char* userName, char* password) { httpUpdater.updateCredentials(userName, password); });
 
     iotWebConf.setConfigSavedCallback(&configSaved);
+    iotWebConf.setFormValidator(&formValidator);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
 
     iotWebConf.getApTimeoutParameter()->visible = true;
@@ -333,33 +471,20 @@ void websetup(){
     iotWebConf.init();
 
     // -- Set up required URL handlers on the web server.
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) { 
-        handleRoot(request); 
-        }
-    );
-    server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
-        AsyncWebRequestWrapper asyncWebRequestWrapper(request);
-        iotWebConf.handleConfig(&asyncWebRequestWrapper);
-        }
-    );
-    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
-        AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", favicon_ico, sizeof(favicon_ico));
-        request->send(response);
-        }
-    );
-    server.on("/data", HTTP_GET, [](AsyncWebServerRequest* request) { 
-        handleData(request); 
-        }
-    );
-    server.on("/post", HTTP_POST, [](AsyncWebServerRequest* request) { 
-        handlePost(request); 
-        }
-    );
-    server.onNotFound([](AsyncWebServerRequest* request) {
-        AsyncWebRequestWrapper asyncWebRequestWrapper(request);
-        iotWebConf.handleNotFound(&asyncWebRequestWrapper);
-        }
-    );
+    server.on("/", handleRoot);
+    server.on("/config", [] { iotWebConf.handleConfig(); });
+    server.on("/groups", handleGroups);
+    server.on("/1", HTTP_POST, handle1);
+    server.on("/2", HTTP_POST, handle2);
+    server.on("/3", HTTP_POST, handle3);
+    server.on("/4", HTTP_POST, handle4);
+    server.on("/5", HTTP_POST, handle5);
+    server.on("/6", HTTP_POST, handle6);
+    server.on("/7", HTTP_POST, handle7);
+    server.on("/8", HTTP_POST, handle8);
+    server.on("/9", HTTP_POST, handle9);
+    server.on("/10", HTTP_POST, handle10);
+    server.onNotFound([]() { iotWebConf.handleNotFound(); });
 }
 
 void webloop(){
@@ -369,6 +494,7 @@ void webloop(){
 
 void wifiConnected() {
     ArduinoOTA.begin();
+
 }
 
 void configSaved(){
@@ -376,3 +502,6 @@ void configSaved(){
     Serial.println(F("Configuration was updated."));
 }
 
+bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper){
+    return true;
+}

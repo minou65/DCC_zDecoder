@@ -124,15 +124,6 @@ void handleChannel(uint8_t Channel_) {
 	}
 }
 
-void handleChannel(uint8_t Channel_, uint8_t Value_) {
-	if (Value_ == 0) {
-		decoder[Channel_]->off();
-	}
-	else {
-		decoder[Channel_]->on();
-	}
-}
-
 bool ChannelIsOn(uint8_t Channel_) {
 	return decoder[Channel_]->isOn();
 }
