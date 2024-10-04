@@ -14,6 +14,7 @@
 #include <IotWebConf.h>
 #include <IotWebConfOptionalGroup.h>
 #include <IotWebConfESP32HTTPUpdateServer.h>
+#include <IotWebRoot.h>
 #include <time.h>
 #include <DNSServer.h>
 #include <iostream>
@@ -93,113 +94,112 @@ protected:
             String(FPSTR(IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT));
     }
 };
-
 CustomHtmlFormatProvider customHtmlFormatProvider;
 
-// -- An instance must be created from the class defined above.
-// iotwebconf::OptionalGroupHtmlFormatProvider optionalGroupHtmlFormatProvider;
+class MyHtmlRootFormatProvider : public HtmlRootFormatProvider {
+protected:
+    virtual String getScriptInner() {
+        String _s = HtmlRootFormatProvider::getScriptInner();
+        _s.replace("{millisecond}", "1000");
+        _s += F("function updateData(jsonData) {\n");
+        _s += F("   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\";\n");
+        _s += F("   for (var key in jsonData) {\n");
+        _s += F("       if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {\n");
+        _s += F("           var button = document.getElementById(key);\n");
+        _s += F("           if (button) {\n");
+        _s += F("               button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';\n");
+        _s += F("           }\n");
+        _s += F("       }\n");
+        _s += F("   }\n");
+        _s += F("}\n");
+        _s += html_css_code;
+        return _s;
+    }
+};
 
-
-
-void handleRoot(){
-    // -- Let IotWebConf test and handle captive portal requests.
-    if (iotWebConf.handleCaptivePortal())
-    {
-        // -- Captive portal request were already served.
+void handleRoot() {
+    if (iotWebConf.handleCaptivePortal()) {
         return;
     }
-    //String s = F("<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>");
-    String s = HTML_Start_Doc;
-    s += HTML_Style;
-    s.replace("center", "left");
-    s.replace("{v}", iotWebConf.getThingName());
 
-    uint8_t _i = 1;
-    uint8_t _count = 0;
+    std::string content_;
+    MyHtmlRootFormatProvider fp_;
 
-    s += HTML_Start_Body;
+    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
+    content_ += fp_.getHtmlStyle().c_str();
+    content_ += fp_.getHtmlHeadEnd().c_str();
+    content_ += fp_.getHtmlScript().c_str();
 
-    s += "<h2>Overview for " + String(iotWebConf.getThingName()) + "</h2>";
+    content_ += fp_.getHtmlTable().c_str();
+    content_ += fp_.getHtmlTableRow().c_str();
+    content_ += fp_.getHtmlTableCol().c_str();
 
-    OutputGroup* _outputgroup = &OutputGroup1;
-    while (_outputgroup != nullptr)
-    {
-        if (_outputgroup->isActive()) {
-            s += "<div>Output group " + String(_i) + "</div>";
-            s += "<ul>";
-            if (_outputgroup->ModeValue != 0) {
-                s += "<li>Designation: " + String(_outputgroup->DesignationValue) + "</li>";
+    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
+    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+    content_ += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n")).c_str();
+    content_ += fp_.getHtmlTableEnd().c_str();
+    content_ += fp_.getHtmlFieldsetEnd().c_str();
+
+    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
+    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+
+    uint8_t i_ = 1;
+
+    OutputGroup* outputgroup_ = &OutputGroup1;
+    while (outputgroup_ != nullptr) {
+        if ((outputgroup_->isActive()) && (atoi(outputgroup_->ModeValue) >= 10)) {
+            String b_ = html_button_code;
+            b_.replace("[value]", String(i_));
+            b_.replace("[name]", String(outputgroup_->DesignationValue) + " (" + String(outputgroup_->ModeValue) + ")");
+            b_.replace("[id]", "output" + String(i_));
+            if (ChannelIsOn(i_ - 1)) {
+                b_.replace("red", "green");
             }
-            else {
-                s += "<li>Designation:  - </li>";
-            }
 
-            s += "<li>Mode: " + String(_outputgroup->ModeValue) + "</li>";
-            s += "<li>Number of outputs: " + String(_outputgroup->NumberValue) + "</li>";
-            if (_outputgroup->ModeValue != 0) {
-                s += "<li>DCC Address: " + String(_outputgroup->AddressValue) + +"</li>";
-            }
-            
-            s += "</ul>";
-            _count += atoi(_outputgroup->NumberValue);
-            _i += 1;
+            content_ += b_.c_str();
+            content_ += fp_.addNewLine(2).c_str();
+            i_ += 1;
         }
-        else {
-            _outputgroup->DesignationParam.applyDefaultValue();
-            _outputgroup->ModeParam.applyDefaultValue();
-            _outputgroup->NumberParam.applyDefaultValue();
-            _outputgroup->AddressParam.applyDefaultValue();
-            _outputgroup->TimeOnParam.applyDefaultValue();
-            _outputgroup->TimeOffParam.applyDefaultValue();
-            _outputgroup->TimeOnFadeParam.applyDefaultValue();
-            _outputgroup->TimeOffFadeParam.applyDefaultValue();
-            
-        }
-        _outputgroup = (OutputGroup*)_outputgroup->getNext();
+        outputgroup_ = (OutputGroup*)outputgroup_->getNext();
     }
 
-    ServoGroup* _servogroup = &ServoGroup1;
-    while (_servogroup != nullptr)
-    {
-        if (_servogroup->isActive()) {
-            s += "<div>Servo group " + String(_i) + "</div>";
-            s += "<ul>";
+    ServoGroup* servogroup_ = &ServoGroup1;
+    while (servogroup_ != nullptr) {
+        if (servogroup_->isActive()) {
+            String b_ = html_button_code;
+            b_.replace("[value]", String(i_));
+            b_.replace("[name]", String(servogroup_->DesignationValue));
+            b_.replace("[id]", "servo" + String(i_));
+            if (ChannelIsOn(i_ - 1)) {
+                b_.replace("red", "green");
+            }
 
-            s += "<li>DCC Address: " + String(_servogroup->AddressValue) + +"</li>";
-            s += "<li>Travel time: " + String(_servogroup->TravelTimeValue) + +"</li>";
-            s += "<li>Multiplier:  " + String(_servogroup->MultiplierValue) + +"</li>";
-            s += "<li>Limit 1:     " + String(_servogroup->Limit1Value) + +"</li>";
-            s += "<li>Limit 2:     " + String(_servogroup->Limit2Value) + +"</li>";
-
-            s += "</ul>";
-            _count += 1;
-            _i += 1;
+            content_ += b_.c_str();
+            content_ += fp_.addNewLine(2).c_str();
+            i_ += 1;
         }
-        else {
-            _servogroup->DesignationParam.applyDefaultValue();
-            _servogroup->AddressParam.applyDefaultValue();
-            _servogroup->TravelTimeParam.applyDefaultValue();
-            _servogroup->MultiplierParam.applyDefaultValue();
-            _servogroup->Limit1Param.applyDefaultValue();
-            _servogroup->Limit2Param.applyDefaultValue();
-
-        }
-        _servogroup = (ServoGroup*)_servogroup->getNext();
+        servogroup_ = (ServoGroup*)servogroup_->getNext();
     }
-    s += F("Total outputs used: ");
-    s += String(_count);
-    s += "<br><br>";
-    s += F("Go to <a href='groups'>groups page</a> for enabling or disabling channels.");
-    s += "<br>";
-    s += F("Go to <a href='config'>configure page</a> to change values.");
-    s += "<br>";
-    s += "<font size = 1>Version: " + String(Version) + "</font>";
 
-    s += HTML_End_Body;
-    s += HTML_End_Doc;
+    content_ += fp_.getHtmlTableEnd().c_str();
+    content_ += fp_.getHtmlFieldsetEnd().c_str();
 
-    server.send(200, "text/html", s);
+    content_ += fp_.addNewLine(2).c_str();
+
+    content_ += fp_.getHtmlTable().c_str();
+    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
+    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)).c_str();
+    content_ += fp_.getHtmlTableEnd().c_str();
+
+    content_ += fp_.getHtmlTableColEnd().c_str();
+    content_ += fp_.getHtmlTableRowEnd().c_str();
+    content_ += fp_.getHtmlTableEnd().c_str();
+    content_ += fp_.getHtmlEnd().c_str();
+
+    server.send(200, "text/html", content_.c_str());
 }
+
+
 
 void handle1() {
     server.send(200, "text/html", ButtonResponse);
