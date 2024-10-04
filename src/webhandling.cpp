@@ -89,7 +89,6 @@ MySelectParameter::MySelectParameter(
         this->customHtml = customHtml;
 };
 
-
 class CustomHtmlFormatProvider : public iotwebconf::OptionalGroupHtmlFormatProvider {
 protected:
     String getScriptInner() override {
@@ -206,8 +205,7 @@ void handleRoot(AsyncWebServerRequest* _request) {
     _content += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
     _content += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
 
-    uint8_t _i = 1;
-
+    uint8_t _i = 0;
     OutputGroup* _outputgroup = &OutputGroup1;
     while (_outputgroup != nullptr) {
         if ((_outputgroup->isActive()) && (atoi(_outputgroup->ModeValue) >= 10)) {
@@ -224,8 +222,10 @@ void handleRoot(AsyncWebServerRequest* _request) {
             _i += 1;
         }
         _outputgroup = (OutputGroup*)_outputgroup->getNext();
+        _i += 1;
     }
 
+    _i = 0;
     ServoGroup* _servogroup = &ServoGroup1;
     while (_servogroup != nullptr) {
         if (_servogroup->isActive()) {
@@ -369,7 +369,6 @@ void webloop(){
 
 void wifiConnected() {
     ArduinoOTA.begin();
-
 }
 
 void configSaved(){
