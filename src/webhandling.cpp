@@ -41,7 +41,6 @@ void handleRoot();
 // -- Callback methods.
 void configSaved();
 void wifiConnected();
-bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper);
 
 DNSServer dnsServer;
 WebServer server(80);
@@ -376,7 +375,6 @@ void websetup(){
         [](const char* userName, char* password) { httpUpdater.updateCredentials(userName, password); });
 
     iotWebConf.setConfigSavedCallback(&configSaved);
-    iotWebConf.setFormValidator(&formValidator);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
 
     iotWebConf.getApTimeoutParameter()->visible = true;
@@ -414,8 +412,4 @@ void wifiConnected() {
 void configSaved(){
     ResetDCCDecoder = true;
     Serial.println(F("Configuration was updated."));
-}
-
-bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper){
-    return true;
 }
