@@ -22,9 +22,8 @@
 #include "Watchdog.h"
 #include "NMRAhandling.h"
 #include "pinmapping.h"
-#include "version.h"
 
-char Version[] = VERSION_STR;
+char Version[] = "1.0.0.2 (2024-03-24)";
 
 // #include "NMRAhandling.h"
 #include "Vector.h"
@@ -336,13 +335,8 @@ void zDecoderInit(void) {
 
 void setup() {
 	Serial.begin(115200);
-
-	while (!Serial) {
-		delay(10);
-	}
-
 	Serial.println();
-	Serial.println("Starting with Firmware " + String(VERSION));
+	Serial.println("Starting up...");
 
 	for (uint8_t _i = 0; _i < sizeof(ChannelToGPIOMapping) - 1; _i++) {
 		pinMode(ChannelToGPIOMapping[_i], OUTPUT);
