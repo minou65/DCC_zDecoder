@@ -199,7 +199,62 @@ void handleRoot() {
     server.send(200, "text/html", content_.c_str());
 }
 
+void handleSettings() {
+    std::string content_;
+    MyHtmlRootFormatProvider fp_;
+    uint8_t i_ = 1;
+    uint8_t count_ = 0;
 
+    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
+    content_ += fp_.getHtmlStyle().c_str();
+    content_ += fp_.getHtmlHeadEnd().c_str();
+    content_ += fp_.getHtmlScript().c_str();
+
+    content_ += fp_.getHtmlTable().c_str();
+    content_ += fp_.getHtmlTableRow().c_str();
+    content_ += fp_.getHtmlTableCol().c_str();
+
+    // content_ += "<h2>Overview for " + String(iotWebConf.getThingName()).c_str() + "</h2>";
+
+    OutputGroup* outputgroup_ = &OutputGroup1;
+    while (outputgroup_ != nullptr) {
+        if (outputgroup_->isActive()) {
+            content_ += String("<div>Output group " + String(outputgroup_->DesignationValue) + "</div>").c_str();
+            content_ += "<ul>";
+            content_ += String("<li>Mode: " + String(outputgroup_->ModeValue) + "</li>").c_str();
+            content_ += String("<li>Number of outputs: " + String(outputgroup_->NumberValue) + "</li>").c_str();
+            content_ += String("<li>DCC Address: " + String(outputgroup_->AddressValue) + +"</li>").c_str();
+            content_ += "</ul>";
+        }
+        else {
+            outputgroup_->DesignationParam.applyDefaultValue();
+            outputgroup_->ModeParam.applyDefaultValue();
+            outputgroup_->NumberParam.applyDefaultValue();
+            outputgroup_->AddressParam.applyDefaultValue();
+            outputgroup_->TimeOnParam.applyDefaultValue();
+            outputgroup_->TimeOffParam.applyDefaultValue();
+            outputgroup_->TimeOnFadeParam.applyDefaultValue();
+        }
+        outputgroup_ = (OutputGroup*)outputgroup_->getNext();
+    }
+
+    content_ += fp_.getHtmlTableEnd().c_str();
+    content_ += fp_.getHtmlFieldsetEnd().c_str();
+
+    content_ += fp_.addNewLine(2).c_str();
+
+    content_ += fp_.getHtmlTable().c_str();
+    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
+    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)).c_str();
+    content_ += fp_.getHtmlTableEnd().c_str();
+
+    content_ += fp_.getHtmlTableColEnd().c_str();
+    content_ += fp_.getHtmlTableRowEnd().c_str();
+    content_ += fp_.getHtmlTableEnd().c_str();
+    content_ += fp_.getHtmlEnd().c_str();
+
+    server.send(200, "text/html", content_.c_str());
+}
 
 void handle1() {
     server.send(200, "text/html", ButtonResponse);
@@ -385,7 +440,7 @@ void websetup(){
     // -- Set up required URL handlers on the web server.
     server.on("/", handleRoot);
     server.on("/config", [] { iotWebConf.handleConfig(); });
-    server.on("/groups", handleGroups);
+    server.on("/settings", handleSettings);
     server.on("/1", HTTP_POST, handle1);
     server.on("/2", HTTP_POST, handle2);
     server.on("/3", HTTP_POST, handle3);
