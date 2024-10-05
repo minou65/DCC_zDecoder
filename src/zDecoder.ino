@@ -115,12 +115,18 @@ void notifyDccFunc(uint16_t Addr, uint8_t FuncNum, uint8_t FuncState){
 		return;
 }
 
-void handleChannel(uint8_t Channel_) {
-	if (decoder[Channel_]->isOn()) {
-		decoder[Channel_]->off();
+void handleChannel(uint8_t Channel) {
+	if (Channel < decoder.Size() && decoder[Channel] != nullptr) {
+		if (decoder[Channel]->isOn()) {
+			decoder[Channel]->off();
+		}
+		else {
+			decoder[Channel]->on();
+		}
 	}
 	else {
-		decoder[Channel_]->on();
+		Serial.print("Invalid channel: ");
+		Serial.println(Channel);
 	}
 }
 
