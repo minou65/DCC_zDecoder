@@ -273,6 +273,7 @@ void handleSettings() {
     content_ += fp_.addNewLine(2).c_str();
 
     content_ += fp_.getHtmlTable().c_str();
+    content_ += fp_.getHtmlTableRowText("<a href = '/'>Home</a>").c_str();
     content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
     content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)).c_str();
     content_ += fp_.getHtmlTableEnd().c_str();
