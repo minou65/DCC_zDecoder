@@ -256,6 +256,34 @@ void handleSettings() {
     server.send(200, "text/html", content_.c_str());
 }
 
+void handleData() {
+    String json_ = "{";
+    json_ += "\"rssi\":" + String(WiFi.RSSI());
+    uint8_t i_ = 0;
+    OutputGroup* outputgroup_ = &OutputGroup1;
+    while (outputgroup_ != nullptr) {
+        if (outputgroup_->isActive()) {
+            json_ += ",\"output" + String(i_) + "\":" + ChannelIsOn(i_);
+        }
+        outputgroup_ = (OutputGroup*)outputgroup_->getNext();
+        i_ += 1;
+    }
+
+    i_ = 0;
+    ServoGroup* servogroup_ = &ServoGroup1;
+    while (servogroup_ != nullptr) {
+        if (servogroup_->isActive()) {
+            json_ += ",\"servo" + String(i_) + "\"" + ChannelIsOn(i_);
+        }
+        servogroup_ = (ServoGroup*)servogroup_->getNext();
+        i_ += 1;
+    }
+
+    json_ += "}";
+    server.send(200, "application/json", json_);
+
+}
+
 void handle1() {
     server.send(200, "text/html", ButtonResponse);
     handleChannel(0);
@@ -304,85 +332,6 @@ void handle9() {
 void handle10() {
     server.send(200, "text/html", ButtonResponse);
     handleChannel(9);
-}
-
-void handleGroups() {
-    String _s = HTML_Start_Doc;
-    _s = HTML_Style;
-    _s.replace("center", "left");
-    _s.replace("{v}", iotWebConf.getThingName());
-    _s.replace("center", "left");
-
-    _s += HTML_Start_Body;
-    _s += "<table border=0 align=center>";
-    _s += "<tr><td>";
-
-    _s += HTML_Start_Fieldset;
-    _s += HTML_Fieldset_Legend;
-    _s.replace("{l}", String(iotWebConf.getThingName()) + " groups");
-
-    _s += HTML_Start_Table;
-
-    _s += "<form align=left action=\"/setgroup\" method=\"POST\">";
-
-    uint8_t _i = 1;
-
-    OutputGroup* _outputgroup = &OutputGroup1;
-    while (_outputgroup != nullptr){
-        if ((_outputgroup->isActive()) && (atoi(_outputgroup->ModeValue) >= 10)) {
-            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
-            if (ChannelIsOn(_i - 1)) {
-                _b.replace("red", "green");
-            }
-            String _bText = String(_outputgroup->DesignationValue) + " (" + String(_outputgroup->ModeValue) + ")";
-            _b.replace("[Text]", _bText);
-
-            _s += _b;
-            _s += "<br><br>";
-            _i += 1;
-        }
-        _outputgroup = (OutputGroup*)_outputgroup->getNext();
-    }
-
-    ServoGroup* _servogroup = &ServoGroup1;
-    while (_servogroup != nullptr) {
-        if (_servogroup->isActive()) {
-            String _b = "<button style=\"background-color:red;\" formaction=\"" + String(_i) + "\"type = \"submit\">[Text]</button>";
-            if (ChannelIsOn(_i - 1)) {
-                _b.replace("red", "green");
-            }
-            String _bText = String(_servogroup->DesignationValue);
-            _b.replace("[Text]", _bText);
-
-            _s += _b;
-            _s += "<br><br>";
-            _i += 1;
-        }
-        _servogroup = (ServoGroup*)_servogroup->getNext();
-    }
-
-    _s += "</form>";
-
-    _s += HTML_End_Table;
-    _s += HTML_End_Fieldset;
-
-    _s += "</td></tr>";
-    _s += HTML_End_Table;
-
-    _s += "<br>";
-    _s += "<br>";
-
-    _s += HTML_Start_Table;
-    _s += "<tr><td align=left>Go to <a href = 'config'>configure page</a> to change configuration.</td></tr>";
-    _s += "<tr><td align=left>Go to <a href='/'>main page</a> to change runtime data.</td></tr>";
-    _s += "<tr><td><font size=1>Version: " + String(Version) + "</font></td></tr>";
-    _s += HTML_End_Table;
-    _s += HTML_End_Body;
-
-    _s += HTML_End_Doc;
-
-
-    server.send(200, "text/html", _s);
 }
 
 void websetup(){
@@ -441,6 +390,7 @@ void websetup(){
     server.on("/", handleRoot);
     server.on("/config", [] { iotWebConf.handleConfig(); });
     server.on("/settings", handleSettings);
+	server.on("/data", handleData);
     server.on("/1", HTTP_POST, handle1);
     server.on("/2", HTTP_POST, handle2);
     server.on("/3", HTTP_POST, handle3);
