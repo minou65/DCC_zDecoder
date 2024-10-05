@@ -21,6 +21,7 @@
 #include <string.h>
 #include "common.h"
 #include "html.h"
+#include "favicon.h"
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
@@ -365,6 +366,10 @@ void handlePost() {
 	server.send(400, "text/plain", "Invalid request");
 }
 
+void handleFavicon() {
+    server.send_P(200, "image/x-icon", (const char*)favicon_ico, sizeof(favicon_ico));
+}
+
 void websetup(){
 
     OutputGroup1.setNext(&OutputGroup2);
@@ -423,7 +428,10 @@ void websetup(){
     server.on("/settings", handleSettings);
 	server.on("/data", handleData);
 	server.on("/post", HTTP_POST, handlePost);
+    server.on("/favicon.ico", HTTP_GET, handleFavicon);
+    server.on("/favicon", HTTP_GET, handleFavicon);
     server.onNotFound([]() { iotWebConf.handleNotFound(); });
+
 }
 
 void webloop(){
