@@ -184,10 +184,39 @@ void handleRoot() {
     content_ += fp_.getHtmlTableEnd().c_str();
     content_ += fp_.getHtmlFieldsetEnd().c_str();
 
+    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
+    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+	content_ += fp_.getHtmlTableRow().c_str();
+	content_ += fp_.getHtmlTableCol().c_str();
+
+    String on_ = html_button_code;
+    on_.replace("group", "all");
+    on_.replace("[value]", "on");
+    on_.replace("[name]", "All on");
+    on_.replace("[id]", "allon");
+    on_.replace("red", "blue");
+	content_ += on_.c_str();
+
+    content_ += fp_.addNewLine(1).c_str();
+
+    String off_ = html_button_code;
+    off_.replace("group", "all");
+    off_.replace("[value]", "off");
+    off_.replace("[name]", "All off");
+    off_.replace("[id]", "alloff");
+    off_.replace("red", "blue");
+    content_ += off_.c_str();
+
+	content_ += fp_.getHtmlTableColEnd().c_str();
+	content_ += fp_.getHtmlTableRowEnd().c_str();
+	content_ += fp_.getHtmlTableEnd().c_str();
+	content_ += fp_.getHtmlFieldsetEnd().c_str();
+
     content_ += fp_.addNewLine(2).c_str();
 
     content_ += fp_.getHtmlTable().c_str();
     content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
+    content_ += fp_.getHtmlTableRowText("<a href = 'settings'>Overview</a>").c_str();
     content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)).c_str();
     content_ += fp_.getHtmlTableEnd().c_str();
 
@@ -285,6 +314,7 @@ void handleData() {
 }
 
 void handlePost() {
+	Serial.println("POST request");
     if (server.hasArg("group")) {
 		String value_ = server.arg("group");
 		uint8_t group_ = value_.toInt();
