@@ -284,54 +284,45 @@ void handleData() {
 
 }
 
-void handle1() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(0);
-}
+void handlePost() {
+    if (server.hasArg("group")) {
+		String value_ = server.arg("group");
+		uint8_t group_ = value_.toInt();
+        if (group_ < 10) {
+            handleChannel(group_ - 1);
 
-void handle2() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(1);
-}
+        } else {
+            server.send(400, "text/plain", "Invalid group");
+            return;
+        }
+        server.send(200, "text/html", html_button_response);
+        return;
+    }
 
-void handle3() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(2);
-}
+	if (server.hasArg("reset")) {
+		server.send(200, "text/html", html_button_response);
+        return;
+	}
 
-void handle4() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(3);
-}
+	if (server.hasArg("all")) {
+		String value_ = server.arg("all");
+		if (value_ == "on") {
+            for (int i_ = 0; i_ < 10; i_++) {
+                handleChannel(i_);
+            }
+		} else if (value_ == "off") {
+			for (int i_ = 0; i_ < 10; i_++) {
+				handleChannel(i_);
+			}
+		} else {
+			server.send(400, "text/plain", "Invalid value");
+            return;
+		}
+		server.send(200, "text/html", html_button_response);
+		return;
+	}
 
-void handle5() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(4);
-}
-
-void handle6() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(5);
-}
-
-void handle7() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(6);
-}
-
-void handle8() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(7);
-}
-
-void handle9() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(8);
-}
-
-void handle10() {
-    server.send(200, "text/html", ButtonResponse);
-    handleChannel(9);
+	server.send(400, "text/plain", "Invalid request");
 }
 
 void websetup(){
@@ -391,16 +382,7 @@ void websetup(){
     server.on("/config", [] { iotWebConf.handleConfig(); });
     server.on("/settings", handleSettings);
 	server.on("/data", handleData);
-    server.on("/1", HTTP_POST, handle1);
-    server.on("/2", HTTP_POST, handle2);
-    server.on("/3", HTTP_POST, handle3);
-    server.on("/4", HTTP_POST, handle4);
-    server.on("/5", HTTP_POST, handle5);
-    server.on("/6", HTTP_POST, handle6);
-    server.on("/7", HTTP_POST, handle7);
-    server.on("/8", HTTP_POST, handle8);
-    server.on("/9", HTTP_POST, handle9);
-    server.on("/10", HTTP_POST, handle10);
+	server.on("/post", HTTP_POST, handlePost);
     server.onNotFound([]() { iotWebConf.handleNotFound(); });
 }
 
