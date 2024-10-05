@@ -93,6 +93,11 @@ protected:
             String(FPSTR(IOTWEBCONF_HTML_FORM_OPTIONAL_GROUP_JAVASCRIPT)) +
             String(FPSTR(IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT));
     }
+    virtual String getFormEnd() {
+        String s_ = OptionalGroupHtmlFormatProvider::getFormEnd();
+        s_ += F("</br><a href='/'>Home</a>");
+        return s_;
+    }
 };
 CustomHtmlFormatProvider customHtmlFormatProvider;
 
