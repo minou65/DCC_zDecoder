@@ -116,7 +116,7 @@ void notifyDccFunc(uint16_t Addr, uint8_t FuncNum, uint8_t FuncState){
 }
 
 void handleChannel(uint8_t Channel) {
-	if (Channel < decoder.Size() && decoder[Channel] != nullptr) {
+	if (ChannelIsActive(Channel)) {
 		if (decoder[Channel]->isOn()) {
 			decoder[Channel]->off();
 		}
@@ -124,14 +124,24 @@ void handleChannel(uint8_t Channel) {
 			decoder[Channel]->on();
 		}
 	}
+}
+
+bool ChannelIsOn(uint8_t Channel) {
+	if (ChannelIsActive(Channel)) {
+		return decoder[Channel]->isOn();
+	}
 	else {
-		Serial.print("Invalid channel: ");
-		Serial.println(Channel);
+		return false;
 	}
 }
 
-bool ChannelIsOn(uint8_t Channel_) {
-	return decoder[Channel_]->isOn();
+bool ChannelIsActive(uint8_t Channel) {
+	if (Channel < decoder.Size() && decoder[Channel] != nullptr) {
+		return true;
+	}
+	else {
+		return false;
+	}
 }
 
 void zDecoderReset() {

@@ -13,7 +13,7 @@ const char html_button_response[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta http-equiv="refresh" content="1; url='/'"/>
+		<meta http-equiv="refresh" content="0; url='/'"/>
 	</head>
 	<body><p>processing group</p></body>
 </html>

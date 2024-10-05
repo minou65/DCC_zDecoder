@@ -339,11 +339,15 @@ void handlePost() {
 		String value_ = server.arg("all");
 		if (value_ == "on") {
             for (int i_ = 0; i_ < 10; i_++) {
-                handleChannel(i_);
+                if (!ChannelIsOn(i_)) {
+                    handleChannel(i_);
+                }
             }
 		} else if (value_ == "off") {
 			for (int i_ = 0; i_ < 10; i_++) {
-				handleChannel(i_);
+                if (ChannelIsOn(i_)) {
+                    handleChannel(i_);
+                }
 			}
 		} else {
 			server.send(400, "text/plain", "Invalid value");
