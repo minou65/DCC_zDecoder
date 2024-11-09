@@ -4,20 +4,20 @@
 // ===========================================
 // LED
 // ===========================================
-LED::LED(const uint8_t Channel_) :
-	Channel(Channel_) {
+LED::LED(const uint8_t Channel) :
+	_Channel(Channel) {
 
 	Serial.println("LED::LED");
 
-	PWMResolution = 8;
-	PWMFrequency = 5000;
+	_PWMResolution = 8;
+	_PWMFrequency = 5000;
 
-	GPIO = ChannelToGPIOMapping[Channel];
-	Serial.print("    Channel: "); Serial.println(Channel);
-	Serial.print("    GPIO   : "); Serial.println(GPIO);
+	_GPIO = ChannelToGPIOMapping[_Channel];
+	Serial.print("    Channel: "); Serial.println(_Channel);
+	Serial.print("    GPIO   : "); Serial.println(_GPIO);
 
-	ledcSetup(Channel, PWMFrequency, PWMResolution);
-	ledcAttachPin(GPIO, Channel);
+	ledcSetup(_Channel, _PWMFrequency, _PWMResolution);
+	ledcAttachPin(_GPIO, _Channel);
 
 	off();
 }
@@ -29,27 +29,27 @@ LED::LED(const uint8_t Channel, uint8_t Brightness) :
 }
 
 LED::~LED() {
-	ledcDetachPin(GPIO);
+	ledcDetachPin(_GPIO);
 }
 
 void LED::process() {}
 
 void LED::SetMaxBrightness(uint16_t MaxBrightness) {
-	_Brightness = MaxBrightness;
+	_MaxBrightness = MaxBrightness;
 }
 
 void LED::on() {
-	IsActive = true;
-	ledcWrite(Channel, _Brightness);
+	_IsActive = true;
+	ledcWrite(_Channel, _MaxBrightness);
 }
 
 void LED::off() {
-	IsActive = false;
-	ledcWrite(Channel, PWM_Set_Off);
+	_IsActive = false;
+	ledcWrite(_Channel, PWM_Set_Off);
 }
 
 bool LED::isOn(){
-	return IsActive;
+	return _IsActive;
 }
 
 // ===========================================
@@ -132,28 +132,28 @@ void LEDFader::process() {
 	//Serial.print("    Current:"); Serial.println(CurrentBrightness);
 	//Serial.print("    Target:"); Serial.println(TargetBrightness);
 
-	ledcWrite(Channel, CurrentBrightness);
+	ledcWrite(_Channel, CurrentBrightness);
 	
 }
 
 void LEDFader::on() {
-	IsActive = true;
-	TargetBrightness = _Brightness;
+	_IsActive = true;
+	TargetBrightness = _MaxBrightness;
 }
 
 void LEDFader::on(uint8_t Brightness_) {
-	IsActive = true;
+	_IsActive = true;
 	SetBrightness(Brightness_);
 };
 
 void LEDFader::off() {
-	IsActive = false;
+	_IsActive = false;
 	TargetBrightness = PWM_Set_Off;
 }
 
 // Brightness in Prozent 0 - 100; , wenn Hardset == true dann wird der Wert direkt gesetzt ohne fading
 void LEDFader::SetPercent(uint8_t Percent_, bool Hardset_) {
-	IsActive = true;
+	_IsActive = true;
 	SetBrightness(((uint32_t)Percent_ * 255) / 100, Hardset_);
 }
 
@@ -172,8 +172,8 @@ void LEDFader::SetBrightness(uint16_t Brightness_, bool Hardset_) {
 		}
 	}
 	else {
-		if (Brightness_ >= _Brightness)
-			TargetBrightness = _Brightness;
+		if (Brightness_ >= _MaxBrightness)
+			TargetBrightness = _MaxBrightness;
 		else
 			TargetBrightness = Brightness_;
 	}
@@ -186,23 +186,23 @@ void LEDFader::SetBrightness(uint16_t Brightness_, bool Hardset_) {
 	//if (TargetBrightness != 0)
 	//	TargetBrightness = Brightness_;
 
-	if (IsActive && Hardset_) {
+	if (_IsActive && Hardset_) {
 		CurrentBrightness = TargetBrightness;
 	}
 }
 
 // Setzen der maximalen Helligkeit
-void LEDFader::SetMaxBrightness(uint16_t Max_) {
+void LEDFader::SetMaxBrightness(uint16_t MaxBrightness) {
 	if (PWM_Set_On == 0) {
-		Max_ = 255 - Max_;
-		_Brightness = Max_;
+		MaxBrightness = 255 - MaxBrightness;
+		LED::SetMaxBrightness(MaxBrightness);
 	}
 	else {
-		_Brightness = Max_;
+		LED::SetMaxBrightness(MaxBrightness);
 	}
 
 	if (TargetBrightness != 0)
-		TargetBrightness = _Brightness;
+		TargetBrightness = _MaxBrightness;
 }
 
 // Time in ms
@@ -305,28 +305,28 @@ void Natrium::process() {
 		}
 
 		// Lampe baut Betriebsdruck auf
-		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() != _Brightness)) {
+		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() != _MaxBrightness)) {
 			SetBrightness(GetCurrentBrightness() + 5);
 		}
 
 		// Lampe hat Betriebsdruck erreicht
-		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() == _Brightness)) {
+		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() == _MaxBrightness)) {
 			CurrentStatus = status::On;
 			Serial.println("Natrium::process, Lampe hat Betriebsdruck erreicht");
 		}
 
 		// Lampe Glüht aus
-		else if ((CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() != PWM_Set_Off) && IsActive) {
+		else if ((CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() != PWM_Set_Off) && _IsActive) {
 			SetBrightness(GetCurrentBrightness() - 3);
 		}
 
 		// Lampe ist Ausgeglüht
-		else if ((CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() == PWM_Set_Off) && IsActive) {
+		else if ((CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() == PWM_Set_Off) && _IsActive) {
 			CurrentStatus = status::Off;
 		}
 
 		// Lampe ist defekt und fällt nun aus
-		else if ((CurrentStatus == status::OperatingPressure || CurrentStatus == status::On) && (IsActive) && (IsMalFunction) && (Malfunctiontimer.repeat())) {
+		else if ((CurrentStatus == status::OperatingPressure || CurrentStatus == status::On) && (_IsActive) && (IsMalFunction) && (Malfunctiontimer.repeat())) {
 			// Ausschalten, Lampe glüht noch
 			CurrentStatus = status::GlowingOff;
 			SetPercent(random(randomMin, randomMax), true);
@@ -336,7 +336,7 @@ void Natrium::process() {
 		}
 
 		// Lampe ist defekt und schaltet nun wieder ein
-		else if ((CurrentStatus == status::GlowingOff || CurrentStatus == status::Off) && IsActive && IsMalFunction && (Malfunctiontimer.repeat())) {
+		else if ((CurrentStatus == status::GlowingOff || CurrentStatus == status::Off) && _IsActive && IsMalFunction && (Malfunctiontimer.repeat())) {
 			// Vorglühen 
 			CurrentStatus = status::GlowingOn;
 			SetPercent(random(randomMin, randomMax), true);
@@ -348,7 +348,7 @@ void Natrium::process() {
 
 void Natrium::on() {
 	Serial.println("Natrium::on");
-	IsActive = true;
+	_IsActive = true;
 
 	// Vorglühen 
 	CurrentStatus = status::GlowingOn;
@@ -359,7 +359,7 @@ void Natrium::on() {
 
 void Natrium::off() {
 	Serial.println("Natrium::off");
-	IsActive = false;
+	_IsActive = false;
 
 	// Ausschalten, Lampe glüht noch
 	CurrentStatus = status::GlowingOff;
@@ -393,7 +393,7 @@ void Neon::process() {
 	LED::process();
 
 	// do nothing if not active and not is running
-	if (!IsActive)
+	if (!_IsActive)
 		return;
 
 	// if time to do something, do it
@@ -406,13 +406,13 @@ void Neon::process() {
 				// Einsachltverzögerung
 				Operationtimer.set(random(300, 500));
 				// Lampe aus
-				ledcWrite(Channel, PWM_Set_Off);
+				ledcWrite(_Channel, PWM_Set_Off);
 			}
 			else {
 				// Ausschaltverzögerung
 				Operationtimer.set(random(200, 400));
 				// Lampe ein
-				ledcWrite(Channel, PWM_Set_On);
+				ledcWrite(_Channel, _MaxBrightness);
 			}
 
 			// Defekte Lampe, Einschaltverzögern darf grösser sein
@@ -428,13 +428,13 @@ void Neon::process() {
 		}
 		else {
 			// Wir müssen nicht mehr blinken, Lampe ein
-			ledcWrite(Channel, PWM_Set_On);
+			ledcWrite(_Channel, _MaxBrightness);
 		}
 	}
 }
 
 void Neon::on() {
-	IsActive = true;
+	_IsActive = true;
 	CurrentStatus = false;
 
 	// Blinker festlegen

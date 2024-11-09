@@ -22,12 +22,14 @@
 // ===========================================
 class LED {
 protected:
-	uint8_t Channel;						 // the number of the LED pin
-	uint8_t GPIO;
-	bool IsActive;
+	uint8_t _Channel;						 // the number of the LED pin
+	uint8_t _GPIO;
+	bool _IsActive;
 
-	uint16_t PWMFrequency;
-	uint16_t PWMResolution;
+	uint16_t _PWMFrequency;
+	uint16_t _PWMResolution;
+
+	uint16_t _MaxBrightness = PWM_Set_On;		// On Value
 
 public:
 	LED(const uint8_t Channel);
@@ -42,9 +44,6 @@ public:
 	void on();
 	void off();
 	bool isOn();
-
-	int16_t _Brightness = PWM_Set_On;		// On Value
-
 };
 
 // ===========================================
@@ -88,7 +87,7 @@ public:
 	// Brightness von 0 - 255, wenn Hardset == true dann wird der Wert direkt gesetzt ohne fading
 	void SetBrightness(uint16_t Brightness_, bool Hardset_ = false);
 	// Setzen der maximalen Helligkeit
-	void SetMaxBrightness(uint16_t Max_);
+	void SetMaxBrightness(uint16_t MaxBrightness);
 
 	// Time in ms
 	void SetFadeTime(uint16_t fadeUpTime_, uint16_t fadeDownTime_);
