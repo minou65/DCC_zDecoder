@@ -30,15 +30,21 @@ protected:
 	uint16_t PWMResolution;
 
 public:
-	LED(const uint8_t Channel_);
+	LED(const uint8_t Channel);
+	LED(const uint8_t Channel, uint8_t Brightness);
 	~LED();
 
 	// Muss regelmässig aufgerufen werden
 	virtual void process();
 
+	virtual void SetMaxBrightness(uint16_t MaxBrightness);
+
 	void on();
 	void off();
 	bool isOn();
+
+	int16_t _Brightness = PWM_Set_On;		// On Value
+
 };
 
 // ===========================================
@@ -49,7 +55,6 @@ protected:
 	Neotimer fadeUpTimer;
 	Neotimer fadeDownTimer;
 
-	int16_t Brightness;					// On Wert
 	int16_t CurrentBrightness;			// Aktuelle Wert für LED beim faden
 	int16_t TargetBrightness;			// Wert, welcher eingestellt werden soll
 
@@ -95,6 +100,8 @@ public:
 	uint8_t GetCurrentBrightness();
 	// Prüft ob die LED ganz Dunkel ist
 	bool isDark();
+private:
+	friend class LED;
 };
 
 // ===========================================

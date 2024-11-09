@@ -22,15 +22,25 @@ LED::LED(const uint8_t Channel_) :
 	off();
 }
 
+LED::LED(const uint8_t Channel, uint8_t Brightness) :
+	LED(Channel) {
+	
+	SetMaxBrightness(Brightness);
+}
+
 LED::~LED() {
 	ledcDetachPin(GPIO);
 }
 
-void LED::process() {};
+void LED::process() {}
+
+void LED::SetMaxBrightness(uint16_t MaxBrightness) {
+	_Brightness = MaxBrightness;
+}
 
 void LED::on() {
 	IsActive = true;
-	ledcWrite(Channel, PWM_Set_On);
+	ledcWrite(Channel, _Brightness);
 }
 
 void LED::off() {
@@ -50,8 +60,7 @@ LEDFader::LEDFader(const uint8_t Channel_) :
 	fadeDownIntervall(10),
 	CurrentBrightness(PWM_Set_Off),
 	TargetBrightness(PWM_Set_Off),
-	LED(Channel_),
-	Brightness(PWM_Set_On) {
+	LED(Channel_, PWM_Set_On) {
 	
 	SetFadeMultiplikator(1);
 	SetFadeTime(500, 500, fadeUpIntervall, fadeDownIntervall);
@@ -69,8 +78,7 @@ LEDFader::LEDFader(const uint8_t Channel_, uint8_t Brightness_, uint16_t fadeUpT
 	fadeDownIntervall(10),
 	CurrentBrightness(PWM_Set_Off),
 	TargetBrightness(PWM_Set_Off),
-	LED(Channel_),
-	Brightness(Brightness_) {
+	LED(Channel_, Brightness_) {
 
 	SetFadeMultiplikator(1);
 	SetFadeTime(fadeUpTime_, fadeDownTime_, fadeUpIntervall, fadeDownIntervall);
@@ -130,7 +138,7 @@ void LEDFader::process() {
 
 void LEDFader::on() {
 	IsActive = true;
-	TargetBrightness = Brightness;
+	TargetBrightness = _Brightness;
 }
 
 void LEDFader::on(uint8_t Brightness_) {
@@ -164,8 +172,8 @@ void LEDFader::SetBrightness(uint16_t Brightness_, bool Hardset_) {
 		}
 	}
 	else {
-		if (Brightness_ >= Brightness)
-			TargetBrightness = Brightness;
+		if (Brightness_ >= _Brightness)
+			TargetBrightness = _Brightness;
 		else
 			TargetBrightness = Brightness_;
 	}
@@ -187,14 +195,14 @@ void LEDFader::SetBrightness(uint16_t Brightness_, bool Hardset_) {
 void LEDFader::SetMaxBrightness(uint16_t Max_) {
 	if (PWM_Set_On == 0) {
 		Max_ = 255 - Max_;
-		Brightness = Max_;
+		_Brightness = Max_;
 	}
 	else {
-		Brightness = Max_;
+		_Brightness = Max_;
 	}
 
 	if (TargetBrightness != 0)
-		TargetBrightness = Brightness;
+		TargetBrightness = _Brightness;
 }
 
 // Time in ms
@@ -297,12 +305,12 @@ void Natrium::process() {
 		}
 
 		// Lampe baut Betriebsdruck auf
-		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() != Brightness)) {
+		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() != _Brightness)) {
 			SetBrightness(GetCurrentBrightness() + 5);
 		}
 
 		// Lampe hat Betriebsdruck erreicht
-		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() == Brightness)) {
+		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() == _Brightness)) {
 			CurrentStatus = status::On;
 			Serial.println("Natrium::process, Lampe hat Betriebsdruck erreicht");
 		}
