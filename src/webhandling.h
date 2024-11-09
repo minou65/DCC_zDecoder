@@ -117,6 +117,7 @@ public:
         snprintf(MultiplierId, STRING_LEN, "%s-multiplier", this->getId());
         snprintf(TimeOnFadeId, STRING_LEN, "%s-onfade", this->getId());
         snprintf(TimeOffFadeId, STRING_LEN, "%s-offfade", this->getId());
+        snprintf(BrightnessId, STRING_LEN, "%s-brightness", this->getId());
         snprintf(ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
 
         // -- Add parameters to this group.
@@ -129,6 +130,7 @@ public:
         this->addItem(&this->MultiplierParam);
         this->addItem(&this->TimeOnFadeParam);
         this->addItem(&this->TimeOffFadeParam);
+        this->addItem(&this->BrightnessParam);
     }
 
     char DesignationValue[STRING_LEN];
@@ -140,9 +142,11 @@ public:
     char MultiplierValue[NUMBER_LEN];
     char TimeOnFadeValue[NUMBER_LEN];
     char TimeOffFadeValue[NUMBER_LEN];
+    char BrightnessValue[NUMBER_LEN] = "255"; // Default value for brightness
 
     iotwebconf::TextParameter DesignationParam =
         iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
+
     MySelectParameter ModeParam =
         MySelectParameter(
             "Mode",
@@ -158,25 +162,28 @@ public:
         );
 
     iotwebconf::NumberParameter NumberParam =
-        iotwebconf::NumberParameter("Number of outputs", NumberId, NumberValue, NUMBER_LEN, "1", "1..16", "min='1' max='16' step='1'");
+        iotwebconf::NumberParameter("Number of outputs", NumberId, NumberValue, NUMBER_LEN, "1", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter AddressParam =
         iotwebconf::NumberParameter("DCC Address", AddressId, AddressValue, NUMBER_LEN, "3", "1..1024", "min='1' max='1024' step='1'");
 
     iotwebconf::NumberParameter TimeOnParam =
-        iotwebconf::NumberParameter("Time on (ms)", TimeOnId, TimeOnValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+        iotwebconf::NumberParameter("Time On (ms)", TimeOnId, TimeOnValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter TimeOffParam =
-        iotwebconf::NumberParameter("Time off (ms)", TimeOffId, TimeOffValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+        iotwebconf::NumberParameter("Time Off (ms)", TimeOffId, TimeOffValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter MultiplierParam =
         iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter TimeOnFadeParam =
-        iotwebconf::NumberParameter("Fader on (ms)", TimeOnFadeId, TimeOnFadeValue, NUMBER_LEN, "1", "1..255", "min='1' max='255' step='1'");
+        iotwebconf::NumberParameter("Time On Fade (ms)", TimeOnFadeId, TimeOnFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter TimeOffFadeParam =
-        iotwebconf::NumberParameter("Fader off (ms)", TimeOffFadeId, TimeOffFadeValue, NUMBER_LEN, "1", "1..255", "min='1' max='255' step='1'");
+        iotwebconf::NumberParameter("Time Off Fade (ms)", TimeOffFadeId, TimeOffFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+
+    iotwebconf::NumberParameter BrightnessParam =
+        iotwebconf::NumberParameter("Brightness", BrightnessId, BrightnessValue, NUMBER_LEN, "255", "0..255", "min='0' max='255' step='1'");
 
 private:
     char DesignationId[STRING_LEN];
@@ -188,19 +195,17 @@ private:
     char MultiplierId[STRING_LEN];
     char TimeOnFadeId[STRING_LEN];
     char TimeOffFadeId[STRING_LEN];
+    char BrightnessId[STRING_LEN];
     char ModeCustomHTML[STRING_LEN];
 
     String getEndTemplate() override {
-
         String result = "<script>hideClass('%s')</script>\n";
         result.replace("%s", this->getId());
-
         result += ChainedParameterGroup::getEndTemplate();
-
         return result;
-
     };
 };
+
 
 extern OutputGroup OutputGroup1;
 extern OutputGroup OutputGroup2;

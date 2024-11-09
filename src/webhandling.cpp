@@ -31,7 +31,7 @@ const char wifiInitialApPassword[] = "123456789";
 
 
 // -- Configuration specific key. The value should be modified if config structure was changed.
-#define CONFIG_VERSION "008"
+#define CONFIG_VERSION "009"
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
