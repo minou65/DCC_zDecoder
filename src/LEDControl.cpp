@@ -56,32 +56,32 @@ bool LED::isOn(){
 // LEDFader
 // ===========================================
 LEDFader::LEDFader(const uint8_t Channel_) :
-	fadeUpIntervall(10),
-	fadeDownIntervall(10),
-	CurrentBrightness(PWM_Set_Off),
-	TargetBrightness(PWM_Set_Off),
+	_fadeUpIntervall(10),
+	_fadeDownIntervall(10),
+	_CurrentBrightness(PWM_Set_Off),
+	_TargetBrightness(PWM_Set_Off),
 	LED(Channel_, PWM_Set_On) {
 	
 	SetFadeMultiplikator(1);
-	SetFadeTime(500, 500, fadeUpIntervall, fadeDownIntervall);
+	SetFadeTime(500, 500, _fadeUpIntervall, _fadeDownIntervall);
 
 	off();
 }
 
 LEDFader::~LEDFader() {
-	fadeUpTimer.~Neotimer();
-	fadeDownTimer.~Neotimer();
+	_fadeUpTimer.~Neotimer();
+	_fadeDownTimer.~Neotimer();
 }
 
-LEDFader::LEDFader(const uint8_t Channel_, uint8_t Brightness_, uint16_t fadeUpTime_, uint16_t fadeDownTime_) :
-	fadeUpIntervall(10),
-	fadeDownIntervall(10),
-	CurrentBrightness(PWM_Set_Off),
-	TargetBrightness(PWM_Set_Off),
-	LED(Channel_, Brightness_) {
+LEDFader::LEDFader(const uint8_t Channel, uint8_t Brightness, uint16_t fadeUpTime, uint16_t fadeDownTime) :
+	_fadeUpIntervall(10),
+	_fadeDownIntervall(10),
+	_CurrentBrightness(PWM_Set_Off),
+	_TargetBrightness(PWM_Set_Off),
+	LED(Channel, Brightness) {
 
 	SetFadeMultiplikator(1);
-	SetFadeTime(fadeUpTime_, fadeDownTime_, fadeUpIntervall, fadeDownIntervall);
+	SetFadeTime(fadeUpTime, fadeDownTime, _fadeUpIntervall, _fadeDownIntervall);
 
 	off();
 }
@@ -91,103 +91,91 @@ void LEDFader::process() {
 
 	LED::process();
 
-	int16_t _direction;
+	int16_t direction_;
 
-	if (CurrentBrightness != TargetBrightness) {
-		_direction = TargetBrightness - CurrentBrightness;
+	if (_CurrentBrightness != _TargetBrightness) {
+		direction_ = _TargetBrightness - _CurrentBrightness;
 
 		// Fade up
-		if (_direction > 0) {
+		if (direction_ > 0) {
 
-			if (fadeUpRate == 0) {
+			if (_fadeUpRate == 0) {
 				// No fading, set direct
-				CurrentBrightness = TargetBrightness;
+				_CurrentBrightness = _TargetBrightness;
 
-			} else if (fadeUpTimer.repeat()) {
+			} else if (_fadeUpTimer.repeat()) {
 				// fading
-				CurrentBrightness = CurrentBrightness + fadeUpRate;
-				if (CurrentBrightness > TargetBrightness) {
-					CurrentBrightness = TargetBrightness;
+				_CurrentBrightness = _CurrentBrightness + _fadeUpRate;
+				if (_CurrentBrightness > _TargetBrightness) {
+					_CurrentBrightness = _TargetBrightness;
 				}
 			}
 		}
 		// Fade down
-		else if (_direction < 0) {
+		else if (direction_ < 0) {
 
-			if (fadeDownRate == 0) {
+			if (_fadeDownRate == 0) {
 				// Set direct the Brightness
-				CurrentBrightness = TargetBrightness;
+				_CurrentBrightness = _TargetBrightness;
 
-			} else if (fadeDownTimer.repeat()) {
+			} else if (_fadeDownTimer.repeat()) {
 				// fading
-				CurrentBrightness = CurrentBrightness - fadeDownRate;
+				_CurrentBrightness = _CurrentBrightness - _fadeDownRate;
 
-				if (CurrentBrightness < TargetBrightness) {
-					CurrentBrightness = TargetBrightness;
+				if (_CurrentBrightness < _TargetBrightness) {
+					_CurrentBrightness = _TargetBrightness;
 				}
 			}
 		}
 	}
 
-	//Serial.print("    Current:"); Serial.println(CurrentBrightness);
-	//Serial.print("    Target:"); Serial.println(TargetBrightness);
-
-	ledcWrite(_Channel, CurrentBrightness);
-	
+	ledcWrite(_Channel, _CurrentBrightness);
 }
 
 void LEDFader::on() {
 	_IsActive = true;
-	TargetBrightness = _MaxBrightness;
+	_TargetBrightness = _MaxBrightness;
 }
 
-void LEDFader::on(uint8_t Brightness_) {
+void LEDFader::on(uint8_t Brightness) {
 	_IsActive = true;
-	SetBrightness(Brightness_);
+	SetBrightness(Brightness);
 };
 
 void LEDFader::off() {
 	_IsActive = false;
-	TargetBrightness = PWM_Set_Off;
+	_TargetBrightness = PWM_Set_Off;
 }
 
 // Brightness in Prozent 0 - 100; , wenn Hardset == true dann wird der Wert direkt gesetzt ohne fading
-void LEDFader::SetPercent(uint8_t Percent_, bool Hardset_) {
+void LEDFader::SetPercent(uint8_t Percent, bool Hardset) {
 	_IsActive = true;
-	SetBrightness(((uint32_t)Percent_ * 255) / 100, Hardset_);
+	SetBrightness(((uint32_t)Percent * 255) / 100, Hardset);
 }
 
 // Brightness von 0 - 255, wenn Hardset == true dann wird der Wert direkt gesetzt ohne fading
-void LEDFader::SetBrightness(uint16_t Brightness_, bool Hardset_) {
+void LEDFader::SetBrightness(uint16_t Brightness, bool Hardset) {
 	if (PWM_Set_On == 0) {
-		Brightness_ = 255 - Brightness_;
+		Brightness = 255 - Brightness;
 
-		if (Brightness_ > PWM_Set_Off) {
-			TargetBrightness = PWM_Set_Off;
+		if (Brightness > PWM_Set_Off) {
+			_TargetBrightness = PWM_Set_Off;
 		}
-		else if (Brightness_ < PWM_Set_On) {
-			TargetBrightness = PWM_Set_On;
+		else if (Brightness < PWM_Set_On) {
+			_TargetBrightness = PWM_Set_On;
 		} else {
-			TargetBrightness = Brightness_;
+			_TargetBrightness = Brightness;
 		}
 	}
 	else {
-		if (Brightness_ >= _MaxBrightness)
-			TargetBrightness = _MaxBrightness;
+		if (Brightness >= _MaxBrightness)
+			_TargetBrightness = _MaxBrightness;
 		else
-			TargetBrightness = Brightness_;
+			_TargetBrightness = Brightness;
 	}
 
-	//Serial.println("LEDFader::SetBrightness");
-	//Serial.print("    new Brightness: "); Serial.println(Brightness_);
-	//Serial.print("    Brightness:     "); Serial.println(Brightness);
-	//Serial.print("    Target:         "); Serial.println(TargetBrightness);
-
-	//if (TargetBrightness != 0)
-	//	TargetBrightness = Brightness_;
-
-	if (_IsActive && Hardset_) {
-		CurrentBrightness = TargetBrightness;
+	if (_IsActive && Hardset) {
+		_CurrentBrightness = _TargetBrightness;
 	}
 }
 
@@ -201,145 +189,145 @@ void LEDFader::SetMaxBrightness(uint16_t MaxBrightness) {
 		LED::SetMaxBrightness(MaxBrightness);
 	}
 
-	if (TargetBrightness != 0)
-		TargetBrightness = _MaxBrightness;
+	if (_TargetBrightness != 0)
+		_TargetBrightness = _MaxBrightness;
 }
 
 // Time in ms
-void LEDFader::SetFadeTime(uint16_t fadeUpTime_, uint16_t fadeDownTime_) {
-	fadeUpTimer.start(fadeUpTime_);
-	fadeDownTimer.start(fadeDownTime_);
+void LEDFader::SetFadeTime(uint16_t fadeUpTime, uint16_t fadeDownTime) {
+	_fadeUpTimer.start(fadeUpTime);
+	_fadeDownTimer.start(fadeDownTime);
 }
 
 // Time in ms, zudem kann das Intevall angepasst werden, kleinst möglicher Wert ist 10ms
 // maximale Schritte sind 255, je mehr Schritte umso flüssiger ist das fading
 // durch erhöhen von fadeIntervall können längere Zeiten erreicht werden
-void LEDFader::SetFadeTime(uint16_t fadeUpTime_, uint16_t fadeDownTime_, uint16_t fadeUpIntervall_, uint16_t fadeDownIntervall_) {
+void LEDFader::SetFadeTime(uint16_t fadeUpTime, uint16_t fadeDownTime, uint16_t fadeUpIntervall, uint16_t fadeDownIntervall) {
 	uint16_t  fadeAmount_;
 	Serial.println("LEDFader::SetFadeTime");
-	Serial.print("    fadeUpTime_       : "); Serial.println(fadeUpTime_);
-	Serial.print("    fadeDownTime_     : "); Serial.println(fadeDownTime_);
-	Serial.print("    fadeUpIntervall_  : "); Serial.println(fadeUpIntervall_);
-	Serial.print("    fadeDownIntervall_: "); Serial.println(fadeDownIntervall_);
+	Serial.print("    fadeUpTime_       : "); Serial.println(fadeUpTime);
+	Serial.print("    fadeDownTime_     : "); Serial.println(fadeDownTime);
+	Serial.print("    fadeUpIntervall_  : "); Serial.println(fadeUpIntervall);
+	Serial.print("    fadeDownIntervall_: "); Serial.println(fadeDownIntervall);
 
 	fadeAmount_ = 0;
-	if (fadeUpIntervall_ < 10) fadeUpIntervall_ = 10;
-	if (fadeUpIntervall_ < 10) fadeUpIntervall_ = 10;
+	if (fadeUpIntervall < 10) fadeUpIntervall = 10;
+	if (fadeUpIntervall < 10) fadeUpIntervall = 10;
 
-	if (fadeUpTime_ > 0) {
-		int _denominator = fadeUpTime_ / fadeUpIntervall_;
-		if (_denominator != 0)
-			fadeAmount_ = 255 / _denominator;
+	if (fadeUpTime > 0) {
+		int denominator_ = fadeUpTime / fadeUpIntervall;
+		if (denominator_ != 0)
+			fadeAmount_ = 255 / denominator_;
 	}
-	fadeUpRate = fadeAmount_;
+	_fadeUpRate = fadeAmount_;
 
 	fadeAmount_ = 0;
-	if (fadeDownTime_ > 0) {
-		int _denominator = fadeDownTime_ / fadeDownIntervall_;
-		if (_denominator != 0)
-			fadeAmount_ = 255 / _denominator;
+	if (fadeDownTime > 0) {
+		int denominator_ = fadeDownTime / fadeDownIntervall;
+		if (denominator_ != 0)
+			fadeAmount_ = 255 / denominator_;
 	}
-	fadeDownRate = fadeAmount_;
+	_fadeDownRate = fadeAmount_;
 
-	SetFadeTime(fadeUpTime_, fadeDownTime_);
+	SetFadeTime(fadeUpTime, fadeDownTime);
 
 }
 
 // Mit diser funktion kann das Intervall zusätzlich erhöht werden. Sollte nicht mehr verwendet werden
-void LEDFader::SetFadeMultiplikator(uint8_t Value_) {
-	FadeMultiplikator = Value_;
+void LEDFader::SetFadeMultiplikator(uint8_t Multiplikator) {
+	_FadeMultiplikator = Multiplikator;
 }
 
 // Liefert die aktuelle helligkeit
 uint8_t LEDFader::GetCurrentBrightness() {
-	uint8_t _result = 255 - CurrentBrightness;
+	uint8_t result_ = 255 - _CurrentBrightness;
 
 	if (PWM_Set_On == 0) {
-		if (_result < PWM_Set_On) {
-			_result = PWM_Set_On;
+		if (result_ < PWM_Set_On) {
+			result_ = PWM_Set_On;
 		}
 	}
 	else {
-		_result =  CurrentBrightness;
+		result_ =  _CurrentBrightness;
 	}
-	return _result;
+	return result_;
 }
 
 // Prüft ob die LED ganz Dunkel ist
 bool LEDFader::isDark() {
-	return CurrentBrightness == PWM_Set_Off;
+	return _CurrentBrightness == PWM_Set_Off;
 }
 
 // ===========================================
 // NatriumLamp
 // ===========================================
-Natrium::Natrium(const uint8_t Channel_, const bool  IsMalFunction_, uint8_t fadeOnIntervall_, uint8_t fadeOffIntervall_) :
-	LEDFader(Channel_, PWM_Set_On, 0, 0),
-	IsMalFunction(IsMalFunction_) {
+Natrium::Natrium(const uint8_t Channel, const bool  IsMalFunction, uint8_t fadeOnIntervall, uint8_t fadeOffIntervall) :
+	LEDFader(Channel, PWM_Set_On, 0, 0),
+	_IsMalFunction(IsMalFunction) {
 
-	SetFadeTime(fadeOnIntervall_, fadeOffIntervall_);
+	SetFadeTime(fadeOnIntervall, fadeOffIntervall);
 	off(true);
 };
 
 Natrium::~Natrium() {
-	Malfunctiontimer.~Neotimer();
-	Operationtimer.~Neotimer();
+	_Malfunctiontimer.~Neotimer();
+	_Operationtimer.~Neotimer();
 }
 
 void Natrium::process() {
 
 	LEDFader::process();
 
-	if (Operationtimer.repeat()) {
+	if (_Operationtimer.repeat()) {
 
 		// Lampe glüht und baut nun Betriebsdruck auf
-		if (CurrentStatus == status::GlowingOn) {
-			CurrentStatus = status::OperatingPressure;
-			SetPercent(random(randomMin, randomMax), true);
+		if (_CurrentStatus == status::GlowingOn) {
+			_CurrentStatus = status::OperatingPressure;
+			SetPercent(random(_randomMin, _randomMax), true);
 
 			// Wenn defekt, dann Ausfallzeit berechnen
-			if (IsMalFunction) {
-				Malfunctiontimer.start(random(MalFunctionIntervalMin, MalFunctionIntervalMax));
+			if (_IsMalFunction) {
+				_Malfunctiontimer.start(random(_MalFunctionIntervalMin, _MalFunctionIntervalMax));
 			}
 
 		}
 
 		// Lampe baut Betriebsdruck auf
-		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() != _MaxBrightness)) {
+		else if ((_CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() != _MaxBrightness)) {
 			SetBrightness(GetCurrentBrightness() + 5);
 		}
 
 		// Lampe hat Betriebsdruck erreicht
-		else if ((CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() == _MaxBrightness)) {
-			CurrentStatus = status::On;
+		else if ((_CurrentStatus == status::OperatingPressure) && (GetCurrentBrightness() == _MaxBrightness)) {
+			_CurrentStatus = status::On;
 			Serial.println("Natrium::process, Lampe hat Betriebsdruck erreicht");
 		}
 
 		// Lampe Glüht aus
-		else if ((CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() != PWM_Set_Off) && _IsActive) {
+		else if ((_CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() != PWM_Set_Off) && _IsActive) {
 			SetBrightness(GetCurrentBrightness() - 3);
 		}
 
 		// Lampe ist Ausgeglüht
-		else if ((CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() == PWM_Set_Off) && _IsActive) {
-			CurrentStatus = status::Off;
+		else if ((_CurrentStatus == status::GlowingOff) && (GetCurrentBrightness() == PWM_Set_Off) && _IsActive) {
+			_CurrentStatus = status::Off;
 		}
 
 		// Lampe ist defekt und fällt nun aus
-		else if ((CurrentStatus == status::OperatingPressure || CurrentStatus == status::On) && (_IsActive) && (IsMalFunction) && (Malfunctiontimer.repeat())) {
+		else if ((_CurrentStatus == status::OperatingPressure || _CurrentStatus == status::On) && (_IsActive) && (_IsMalFunction) && (_Malfunctiontimer.repeat())) {
 			// Ausschalten, Lampe glüht noch
-			CurrentStatus = status::GlowingOff;
-			SetPercent(random(randomMin, randomMax), true);
+			_CurrentStatus = status::GlowingOff;
+			SetPercent(random(_randomMin, _randomMax), true);
 
 			// Einschaltzeit berechnen
-			Malfunctiontimer.start(random(MalFunctionIntervalMin, MalFunctionIntervalMax));
+			_Malfunctiontimer.start(random(_MalFunctionIntervalMin, _MalFunctionIntervalMax));
 		}
 
 		// Lampe ist defekt und schaltet nun wieder ein
-		else if ((CurrentStatus == status::GlowingOff || CurrentStatus == status::Off) && _IsActive && IsMalFunction && (Malfunctiontimer.repeat())) {
+		else if ((_CurrentStatus == status::GlowingOff || _CurrentStatus == status::Off) && _IsActive && _IsMalFunction && (_Malfunctiontimer.repeat())) {
 			// Vorglühen 
-			CurrentStatus = status::GlowingOn;
-			SetPercent(random(randomMin, randomMax), true);
+			_CurrentStatus = status::GlowingOn;
+			SetPercent(random(_randomMin, _randomMax), true);
 		}
 
 
@@ -351,10 +339,10 @@ void Natrium::on() {
 	_IsActive = true;
 
 	// Vorglühen 
-	CurrentStatus = status::GlowingOn;
+	_CurrentStatus = status::GlowingOn;
 
 
-	Operationtimer.start(OperationTime);
+	_Operationtimer.start(_OperationTime);
 };
 
 void Natrium::off() {
@@ -362,15 +350,15 @@ void Natrium::off() {
 	_IsActive = false;
 
 	// Ausschalten, Lampe glüht noch
-	CurrentStatus = status::GlowingOff;
-	SetPercent(random(randomMin, randomMax), true);
+	_CurrentStatus = status::GlowingOff;
+	SetPercent(random(_randomMin, _randomMax), true);
 };
 
 void Natrium::off(bool force_) {
 	Serial.println("Natrium::off(bool force_)");
 	if (force_) {
 		LEDFader::off();
-		CurrentStatus = status::Off;
+		_CurrentStatus = status::Off;
 	}
 	else {
 		off();
@@ -382,10 +370,10 @@ void Natrium::off(bool force_) {
 // ===========================================
 Neon::Neon(const uint8_t Channel_, const bool MalFunction_) :
 	LED(Channel_),
-	IsMalFunction(MalFunction_) {
+	_IsMalFunction(MalFunction_) {
 }
 Neon::~Neon(){
-	Operationtimer.~Neotimer();
+	_Operationtimer.~Neotimer();
 }
 
 void Neon::process() {
@@ -397,33 +385,33 @@ void Neon::process() {
 		return;
 
 	// if time to do something, do it
-	if (Operationtimer.repeat()) {
+	if (_Operationtimer.repeat()) {
 
 		// Wir müssen blinken
-		if (FlashCounter > 0) {
+		if (_FlashCounter > 0) {
 
-			if (CurrentStatus) {
+			if (_CurrentStatus) {
 				// Einsachltverzögerung
-				Operationtimer.set(random(300, 500));
+				_Operationtimer.set(random(300, 500));
 				// Lampe aus
 				ledcWrite(_Channel, PWM_Set_Off);
 			}
 			else {
 				// Ausschaltverzögerung
-				Operationtimer.set(random(200, 400));
+				_Operationtimer.set(random(200, 400));
 				// Lampe ein
 				ledcWrite(_Channel, _MaxBrightness);
 			}
 
 			// Defekte Lampe, Einschaltverzögern darf grösser sein
-			if (CurrentStatus && IsMalFunction)
-				Operationtimer.set(random(200, 2000));
+			if (_CurrentStatus && _IsMalFunction)
+				_Operationtimer.set(random(200, 2000));
 
 			// Blinker runterzählen wenn Lampe nicht defekt ist
-			if (!IsMalFunction)
-				FlashCounter--;
+			if (!_IsMalFunction)
+				_FlashCounter--;
 
-			CurrentStatus = !CurrentStatus;
+			_CurrentStatus = !_CurrentStatus;
 
 		}
 		else {
@@ -435,17 +423,17 @@ void Neon::process() {
 
 void Neon::on() {
 	_IsActive = true;
-	CurrentStatus = false;
+	_CurrentStatus = false;
 
 	// Blinker festlegen
-	FlashCounter = random(1, 10);
+	_FlashCounter = random(1, 10);
 
 	// Defekte Lampe dann muss m_Flashcount auf jedenfall grösser als 0 sein
-	if (IsMalFunction)
-		FlashCounter = 1;
+	if (_IsMalFunction)
+		_FlashCounter = 1;
 
 	// Wie lange soll gewartet werden bis zum ersten Einschalten
-	Operationtimer.start(random(400, 600));
+	_Operationtimer.start(random(400, 600));
 }
 
 void Neon::off() {
