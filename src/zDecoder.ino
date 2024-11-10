@@ -116,17 +116,12 @@ void notifyDccFunc(uint16_t Addr, uint8_t FuncNum, uint8_t FuncState){
 }
 
 void handleDecoderGroup(uint8_t DecoderGroup) {
-	Serial.println("handleDecoderGroup");
-	Serial.printf("    DecoderGroup: %d\n", DecoderGroup);
-
 	if (DecoderGroupIsActive(DecoderGroup)) {
 		if (decoder[DecoderGroup]->isOn()) {
 			decoder[DecoderGroup]->off();
-			Serial.println("was on, now off");
 		}
 		else {
 			decoder[DecoderGroup]->on();
-			Serial.println("was off, now on");
 		}
 	}
 }
@@ -141,13 +136,10 @@ bool DecoderGroupIsEnabled(uint8_t DecoderGroup) {
 }
 
 bool DecoderGroupIsActive(uint8_t DecoderGroup) {
-	Serial.print("DecoderGroupIsActive: "); Serial.println(DecoderGroup);
 	if (DecoderGroup <= decoder.Size() && decoder[DecoderGroup] != nullptr) {
-		Serial.println("DecoderGroup is active");
 		return true;
 	}
 	else {
-		Serial.println("DecoderGroup is not active");
 		return false;
 	}
 }
