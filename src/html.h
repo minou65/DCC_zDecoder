@@ -10,22 +10,31 @@
 #endif
 
 const char html_button_response[] PROGMEM = R"=====(
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta http-equiv="refresh" content="0; url='/'"/>
-	</head>
-	<body><p>processing group</p></body>
-</html>
+function submitForm(event) { 
+    event.preventDefault(); // Verhindert das Standardverhalten des Formulars 
+    var form = event.target; 
+    var formData = new FormData(form);
+    fetch(form.action, { 
+        method: form.method, 
+        body: formData 
+    }).then(response => { 
+        if (response.ok) { 
+            console.log('Formular erfolgreich gesendet'); 
+        } else { 
+            console.error('Fehler beim Senden des Formulars'); 
+        } 
+    }).catch(error => { 
+        console.error('Netzwerkfehler:', error); 
+    }); 
+}
 )=====";
 
 const char html_button_code[] PROGMEM = R"=====(
-<form action="/post" method="post">
+<form id="[id]" action="/post" method="post" onsubmit="submitForm(event)">
     <input type="hidden" name="group" value="[value]">
-    <button id="[id]" style="background-color: red;" type="submit">[name]</button>
+    <button style="background-color: red;" type="submit">[name]</button>
 </form>
 )=====";
-
 
 const char html_css_code[] PROGMEM = R"=====(
 <style>

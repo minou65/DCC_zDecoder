@@ -43,7 +43,7 @@ const char wifiInitialApPassword[] = "123456789";
 //      when connected to the Wifi it will turn off (kept HIGH).
 #define STATUS_PIN LED_BUILTIN
 #if ESP32 
-#define ON_LEVEL HIGH
+#define ON_LEVEL LOW
 #else
 #define ON_LEVEL LOW
 #endif
@@ -128,6 +128,7 @@ protected:
         _s += F("       }\n");
         _s += F("   }\n");
         _s += F("}\n");
+		_s += html_button_response;
         _s += html_css_code;
         return _s;
     }
@@ -153,6 +154,7 @@ void handleRoot() {
     content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
     content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
     content_ += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n")).c_str();
+
     content_ += fp_.getHtmlTableEnd().c_str();
     content_ += fp_.getHtmlFieldsetEnd().c_str();
 
@@ -342,12 +344,14 @@ void handlePost() {
             server.send(400, "text/plain", "Invalid group");
             return;
         }
-        server.send(200, "text/html", html_button_response);
+        server.sendHeader("Location", "/", true);
+        server.send(302, "text/plain", "");
         return;
     }
 
 	if (server.hasArg("reset")) {
-		server.send(200, "text/html", html_button_response);
+        server.sendHeader("Location", "/", true);
+        server.send(302, "text/plain", "");
         return;
 	}
 
@@ -369,7 +373,8 @@ void handlePost() {
 			server.send(400, "text/plain", "Invalid value");
             return;
 		}
-		server.send(200, "text/html", html_button_response);
+        server.sendHeader("Location", "/", true);
+        server.send(302, "text/plain", "");
 		return;
 	}
 
