@@ -297,11 +297,15 @@ void zDecoderInit(void) {
 			}
 
 			if (newAccessory != nullptr) {
+				Serial.print(F("    Mode: ")); Serial.println(Mode_);
+
 				// Check the type of newAccessory
 				if (newAccessory->getType() == AccessoryType::LED) {
-					LED* ledAccessory = static_cast<LED*>(newAccessory);
-					// If the cast is successful, set the brightness
-					ledAccessory->SetMaxBrightness(Brightness_);
+					if (newAccessory->getType() == AccessoryType::LED) {
+						Ausgang* ledAccessory = static_cast<Ausgang*>(newAccessory);
+						// If the cast is successful, set the brightness
+						ledAccessory->SetMaxBrightness(Brightness_);
+					}
 				}
 				decoder.PushBack(newAccessory);
 			}
