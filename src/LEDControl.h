@@ -18,10 +18,20 @@
 #define PWM_Set_On 255
 #define PWM_Set_Off 0
 
+class LEDaccessories : public accessories {
+public:
+	LEDaccessories() = default;
+	LEDaccessories(uint16_t BaseAddress, byte BaseChannel);
+	LEDaccessories(uint16_t BaseAddress, byte BaseChannel, byte Mode);
+	~LEDaccessories();
+	AccessoryType getType() const override;
+	virtual void SetMaxBrightness(uint16_t MaxBrightness);
+};
+
 // ===========================================
 // LED
 // ===========================================
-class LED : public accessories {
+class LED {
 protected:
 	uint8_t _Channel;						 // the number of the LED pin
 	uint8_t _GPIO;
@@ -45,7 +55,6 @@ public:
 	void on();
 	void off();
 	bool isOn();
-	AccessoryType getType() const override { return AccessoryType::LED; }
 };
 
 // ===========================================
@@ -137,6 +146,7 @@ protected:
 public:
 	Natrium(const uint8_t Channel, const bool MalFunction, uint8_t fadeOnIntervall, uint8_t fadeOffIntervall);
 	~Natrium();
+	void SetMaxBrightness(uint16_t MaxBrightness) override;
 	void process();
 	void on();
 	void off();
@@ -159,6 +169,7 @@ protected:
 public:
 	Neon(const uint8_t Channel, const bool MalFunction);
 	~Neon();
+	void SetMaxBrightness(uint16_t MaxBrightness) override;
 	void process();
 	void on();
 	void off();

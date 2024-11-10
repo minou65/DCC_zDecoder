@@ -1,6 +1,24 @@
 #include "LEDControl.h"
 #include "pinmapping.h"
 
+LEDaccessories::LEDaccessories(uint16_t BaseAddress, byte BaseChannel) :
+	accessories(BaseAddress, BaseChannel) {
+}
+
+LEDaccessories::LEDaccessories(uint16_t BaseAddress, byte BaseChannel, byte Mode) :
+	accessories(BaseAddress, BaseChannel, Mode) {
+}
+
+LEDaccessories::~LEDaccessories() {
+}
+AccessoryType LEDaccessories::getType() const {
+	Serial.println("LEDaccessories::getType");
+	return AccessoryType::LED;
+}
+
+void LEDaccessories::SetMaxBrightness(uint16_t MaxBrightness) {
+}
+
 // ===========================================
 // LED
 // ===========================================
@@ -35,6 +53,8 @@ LED::~LED() {
 void LED::process() {}
 
 void LED::SetMaxBrightness(uint16_t MaxBrightness) {
+	Serial.println("LED::SetMaxBrightness");
+	Serial.print("    MaxBrightness: "); Serial.println(MaxBrightness);
 	_MaxBrightness = MaxBrightness;
 }
 
@@ -274,6 +294,10 @@ Natrium::~Natrium() {
 	_Operationtimer.~Neotimer();
 }
 
+void Natrium::SetMaxBrightness(uint16_t MaxBrightness) {
+	LEDFader::SetMaxBrightness(MaxBrightness);
+}
+
 void Natrium::process() {
 
 	LEDFader::process();
@@ -374,6 +398,10 @@ Neon::Neon(const uint8_t Channel_, const bool MalFunction_) :
 }
 Neon::~Neon(){
 	_Operationtimer.~Neotimer();
+}
+
+void Neon::SetMaxBrightness(uint16_t MaxBrightness){
+	LED::SetMaxBrightness(MaxBrightness);
 }
 
 void Neon::process() {
