@@ -25,6 +25,8 @@ public:
 
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	void process();
+
+	AccessoryType getType() const override { return AccessoryType::Watchdog; }
 };
 
 
