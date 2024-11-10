@@ -30,9 +30,9 @@ function submitForm(event) {
 )=====";
 
 const char html_button_code[] PROGMEM = R"=====(
-<form id="[id]" action="/post" method="post" onsubmit="submitForm(event)">
+<form id="form-[id]" action="/post" method="post" onsubmit="submitForm(event)">
     <input type="hidden" name="group" value="[value]">
-    <button style="background-color: red;" type="submit">[name]</button>
+    <button id="[id]" style="background-color: red;" type="submit">[name]</button>
 </form>
 )=====";
 
