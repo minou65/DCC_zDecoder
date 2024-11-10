@@ -9,8 +9,9 @@
 #endif
 
 #include "neotimer.h"
+#include "accessories.h"
 
-class Coil {
+class Coil : public accessories {
 protected:
 	const int8_t GPIO;
 	bool IsActive;
@@ -26,6 +27,8 @@ public:
 	void on();
 	void off();
 	bool isOn();
+
+	AccessoryType getType() const override { return AccessoryType::Coil; }
 };
 
 class CoilPulsed : public Coil {
