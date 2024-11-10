@@ -9,6 +9,16 @@
 #include "WProgram.h"
 #endif
 
+enum class AccessoryType {
+	None,
+	LED,
+	Servo,
+	Coil,
+	Output,
+	Signal,
+	Watchdog
+};
+
 // Root Klasse
 class accessories {
 protected:
@@ -28,6 +38,7 @@ public:
 	virtual void process();
 	virtual void on();
 	virtual void off();
+	virtual AccessoryType getType() const { return AccessoryType::None; }
 
 	virtual void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	virtual void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
@@ -57,6 +68,7 @@ public:
 
 	Signal(uint16_t BaseAddress_, byte BaseChannel_, uint16_t DayLightAddress_, byte Mode_, byte Brightness1_ = 255, byte Brightness2_ = 100);
 	bool SignalState();
+	AccessoryType getType() const override { return AccessoryType::Signal; }
 };
 
 #endif
