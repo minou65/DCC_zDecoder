@@ -14,14 +14,16 @@
 #include "neotimer.h"
 #include "Vector.h"
 
-class Ausgang : public accessories {
+class Ausgang : public LEDaccessories {
 private:
 	LED Output;
 
 public:
 	Ausgang(uint16_t BaseAddress_, uint8_t BaseChannel_);
 	~Ausgang();
+
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	void SetMaxBrightness(uint16_t MaxBrightness) override;
 	void on();
 	void off();
 };
@@ -31,7 +33,7 @@ public:
 //Mode 50
 //Type n/a
 //=======================================================
-class Blinker : public accessories {
+class Blinker : public LEDaccessories {
 protected:
 	LEDFader LED1;
 
@@ -48,6 +50,7 @@ public:
 	Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_, uint8_t Mode_);
 	~Blinker();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 
 	void on();
@@ -67,6 +70,7 @@ public:
 	Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_);
 	Wechselblinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_);
 	~Wechselblinker();
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 	void on();
 	void off();
@@ -77,7 +81,7 @@ public:
 //Mode 
 //Type 
 //=======================================================
-class Lauflicht : public accessories {
+class Lauflicht : public LEDaccessories {
 private:
 	Vector<LEDFader*> LEDs;
 
@@ -98,6 +102,7 @@ public:
 	Lauflicht(uint16_t BaseAddress_, uint8_t BaseChannel_, uint8_t Anzahl_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_, uint8_t Mode_);
 	~Lauflicht();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 	void on();
 	void off();
@@ -110,7 +115,7 @@ public:
 // http://forum.arduino.cc/index.php?topic=159117.15
 // Zeiten in Sekunden
 //=======================================================
-class Hausbeleuchtung : public accessories {
+class Hausbeleuchtung : public LEDaccessories {
 private:
 	Vector<LED*> LEDs;
 
@@ -125,6 +130,7 @@ public:
 	Hausbeleuchtung(uint16_t BaseAddress_, uint8_t BaseChannel_, uint8_t Anzahl_, uint32_t minRandomTime_, uint32_t maxRandomTime_);
 	~Hausbeleuchtung();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 	void on();
 	void off();
@@ -180,6 +186,7 @@ private:
 public:
 	Schweissen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint64_t minRandomPause_, uint64_t maxRandomPause_);
 	~Schweissen();
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 	void on();
 	void off();
@@ -192,7 +199,7 @@ public:
 // http://forum.arduino.cc/index.php?topic=159117.15
 // 
 //=======================================================
-class NeonLampen : public accessories {
+class NeonLampen : public LEDaccessories {
 private:
 	bool Chance = 0;						// Prozentuale chance auf defekte Lampe: 
 											// für 50:50 den Wert 1. für 33:66 den Wert 2, etc.
@@ -206,6 +213,7 @@ public:
 	NeonLampen(uint16_t BaseAddress_, uint8_t BaseChannel_, const uint8_t Anzahl_, const uint8_t DefekteNeonChance_);
 	~NeonLampen();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 
 	void on();
@@ -218,7 +226,7 @@ public:
 //Type n/a
 // 
 //=======================================================
-class NatriumLampen :public accessories {
+class NatriumLampen :public LEDaccessories {
 private:
 	uint8_t Chance = 0;					// Prozentuale chance auf defekte Lampe: 
 											// für 50:50 den Wert 1. für 33:66 den Wert 2, etc.
@@ -236,6 +244,7 @@ public:
 	NatriumLampen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint8_t Anzahl_, uint8_t Chance_, uint8_t fadeOnIntervall_, uint8_t fadeOffIntervall_);
 	~NatriumLampen();
 	void notifyAddress(uint16_t Address_, uint8_t cmd_);
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 
 	void on();

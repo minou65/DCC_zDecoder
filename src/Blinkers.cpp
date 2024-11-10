@@ -9,7 +9,7 @@ using namespace std;
 //Type n/a
 //=======================================================
 Ausgang::Ausgang(uint16_t BaseAddress_, uint8_t BaseChannel_):
-	accessories(BaseAddress_, BaseChannel_, 40),
+	LEDaccessories(BaseAddress_, BaseChannel_, 40),
 	Output(BaseChannel_){
 
 	off();
@@ -36,6 +36,10 @@ void Ausgang::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 	}
 }
 
+void Ausgang::SetMaxBrightness(uint16_t MaxBrightness) {
+	Output.SetMaxBrightness(MaxBrightness);
+}
+
 void Ausgang::on() {
 	Serial.println("Ausgang::on");
 	IsActive = true;
@@ -56,7 +60,7 @@ void Ausgang::off() {
 //Type n/a
 //=======================================================
 Blinker::Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_):
-	accessories(BaseAddress_, BaseChannel_, 50),
+	LEDaccessories(BaseAddress_, BaseChannel_, 50),
 	Status(false),
 	timeOff(timeOff_),
 	timeOn(timeOn_),
@@ -66,7 +70,7 @@ Blinker::Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_,
 };
 
 Blinker::Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_,  uint8_t Mode_):
-	accessories(BaseAddress_, BaseChannel_, Mode_),
+	LEDaccessories(BaseAddress_, BaseChannel_, Mode_),
 	Status(false),
 	timeOff(timeOff_),
 	timeOn(timeOn_),
@@ -77,7 +81,7 @@ Blinker::Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_,
 };
 
 Blinker::Blinker(uint16_t BaseAddress_, uint8_t BaseChannel_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_,  uint8_t Mode_):
-	accessories(BaseAddress_, BaseChannel_, Mode_),
+	LEDaccessories(BaseAddress_, BaseChannel_, Mode_),
 	Status(false),
 	timeOff(timeOff_),
 	timeOn(timeOn_),
@@ -105,6 +109,10 @@ void Blinker::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 			}
 		}
 	}
+}
+
+void Blinker::SetMaxBrightness(uint16_t MaxBrightness) {
+	LED1.SetMaxBrightness(MaxBrightness);
 }
 
 void Blinker::process() {
@@ -168,6 +176,11 @@ Wechselblinker::~Wechselblinker() {
 	LED2.~LEDFader();
 }
 
+void Wechselblinker::SetMaxBrightness(uint16_t MaxBrightness) {
+	Blinker::SetMaxBrightness(MaxBrightness);
+	LED2.SetMaxBrightness(MaxBrightness);
+}
+
 void Wechselblinker::process() {
 	
 	LED1.process();
@@ -213,7 +226,7 @@ void Wechselblinker::off() {
 //Type 
 //=======================================================
 Lauflicht::Lauflicht(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzahl_, uint16_t timeOff_, uint16_t timeOn_,  uint8_t Mode_):
-	accessories(BaseAddress_, BaseChannel_, Mode_),
+	LEDaccessories(BaseAddress_, BaseChannel_, Mode_),
 	Anzahl(Anzahl_),
 	Status(false),
 	Direction(true),
@@ -229,7 +242,7 @@ Lauflicht::Lauflicht(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzah
 };
 
 Lauflicht::Lauflicht(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzahl_, uint16_t timeOff_, uint16_t timeOn_, uint8_t fadeUpTime_, uint8_t fadeDownTime_,  uint8_t Mode_) :
-	accessories(BaseAddress_, BaseChannel_, Mode_),
+	LEDaccessories(BaseAddress_, BaseChannel_, Mode_),
 	Anzahl(Anzahl_),
 	Status(false),
 	Direction(true),
@@ -277,6 +290,11 @@ void Lauflicht::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 			}
 		}
 	}
+}
+
+void Lauflicht::SetMaxBrightness(uint16_t MaxBrightness) {
+	for (int _i = 0; _i < LEDs.Size(); _i++)
+		LEDs[_i]->SetMaxBrightness(MaxBrightness);
 }
 
 void Lauflicht::process() {
@@ -427,7 +445,7 @@ void Lauflicht::off() {
 // http://forum.arduino.cc/index.php?topic=159117.15
 //=======================================================
 Hausbeleuchtung::Hausbeleuchtung(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzahl_, uint32_t minRandomTime_, uint32_t maxRandomTime_) :
-	accessories(BaseAddress_, BaseChannel_),
+	LEDaccessories(BaseAddress_, BaseChannel_),
 	Anzahl(Anzahl_),
 	maxRandomTime(maxRandomTime_),
 	minRandomTime(minRandomTime_) {
@@ -482,6 +500,11 @@ void Hausbeleuchtung::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 			}
 		}
 	}
+}
+
+void Hausbeleuchtung::SetMaxBrightness(uint16_t MaxBrightness) {
+	for (int _i = 0; _i < LEDs.Size(); _i++)
+		LEDs[_i]->SetMaxBrightness(MaxBrightness);
 }
 
 void Hausbeleuchtung::process() {
@@ -611,6 +634,13 @@ Schweissen::~Schweissen() {
 	LED3.~LEDFader();
 }
 
+void Schweissen::SetMaxBrightness(uint16_t MaxBrightness) {
+	LED1.SetMaxBrightness(MaxBrightness);
+	LED2.SetMaxBrightness(MaxBrightness);
+	LED3.SetMaxBrightness(MaxBrightness);
+
+}
+
 void Schweissen::process() {
 
 	LED1.process();
@@ -728,7 +758,7 @@ void Schweissen::off() {
 // 
 //=======================================================
 NeonLampen::NeonLampen(uint16_t BaseAddress_, uint8_t BaseChannel_,  uint8_t Anzahl_,  uint8_t Chance_) :
-	accessories(BaseAddress_, BaseChannel_),
+	LEDaccessories(BaseAddress_, BaseChannel_),
 	Anzahl(Anzahl_),
 	Chance(Chance_) {
 
@@ -791,6 +821,11 @@ void NeonLampen::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 	}
 }
 
+void NeonLampen::SetMaxBrightness(uint16_t MaxBrightness) {
+	for (int _i = 0; _i < Lampen.Size(); _i++)
+		Lampen[_i]->SetMaxBrightness(MaxBrightness);
+}
+
 void NeonLampen::process() {
 
 	for (int i = 0; i < Lampen.Size(); i++) {
@@ -821,7 +856,7 @@ void NeonLampen::off() {
 // 
 //=======================================================
 NatriumLampen::NatriumLampen(uint16_t BaseAddress_, uint8_t BaseChannel_, uint8_t Anzahl_, uint8_t Chance_, uint8_t fadeOnIntervall_ = 10, uint8_t fadeOffIntervall_ = 10) :
-	accessories(BaseAddress_, BaseChannel_),
+	LEDaccessories(BaseAddress_, BaseChannel_),
 	Anzahl(Anzahl_),
 	Chance(Chance_),
 	fadeOnIntervall(fadeOnIntervall_),
@@ -896,6 +931,12 @@ void NatriumLampen::notifyAddress(uint16_t Address_, uint8_t cmd_) {
 			}
 		}
 	}
+}
+
+void NatriumLampen::SetMaxBrightness(uint16_t MaxBrightness) {
+	for (int _i = 0; _i < Lampen.Size(); _i++)
+		Lampen[_i]->SetMaxBrightness(MaxBrightness);
+
 }
 
 void NatriumLampen::process() {
