@@ -32,6 +32,7 @@ Ein einfacher Ausgang um z.B. eine Lampe oder Relais ein und auszuschalten.
 | Designation | Beschreibung des Channels | |
 | Modus | ein/aus | einfacher Ausgang |
 | Address | DCC Adresse des Ausgangs | default 3 |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -54,6 +55,7 @@ Einfacher blinker, welcher es erlaubt auch ein und aus zu faden
 | Multiplikator | Multiplikator mit welchem die ein / aus Zeit multipliziert wird | |
 | Fade Time on | Zeit in ms für das Fade on | |
 | Fade Time off | Zeit in ms für das Fade off | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -76,6 +78,7 @@ Wechselblinker, welcher es erlaubt auch ein und aus zu faden
 | Multiplikator | Multiplikator mit welchem die ein / aus Zeit multipliziert wird | |
 | Fade Time on | Zeit in ms für das Fade on | |
 | Fade Time off | Zeit in ms für das Fade off | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -92,6 +95,7 @@ Simulation eines Fernsehers
 | Designation | | |
 | Modus | | Fernseher |
 | Address | DCC Adresse des Ausgangs | default 3 |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -113,6 +117,7 @@ Simuliert ein Schweisslicht
 | Blinker time on | minimalae Pause in ms zwischen zwei Schweiss vorgängen | |
 | Blinker time off | maximale Pause in ms zwischen zwei Scheiss vorgängen  | |
 | Multitiplikator | Faktor mit welchem die ein / aus Zeit mulitpliziert wird| |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -131,6 +136,7 @@ Simuliert ein flackerndes Feuer
 | Designation | | |
 | Modus |  |  Feuer |
 | Address | DCC Adresse des Ausgangs | default 3 |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -153,6 +159,7 @@ Die flashtime sollte zwischen 100 und 300 ms sein, um gute Ergebinsse zu erreich
 | Multiplier | Faktor mit welchem die min / max Pausenzeit mulitpliziert wird| 10 |
 | Minimum flash time | minimale pausenzeit in sekunden | 5 |
 | Maximal flash time | maximale pausenzeit in sekunden | 30 |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -173,6 +180,7 @@ Kette durchgehen und notwendige LED einschalten, die anderen aussschalten
 | Blinker time on | | |
 | Blinker time off | | |
 | Einheit | | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -193,6 +201,7 @@ Alle Lampen werden nacheinander eingschaltet, am Schluss werden alle ausgeschalt
 | Blinker time on | | |
 | Blinker time off | | |
 | Einheit | | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -213,6 +222,7 @@ Lampe für Lampe wird eingeschaltet. Sind alle eingeschaltet, wird mit der erste
 | Blinker time on | | |
 | Blinker time off | | |
 | Einheit | | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -234,6 +244,7 @@ Funktion analaog Lauflicht 1, aber in beide richtungen (Knigth rider)
 | Blinker time on | | |
 | Blinker time off | | |
 | Einheit | | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -253,6 +264,7 @@ Funktion analaog Lauflicht 1, aber in beide richtungen (Knigth rider)
 | Blinker time on | | |
 | Blinker time off | | |
 | Einheit | | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -272,7 +284,8 @@ Simuliert eine oder mehere Natriumlampen. Beim einschalten beginnt die lampe zu 
 | Address | DCC Adresse des Ausgangs | default 3 ||
 | Mulitiplier | Prozentuale chance auf defekte Lampe: <br/> für 50:50 den Wert 1. <br/> für 33:66 den Wert 2, etc. <br/> wenn Null dann gibt es keine defekte Lampe <br/> wenn 255, dann gibt es immer eine defekte Lampe | |
 | Fade Time on | minimale Zeit für Glühen| |
-| Fade Time off | maximale Zeit für Glüchen | |
+| Fade Time off | maximale Zeit für Glühen | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
@@ -291,6 +304,7 @@ Simuliert eine oder mehere Nenolampen. Beim einschalten blinken die Lampen 1-5 m
 | Number of outputs| 1 - 16 | |
 | Address | DCC Adresse des Ausgangs | default 3 |
 | Mulitiplier | Prozentuale chance auf defekte Lampe: <br/> für 50:50 den Wert 1. <br/> für 33:66 den Wert 2, etc. <br/> wenn Null dann gibt es keine defekte Lampe <br/> wenn 255, dann gibt es immer eine defekte Lampe | |
+| Brightness | Helligkeit des Ausgangs | default 255 |
 
 [Betriebsarten](../readme.md#betriebsarten) <br>
 [Top of document](#blinkers)
