@@ -114,23 +114,28 @@ CustomHtmlFormatProvider customHtmlFormatProvider;
 
 class MyHtmlRootFormatProvider : public HtmlRootFormatProvider {
 protected:
+    virtual String getStyleInner() {
+        String s_ = HtmlRootFormatProvider::getStyleInner();
+        s_ += html_css_code;
+        return s_;
+    }
+
     virtual String getScriptInner() {
-        String _s = HtmlRootFormatProvider::getScriptInner();
-        _s.replace("{millisecond}", "1000");
-        _s += F("function updateData(jsonData) {\n");
-        _s += F("   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\";\n");
-        _s += F("   for (var key in jsonData) {\n");
-        _s += F("       if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {\n");
-        _s += F("           var button = document.getElementById(key);\n");
-        _s += F("           if (button) {\n");
-        _s += F("               button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';\n");
-        _s += F("           }\n");
-        _s += F("       }\n");
-        _s += F("   }\n");
-        _s += F("}\n");
-		_s += html_button_response;
-        _s += html_css_code;
-        return _s;
+        String s_ = HtmlRootFormatProvider::getScriptInner();
+        s_.replace("{millisecond}", "1000");
+        s_ += F("function updateData(jsonData) {\n");
+        s_ += F("   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\" \n");
+        s_ += F("   for (var key in jsonData) {\n");
+        s_ += F("       if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {\n");
+        s_ += F("           var button = document.getElementById(key);\n");
+        s_ += F("           if (button) {\n");
+        s_ += F("               button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';\n");
+        s_ += F("           }\n");
+        s_ += F("       }\n");
+        s_ += F("   }\n");
+        s_ += F("}\n");
+		s_ += html_button_response;
+        return s_;
     }
 };
 
@@ -170,7 +175,7 @@ void handleRoot() {
             b_.replace("[value]", String(i_));
             b_.replace("[name]", String(outputgroup_->DesignationValue) + " (" + String(outputgroup_->ModeValue) + ")");
             b_.replace("[id]", "output" + String(i_));
-            if (ChannelIsOn(i_ - 1)) {
+            if (DecoderGroupIsEnabled(i_ - 1)) {
                 b_.replace("red", "green");
             }
 
@@ -188,7 +193,7 @@ void handleRoot() {
             b_.replace("[value]", String(i_));
             b_.replace("[name]", String(servogroup_->DesignationValue));
             b_.replace("[id]", "servo" + String(i_));
-            if (ChannelIsOn(i_ - 1)) {
+            if (DecoderGroupIsEnabled(i_ - 1)) {
                 b_.replace("red", "green");
             }
 
@@ -311,7 +316,7 @@ void handleData() {
     OutputGroup* outputgroup_ = &OutputGroup1;
     while (outputgroup_ != nullptr) {
         if (outputgroup_->isActive()) {
-            json_ += ",\"output" + String(i_) + "\":" + ChannelIsOn(i_);
+            json_ += ",\"output" + String(i_ + 1) + "\":" + DecoderGroupIsEnabled(i_);
         }
         outputgroup_ = (OutputGroup*)outputgroup_->getNext();
         i_ += 1;
@@ -321,7 +326,7 @@ void handleData() {
     ServoGroup* servogroup_ = &ServoGroup1;
     while (servogroup_ != nullptr) {
         if (servogroup_->isActive()) {
-            json_ += ",\"servo" + String(i_) + "\"" + ChannelIsOn(i_);
+            json_ += ",\"servo" + String(i_ + 1) + "\"" + DecoderGroupIsEnabled(i_);
         }
         servogroup_ = (ServoGroup*)servogroup_->getNext();
         i_ += 1;
@@ -336,9 +341,10 @@ void handlePost() {
 	Serial.println("POST request");
     if (server.hasArg("group")) {
 		String value_ = server.arg("group");
-		uint8_t group_ = value_.toInt();
+		uint8_t group_ = value_.toInt() - 1;
+		Serial.println("    Channel: " + String(group_));
         if (group_ < 10) {
-            handleChannel(group_ - 1);
+            handleDecoderGroup(group_);
 
         } else {
             server.send(400, "text/plain", "Invalid group");
@@ -359,14 +365,14 @@ void handlePost() {
 		String value_ = server.arg("all");
 		if (value_ == "on") {
             for (int i_ = 0; i_ < 10; i_++) {
-                if (!ChannelIsOn(i_)) {
-                    handleChannel(i_);
+                if (!DecoderGroupIsEnabled(i_)) {
+                    handleDecoderGroup(i_);
                 }
             }
 		} else if (value_ == "off") {
 			for (int i_ = 0; i_ < 10; i_++) {
-                if (ChannelIsOn(i_)) {
-                    handleChannel(i_);
+                if (DecoderGroupIsEnabled(i_)) {
+                    handleDecoderGroup(i_);
                 }
 			}
 		} else {
@@ -441,7 +447,7 @@ void websetup(){
     server.on("/", handleRoot);
     server.on("/config", [] { iotWebConf.handleConfig(); });
     server.on("/settings", handleSettings);
-	server.on("/data", handleData);
+	server.on("/data", HTTP_GET, handleData);
 	server.on("/post", HTTP_POST, handlePost);
     server.on("/favicon.ico", HTTP_GET, handleFavicon);
     server.on("/favicon", HTTP_GET, handleFavicon);

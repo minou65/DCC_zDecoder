@@ -115,31 +115,39 @@ void notifyDccFunc(uint16_t Addr, uint8_t FuncNum, uint8_t FuncState){
 		return;
 }
 
-void handleChannel(uint8_t Channel) {
-	if (ChannelIsActive(Channel)) {
-		if (decoder[Channel]->isOn()) {
-			decoder[Channel]->off();
+void handleDecoderGroup(uint8_t DecoderGroup) {
+	Serial.println("handleDecoderGroup");
+	Serial.printf("    DecoderGroup: %d\n", DecoderGroup);
+
+	if (DecoderGroupIsActive(DecoderGroup)) {
+		if (decoder[DecoderGroup]->isOn()) {
+			decoder[DecoderGroup]->off();
+			Serial.println("was on, now off");
 		}
 		else {
-			decoder[Channel]->on();
+			decoder[DecoderGroup]->on();
+			Serial.println("was off, now on");
 		}
 	}
 }
 
-bool ChannelIsOn(uint8_t Channel) {
-	if (ChannelIsActive(Channel)) {
-		return decoder[Channel]->isOn();
+bool DecoderGroupIsEnabled(uint8_t DecoderGroup) {
+	if (DecoderGroupIsActive(DecoderGroup)) {
+		return decoder[DecoderGroup]->isOn();
 	}
 	else {
 		return false;
 	}
 }
 
-bool ChannelIsActive(uint8_t Channel) {
-	if (Channel < decoder.Size() && decoder[Channel] != nullptr) {
+bool DecoderGroupIsActive(uint8_t DecoderGroup) {
+	Serial.print("DecoderGroupIsActive: "); Serial.println(DecoderGroup);
+	if (DecoderGroup <= decoder.Size() && decoder[DecoderGroup] != nullptr) {
+		Serial.println("DecoderGroup is active");
 		return true;
 	}
 	else {
+		Serial.println("DecoderGroup is not active");
 		return false;
 	}
 }

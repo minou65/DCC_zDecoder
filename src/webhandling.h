@@ -18,8 +18,8 @@
 void websetup();
 void webloop();
 
-extern void handleChannel(uint8_t Channel_);
-extern bool ChannelIsOn(uint8_t Channel_);
+extern void handleDecoderGroup(uint8_t DecoderGroup);
+extern bool DecoderGroupIsEnabled(uint8_t DecoderGroup);
 
 class MySelectParameter : public iotwebconf::SelectParameter {
 public:
