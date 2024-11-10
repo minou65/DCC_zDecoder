@@ -174,7 +174,6 @@ void zDecoderReset() {
 }
 
 void zDecoderInit(void) {
-
 	uint8_t channel_ = 0;
 
 	// Decoderobjekte in decoder löschen
@@ -198,6 +197,7 @@ void zDecoderInit(void) {
 			uint8_t Multiplier_ = atoi(outputgroup_->MultiplierValue); // Multiplikator
 			uint8_t TimeOnFade_ = atoi(outputgroup_->TimeOnFadeValue);
 			uint8_t TimeOffFade_ = atoi(outputgroup_->TimeOffFadeValue);
+			uint8_t Brightness_ = atoi(outputgroup_->BrightnessValue);
 
 			uint16_t DayLightAddress_ = 0;
 			uint8_t DayBrightness_ = 255;
@@ -208,114 +208,103 @@ void zDecoderInit(void) {
 			Serial.print(F("    Address: ")); Serial.println(Address_);
 
 			// Einrichten des Ports
+			accessories* newAccessory = nullptr;
 			switch (Mode_) {
 			case 0:
-				decoder.PushBack(new accessories(Address_, channel_));
+				newAccessory = new accessories(Address_, channel_);
 				channel_ += Count_;
 				break;
-			case 1:			// Watchdog
-				decoder.PushBack(new Watchdog(Address_, channel_, Multiplier_ * TimeOn_));
+			case 1: // Watchdog
+				newAccessory = new Watchdog(Address_, channel_, Multiplier_ * TimeOn_);
 				channel_ += 1;
 				break;
-			case 40:			// einfacher Ausgang
-				decoder.PushBack(new Ausgang(Address_, channel_));
+			case 40: // einfacher Ausgang
+				newAccessory = new Ausgang(Address_, channel_);
 				channel_ += 1;
 				break;
-
-			case 50:			// Blinker
-				decoder.PushBack(new Blinker(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, TimeOnFade_, TimeOffFade_, Mode_));
-				// decoder.PushBack(new Blinker(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, 150, 150, Mode_));
-
+			case 50: // Blinker
+				newAccessory = new Blinker(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, TimeOnFade_, TimeOffFade_, Mode_);
 				channel_ += 1;
 				break;
-
-			case 51:			// Wechselblinker
-				decoder.PushBack(new Wechselblinker(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, TimeOnFade_, TimeOffFade_));
+			case 51: // Wechselblinker
+				newAccessory = new Wechselblinker(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, TimeOnFade_, TimeOffFade_);
 				channel_ += 2;
 				break;
-
-			case 52: case 53: case 54: case 55:			// diverse Lauflichter
-				decoder.PushBack(new Lauflicht(Address_, channel_, Count_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, Mode_));
+			case 52: case 53: case 54: case 55: // diverse Lauflichter
+				newAccessory = new Lauflicht(Address_, channel_, Count_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_, Mode_);
 				channel_ += Count_;
 				break;
-
-			case 60:			// Hausbeleuchtung
-				decoder.PushBack(new Hausbeleuchtung(Address_, channel_, Count_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_));
+			case 60: // Hausbeleuchtung
+				newAccessory = new Hausbeleuchtung(Address_, channel_, Count_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_);
 				channel_ += Count_;
 				break;
-
-			case 61:			// Neonröhren
-				decoder.PushBack(new NeonLampen(Address_, channel_, Count_, Multiplier_));
+			case 61: // Neonröhren
+				newAccessory = new NeonLampen(Address_, channel_, Count_, Multiplier_);
 				channel_ += Count_;
 				break;
-
-			case 62:			// Natriumlampen
-				decoder.PushBack(new NatriumLampen(Address_, channel_, Count_, Multiplier_, TimeOnFade_, TimeOffFade_));
+			case 62: // Natriumlampen
+				newAccessory = new NatriumLampen(Address_, channel_, Count_, Multiplier_, TimeOnFade_, TimeOffFade_);
 				channel_ += Count_;
 				break;
-
-			case 80:            // TV
-				decoder.PushBack(new Fernseher(Address_, channel_));
+			case 80: // TV
+				newAccessory = new Fernseher(Address_, channel_);
 				channel_ += 1;
 				break;
-
-			case 81:            // Schweisslicht
-				decoder.PushBack(new Schweissen(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_));
+			case 81: // Schweisslicht
+				newAccessory = new Schweissen(Address_, channel_, Multiplier_ * TimeOff_, Multiplier_ * TimeOn_);
 				channel_ += 3;
 				break;
-
-			case 82:            // Feuer
-				decoder.PushBack(new Feuer(Address_, channel_));
+			case 82: // Feuer
+				newAccessory = new Feuer(Address_, channel_);
 				channel_ += 3;
 				break;
-
-			case 83:            // Blitzlicht
-				decoder.PushBack(new Blitzlicht(Address_, channel_, TimeOnFade_ * 1000, TimeOffFade_ * 1000, TimeOn_ * Multiplier_, TimeOff_ * Multiplier_));
+			case 83: // Blitzlicht
+				newAccessory = new Blitzlicht(Address_, channel_, TimeOnFade_ * 1000, TimeOffFade_ * 1000, TimeOn_ * Multiplier_, TimeOff_ * Multiplier_);
 				channel_ += 1;
 				break;
-
-			case 102:			// SBB_Hauptsignal_102
-				decoder.PushBack(new SBB_Hauptsignal_102(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_));
+			case 102: // SBB_Hauptsignal_102
+				newAccessory = new SBB_Hauptsignal_102(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_);
 				channel_ += 2;
 				break;
-
-
-			case 103:			// SBB_Hauptsignal_103
-				decoder.PushBack(new SBB_Hauptsignal_103(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_));
+			case 103: // SBB_Hauptsignal_103
+				newAccessory = new SBB_Hauptsignal_103(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_);
 				channel_ += 3;
 				break;
-
-			case 104:			// SBB_Hauptsignal_104
-				decoder.PushBack(new SBB_Hauptsignal_104(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_));
+			case 104: // SBB_Hauptsignal_104
+				newAccessory = new SBB_Hauptsignal_104(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_);
 				channel_ += 4;
 				break;
-
 			case 105:
-				decoder.PushBack(new SBB_Hauptsignal_105(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_));
+				newAccessory = new SBB_Hauptsignal_105(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_);
 				channel_ += 5;
 				break;
-
 			case 106:
-				decoder.PushBack(new SBB_Hauptsignal_106(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_));
+				newAccessory = new SBB_Hauptsignal_106(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_);
 				channel_ += 6;
 				break;
-
 			case 110:
-				decoder.PushBack(new SBB_Zwergsignal_110(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_));
+				newAccessory = new SBB_Zwergsignal_110(Address_, channel_, DayLightAddress_, DayBrightness_, NightBrightness_, TimeOnFade_, TimeOffFade_);
 				channel_ += 2;
 				break;
-
 			case 201: // Spule, Entkuppler
-				decoder.PushBack(new UnCoupler(channel_, Address_, Multiplier_ * TimeOn_));
+				newAccessory = new UnCoupler(channel_, Address_, Multiplier_ * TimeOn_);
 				channel_ += 1;
 				break;
-
 			case 202: // Weiche
-				decoder.PushBack(new Turnout(channel_, channel_ + 1, Address_, Multiplier_ * TimeOn_));
+				newAccessory = new Turnout(channel_, channel_ + 1, Address_, Multiplier_ * TimeOn_);
 				channel_ += 2;
 				break;
 			}
-			
+
+			if (newAccessory != nullptr) {
+				// Check the type of newAccessory
+				if (newAccessory->getType() == AccessoryType::LED) {
+					LED* ledAccessory = static_cast<LED*>(newAccessory);
+					// If the cast is successful, set the brightness
+					ledAccessory->SetMaxBrightness(Brightness_);
+				}
+				decoder.PushBack(newAccessory);
+			}
 		}
 		outputgroup_ = (OutputGroup*)outputgroup_->getNext();
 	}
@@ -328,7 +317,6 @@ void zDecoderInit(void) {
 		}
 
 		if (servogroup_->isActive()) {
-
 			uint8_t Address_ = atoi(servogroup_->AddressValue);
 			uint8_t _TravelTime = atoi(servogroup_->TravelTimeValue);
 			uint8_t Multiplier_ = atoi(servogroup_->MultiplierValue); // Multiplikator
@@ -339,15 +327,14 @@ void zDecoderInit(void) {
 			Serial.print(F("Values for channel ")); Serial.print(channel_); Serial.println(F(" preserved"));
 			Serial.print(F("    Channels used: ")); Serial.println(Count_);
 
-			decoder.PushBack(new TurnoutServo(channel_, Address_, _Limit1, _Limit2, Multiplier_ * _TravelTime));
+			accessories* newServo = new TurnoutServo(channel_, Address_, _Limit1, _Limit2, Multiplier_ * _TravelTime);
+			decoder.PushBack(newServo);
 			channel_ += 1;
 
 			Serial.print(F("next channel is ")); Serial.println(channel_);
 		}
 		servogroup_ = (ServoGroup*)servogroup_->getNext();
-
 	}
-
 }
 
 void setup() {
