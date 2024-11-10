@@ -38,7 +38,10 @@ public:
 	virtual void process();
 	virtual void on();
 	virtual void off();
-	virtual AccessoryType getType() const { return AccessoryType::None; }
+	virtual AccessoryType getType() const { 
+		Serial.print("accessories::getType");
+		return AccessoryType::None;
+	}
 
 	virtual void notifyAddress(uint16_t Address_, uint8_t cmd_);
 	virtual void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
