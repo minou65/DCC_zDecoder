@@ -101,8 +101,14 @@ function hideClass(id) {
     var multiplierClass = document.getElementsByClassName(id + '-multiplier')[0];
     var onfadeClass = document.getElementsByClassName(id + '-onfade')[0];
     var offfadeClass = document.getElementsByClassName(id + '-offfade')[0];
+    var brightnessClass = document.getElementsByClassName(id + '-brightness')[0];
 
     // none is not visible, block is visible
+
+    // The array parameters contains a list of items for which numberclass should not be visible
+    var parameters = ["0", "201", "202", "1"];
+    brightnessClass.style.display = parameters.includes(selectedValue) ? "none" : "block";
+
     // The array parameters contains a list of items for which numberclass should be visible
     var parameters = ["52", "53", "54", "55", "60", "61", "62"];
     numberClass.style.display = parameters.includes(selectedValue) ? "block" : "none";
