@@ -26,7 +26,7 @@
 #define SERVO_MIN() (544)  // minimum value in uS for this servo
 #define SERVO_MAX() (2400)  // maximum value in uS for this servo 
 
-class ServoControl {
+class ServoControl : public accessories {
 private:
     ESPServo espservo;
     Neotimer TravelTimer;
@@ -80,6 +80,7 @@ public:
     boolean isAbsolute();
     void writeTenths(int tenth_);
 
+    AccessoryType getType() const override { return AccessoryType::Servo; }
 };
 
 extern void notifyServoPosition(ServoControl*, int) __attribute__((weak));
