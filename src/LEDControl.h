@@ -10,6 +10,7 @@
 #endif
 
 #include "neotimer.h"
+#include "accessories.h"
 
 // Values for On and Off
 // Werden die LED's direkt am ESP angeschlossen sind die 
@@ -20,7 +21,7 @@
 // ===========================================
 // LED
 // ===========================================
-class LED {
+class LED : public accessories {
 protected:
 	uint8_t _Channel;						 // the number of the LED pin
 	uint8_t _GPIO;
@@ -44,6 +45,7 @@ public:
 	void on();
 	void off();
 	bool isOn();
+	AccessoryType getType() const override { return AccessoryType::LED; }
 };
 
 // ===========================================
