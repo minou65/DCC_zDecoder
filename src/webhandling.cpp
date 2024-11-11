@@ -117,7 +117,7 @@ protected:
 
     virtual String getScriptInner() {
         String s_ = HtmlRootFormatProvider::getScriptInner();
-        s_.replace("{millisecond}", "1000");
+        s_.replace("{millisecond}", "2000");
         s_ += F("function updateData(jsonData) {\n");
         s_ += F("   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\" \n");
         s_ += F("   for (var key in jsonData) {\n");
@@ -306,7 +306,7 @@ void handleSettings() {
 
 void handleData() {
     String json_ = "{";
-    json_ += "\"rssi\":" + String(WiFi.RSSI());
+    json_ += "\"rssi\":\"" + String(WiFi.RSSI()) + "\"";
     uint8_t i_ = 0;
     OutputGroup* outputgroup_ = &OutputGroup1;
     while (outputgroup_ != nullptr) {

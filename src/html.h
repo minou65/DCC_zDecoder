@@ -10,7 +10,6 @@
 #endif
 
 const char html_button_response[] PROGMEM = R"=====(
-const char html_button_response[] PROGMEM = R"=====(
 function submitForm(event) { 
     event.preventDefault(); // Prevents the default behavior of the form 
     var form = event.target; 
