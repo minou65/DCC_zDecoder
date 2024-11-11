@@ -270,6 +270,7 @@ private:
 public:
 	Feuer(uint16_t BaseAddress_, uint8_t BaseChannel_);
 	~Feuer();
+	void SetMaxBrightness(uint16_t MaxBrightness);
 	void process();
 	void off();
 };
@@ -289,6 +290,8 @@ public:
 	Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_);
 	Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_, uint32_t sleeptimeMin_, uint32_t sleeptimeMax_, uint16_t blitztimeMin_, uint16_t blitztimeMax_);
 	~Blitzlicht();
+
+	void SetMaxBrightness(uint16_t MaxBrightness);
 
 	void process();
 	void on();

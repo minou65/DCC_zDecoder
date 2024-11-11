@@ -982,6 +982,12 @@ Feuer::~Feuer() {
 	LED3.~LEDFader();
 }
 
+void Feuer::SetMaxBrightness(uint16_t MaxBrightness) {
+	LED1.SetMaxBrightness(MaxBrightness);
+	LED2.SetMaxBrightness(MaxBrightness);
+	LED3.SetMaxBrightness(MaxBrightness);
+}
+
 void Feuer::process() {
 	LED1.process();
 	LED2.process();
@@ -1041,6 +1047,10 @@ Blitzlicht::Blitzlicht(uint16_t BaseAddress_, uint8_t BaseChannel_, uint32_t sle
 }
 
 Blitzlicht::~Blitzlicht() {
+}
+
+void Blitzlicht::SetMaxBrightness(uint16_t MaxBrightness) {
+	LED1.SetMaxBrightness(MaxBrightness);
 }
 
 void Blitzlicht::process() {
