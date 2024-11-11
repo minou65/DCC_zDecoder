@@ -10,8 +10,9 @@
 #endif
 
 const char html_button_response[] PROGMEM = R"=====(
+const char html_button_response[] PROGMEM = R"=====(
 function submitForm(event) { 
-    event.preventDefault(); // Verhindert das Standardverhalten des Formulars 
+    event.preventDefault(); // Prevents the default behavior of the form 
     var form = event.target; 
     var formData = new FormData(form);
     fetch(form.action, { 
@@ -19,12 +20,13 @@ function submitForm(event) {
         body: formData 
     }).then(response => { 
         if (response.ok) { 
-            console.log('Formular erfolgreich gesendet'); 
+            console.log('Form successfully submitted'); 
+            requestData(); // Call requestData function
         } else { 
-            console.error('Fehler beim Senden des Formulars'); 
+            console.error('Error submitting the form'); 
         } 
     }).catch(error => { 
-        console.error('Netzwerkfehler:', error); 
+        console.error('Network error:', error); 
     }); 
 }
 )=====";
