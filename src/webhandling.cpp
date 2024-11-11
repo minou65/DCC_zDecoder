@@ -37,13 +37,8 @@ const char wifiInitialApPassword[] = "123456789";
 //      First it will light up (kept LOW), on Wifi connection it will blink,
 //      when connected to the Wifi it will turn off (kept HIGH).
 #define STATUS_PIN LED_BUILTIN
-
-// -- Status indicator pin.
-//      First it will light up (kept LOW), on Wifi connection it will blink,
-//      when connected to the Wifi it will turn off (kept HIGH).
-#define STATUS_PIN LED_BUILTIN
 #if ESP32 
-#define ON_LEVEL LOW
+#define ON_LEVEL HIGH
 #else
 #define ON_LEVEL LOW
 #endif
@@ -409,8 +404,6 @@ void websetup(){
     ServoGroup4.setNext(&ServoGroup5);
     ServoGroup5.setNext(&ServoGroup6);
 
-    iotWebConf.setStatusPin(STATUS_PIN);
-    iotWebConf.setConfigPin(CONFIG_PIN);
     iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
 
     iotWebConf.addParameterGroup(&ServoGroup1);
@@ -438,6 +431,8 @@ void websetup(){
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
 
+    iotWebConf.setStatusPin(STATUS_PIN, ON_LEVEL);
+    iotWebConf.setConfigPin(CONFIG_PIN);
     iotWebConf.getApTimeoutParameter()->visible = true;
 
     // -- Initializing the configuration.
