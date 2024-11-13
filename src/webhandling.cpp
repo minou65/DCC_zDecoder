@@ -48,6 +48,7 @@ void handleRoot();
 // -- Callback methods.
 void configSaved();
 void wifiConnected();
+void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper);
 
 DNSServer dnsServer;
 WebServer server(80);
@@ -382,7 +383,7 @@ void handlePost() {
 	server.send(400, "text/plain", "Invalid request");
 }
 
-void handleConfigSavedPage(){
+void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper){
 	server.sendHeader("Location", "/", true);
 	server.send(302, "text/plain", "");
 }
@@ -435,6 +436,7 @@ void websetup(){
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
+    iotWebConf.setConfigSavedPage(&handleConfigSavedPage);
 
     iotWebConf.setStatusPin(STATUS_PIN, ON_LEVEL);
     iotWebConf.setConfigPin(CONFIG_PIN);
