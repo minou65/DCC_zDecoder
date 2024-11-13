@@ -382,6 +382,11 @@ void handlePost() {
 	server.send(400, "text/plain", "Invalid request");
 }
 
+void handleConfigSavedPage(){
+	server.sendHeader("Location", "/", true);
+	server.send(302, "text/plain", "");
+}
+
 void handleFavicon() {
     server.send_P(200, "image/x-icon", (const char*)favicon_ico, sizeof(favicon_ico));
 }
