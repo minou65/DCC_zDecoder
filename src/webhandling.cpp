@@ -383,9 +383,33 @@ void handlePost() {
 	server.send(400, "text/plain", "Invalid request");
 }
 
+void handleAPPasswordMissingPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
+    std::string content_;
+    MyHtmlRootFormatProvider fp_;
+
+    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
+    content_ += fp_.getHtmlStyle().c_str();
+    content_ += fp_.getHtmlHeadEnd().c_str();
+    content_ += "<body>";
+    content_ += "You should change the default AP password to continue.";
+    content_ += fp_.addNewLine(2).c_str();
+    content_ += "Return to <a href = ''>configuration page</a>.";
+    content_ += fp_.addNewLine(1).c_str();
+    content_ += "Return to <a href='/'>home page</a>.";
+	content_ += "</body>";
+	content_ += fp_.getHtmlEnd().c_str();
+
+	webRequestWrapper->send(200, "text/html", content_.c_str());
+}
+
+void handleSSIDNotConfiguredPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
+    webRequestWrapper->sendHeader("Location", "/", true);
+    webRequestWrapper->send(302, "text/plain", "");
+}
+
 void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper){
-	server.sendHeader("Location", "/", true);
-	server.send(302, "text/plain", "");
+    webRequestWrapper->sendHeader("Location", "/", true);
+    webRequestWrapper->send(302, "text/plain", "");
 }
 
 void handleFavicon() {
@@ -437,6 +461,8 @@ void websetup(){
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
     iotWebConf.setConfigSavedPage(&handleConfigSavedPage);
+	iotWebConf.setConfigAPPasswordMissingPage(&handleAPPasswordMissingPage);
+	iotWebConf.setConfigSSIDNotConfiguredPage(&handleSSIDNotConfiguredPage);
 
     iotWebConf.setStatusPin(STATUS_PIN, ON_LEVEL);
     iotWebConf.setConfigPin(CONFIG_PIN);
