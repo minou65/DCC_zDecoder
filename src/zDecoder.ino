@@ -301,11 +301,9 @@ void zDecoderInit(void) {
 
 				// Check the type of newAccessory
 				if (newAccessory->getType() == AccessoryType::LED) {
-					if (newAccessory->getType() == AccessoryType::LED) {
-						Ausgang* ledAccessory = static_cast<Ausgang*>(newAccessory);
-						// If the cast is successful, set the brightness
-						ledAccessory->SetMaxBrightness(Brightness_);
-					}
+					Ausgang* ledAccessory = static_cast<Ausgang*>(newAccessory);
+					// If the cast is successful, set the brightness
+					ledAccessory->SetMaxBrightness(Brightness_);
 				}
 				decoder.PushBack(newAccessory);
 			}
