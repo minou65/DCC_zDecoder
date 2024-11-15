@@ -45,8 +45,9 @@ Unbestückte Platinen sind bei mir erhältlich für CHF 5.00 / Stück plus Porto
 
 ## Librarys
 Die folgenden Bibliotheken werden verwendet und müssen installiert werden
-- prampec/IotWebConf
-- NmraDcc
+- [NMRA DCC](https://github.com/mrrwa/NmraDcc)
+- [IotWebConf (3.2.3)](https://github.com/minou65/IotWebConf)
+- [IotWebRoot](https://github.com/minou65/IotWebRoot)
 
 [Top of document](#dcc-zdecoder)
 
