@@ -45,6 +45,9 @@ const char wifiInitialApPassword[] = "123456789";
 
 // -- Method declarations.
 void handleRoot();
+
+extern void zDecoderReset();
+
 // -- Callback methods.
 void configSaved();
 void wifiConnected();
@@ -103,6 +106,20 @@ protected:
     virtual String getFormEnd() {
         String s_ = OptionalGroupHtmlFormatProvider::getFormEnd();
         s_ += F("</br><a href='/'>Home</a>");
+        s_ += "</br><a href='#' onclick=\"postReset()\">Reset</a>";
+        s_ += "<script>";
+        s_ += "function postReset() {";
+        s_ += "  var xhr = new XMLHttpRequest();";
+        s_ += "  xhr.open('POST', '/post', true);";
+        s_ += "  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
+        s_ += "  xhr.onload = function() {";
+        s_ += "    if (xhr.status >= 200 && xhr.status < 400) {";
+        s_ += "      window.location.href = '/';";
+        s_ += "    }";
+        s_ += "  };";
+        s_ += "  xhr.send('reset=true');";
+        s_ += "}";
+        s_ += "</script>";
         return s_;
     }
 };
@@ -338,7 +355,7 @@ void handlePost() {
     if (server.hasArg("group")) {
 		String value_ = server.arg("group");
 		uint8_t group_ = value_.toInt() - 1;
-		Serial.println("    Channel: " + String(group_));
+		Serial.println("    Toggel group: " + String(group_));
         if (group_ < 10) {
             handleDecoderGroup(group_);
 
@@ -352,6 +369,8 @@ void handlePost() {
     }
 
 	if (server.hasArg("reset")) {
+		Serial.println("    Resetting decoder");
+		zDecoderReset();
         server.sendHeader("Location", "/", true);
         server.send(302, "text/plain", "");
         return;
