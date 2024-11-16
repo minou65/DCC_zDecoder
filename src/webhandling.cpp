@@ -261,6 +261,7 @@ void handleRoot() {
     content_ += fp_.getHtmlTableEnd().c_str();
     content_ += fp_.getHtmlEnd().c_str();
 
+    server.sendHeader("Content-Length", String(content_.length()));
     server.send(200, "text/html", content_.c_str());
 }
 
@@ -319,6 +320,7 @@ void handleSettings() {
     content_ += fp_.getHtmlTableEnd().c_str();
     content_ += fp_.getHtmlEnd().c_str();
 
+	server.sendHeader("Content-Length", String(content_.length()));
     server.send(200, "text/html", content_.c_str());
 }
 
@@ -346,8 +348,15 @@ void handleData() {
     }
 
     json_ += "}";
+	server.sendHeader("Content-Length", String(json_.length()));
     server.send(200, "application/json", json_);
 
+}
+
+void SendServer(int code, const char *content_type, const char *content) {
+	server.setContentLength(strlen(content));
+	server.send(code, content_type, content);
+	Serial.println("    " + String(code) + " " + content);
 }
 
 void handlePost() {
@@ -360,11 +369,12 @@ void handlePost() {
             handleDecoderGroup(group_);
 
         } else {
-            server.send(400, "text/plain", "Invalid group");
+			SendServer(400, "text/plain", "Invalid group");
             return;
         }
+		
         server.sendHeader("Location", "/", true);
-        server.send(302, "text/plain", "");
+        SendServer(302, "text/plain", "redirection");
         return;
     }
 
@@ -372,7 +382,7 @@ void handlePost() {
 		Serial.println("    Resetting decoder");
 		zDecoderReset();
         server.sendHeader("Location", "/", true);
-        server.send(302, "text/plain", "");
+		SendServer(200, "text/plain", "Reset successful");
         return;
 	}
 
@@ -391,15 +401,14 @@ void handlePost() {
                 }
 			}
 		} else {
-			server.send(400, "text/plain", "Invalid value");
+			SendServer(400, "text/plain", "Invalid value");
             return;
 		}
         server.sendHeader("Location", "/", true);
-        server.send(302, "text/plain", "");
+		SendServer(302, "text/plain", "redirection");
 		return;
 	}
-
-	server.send(400, "text/plain", "Invalid request");
+	SendServer(400, "text/plain", "Invalid request");
 }
 
 void handleAPPasswordMissingPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
@@ -418,6 +427,7 @@ void handleAPPasswordMissingPage(iotwebconf::WebRequestWrapper* webRequestWrappe
 	content_ += "</body>";
 	content_ += fp_.getHtmlEnd().c_str();
 
+	webRequestWrapper->sendHeader("Content-Length", String(content_.length()));
 	webRequestWrapper->send(200, "text/html", content_.c_str());
 }
 
