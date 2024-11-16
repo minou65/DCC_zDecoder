@@ -101,26 +101,12 @@ protected:
         return
             HtmlFormatProvider::getScriptInner() + 
             String(FPSTR(IOTWEBCONF_HTML_FORM_OPTIONAL_GROUP_JAVASCRIPT)) +
-            String(FPSTR(IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT));
+            String(FPSTR(html_js_hideclass));
     }
     virtual String getFormEnd() {
-        String s_ = OptionalGroupHtmlFormatProvider::getFormEnd();
-        s_ += F("</br><a href='/'>Home</a>");
-        s_ += "</br><a href='#' onclick=\"postReset()\">Reset</a>";
-        s_ += "<script>";
-        s_ += "function postReset() {";
-        s_ += "  var xhr = new XMLHttpRequest();";
-        s_ += "  xhr.open('POST', '/post', true);";
-        s_ += "  xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');";
-        s_ += "  xhr.onload = function() {";
-        s_ += "    if (xhr.status >= 200 && xhr.status < 400) {";
-        s_ += "      window.location.href = '/';";
-        s_ += "    }";
-        s_ += "  };";
-        s_ += "  xhr.send('reset=true');";
-        s_ += "}";
-        s_ += "</script>";
-        return s_;
+        return
+            OptionalGroupHtmlFormatProvider::getFormEnd() +
+            String(FPSTR(html_form_end));
     }
 };
 CustomHtmlFormatProvider customHtmlFormatProvider;
@@ -128,26 +114,17 @@ CustomHtmlFormatProvider customHtmlFormatProvider;
 class MyHtmlRootFormatProvider : public HtmlRootFormatProvider {
 protected:
     virtual String getStyleInner() {
-        String s_ = HtmlRootFormatProvider::getStyleInner();
-        s_ += html_css_code;
-        return s_;
+		return 
+            HtmlRootFormatProvider::getStyleInner() + 
+            String(FPSTR(html_css_code));
     }
 
     virtual String getScriptInner() {
-        String s_ = HtmlRootFormatProvider::getScriptInner();
+        String s_ = 
+            HtmlRootFormatProvider::getScriptInner() +
+			String(FPSTR(html_button_response)) +
+			String(FPSTR(html_js_updatedata));
         s_.replace("{millisecond}", "2000");
-        s_ += F("function updateData(jsonData) {\n");
-        s_ += F("   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\" \n");
-        s_ += F("   for (var key in jsonData) {\n");
-        s_ += F("       if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {\n");
-        s_ += F("           var button = document.getElementById(key);\n");
-        s_ += F("           if (button) {\n");
-        s_ += F("               button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';\n");
-        s_ += F("           }\n");
-        s_ += F("       }\n");
-        s_ += F("   }\n");
-        s_ += F("}\n");
-		s_ += html_button_response;
         return s_;
     }
 };

@@ -101,7 +101,7 @@ input:checked + .slider:before {
 </style>
 )=====";
 
-const char IOTWEBCONF_HTML_FORM_InputElements_JAVASCRIPT[] PROGMEM = R"=====(
+const char html_js_hideclass[] PROGMEM = R"=====(
 function hideClass(id) {
     var dropdown = document.getElementById(id + '-mode');
     var selectedValue = dropdown.options[dropdown.selectedIndex].value;
@@ -170,19 +170,36 @@ function hideClass(id) {
 }
 )=====";
 
-const char UPDATE_DATA_FUNCTION[] PROGMEM = R"=====(
-function updateData(jsonData) {
-    document.getElementById('RSSIValue').innerHTML = jsonData.rssi + "dBm";
-    for (var key in jsonData) {
-        if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {
-            var button = document.getElementById(key);
-            if (button) {
-                button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';
-            }
+const char html_form_end[] PROGMEM = R"=====(
+</br><a href='/'>Home</a>
+</br><a href='#' onclick="postReset()">Reset</a>
+<script>
+function postReset() {
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', '/post', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.onload = function() {
+        if (xhr.status >= 200 && xhr.status < 400) {
+            window.location.href = '/';
         }
-    }
+    };
+    xhr.send('reset=true');
 }
+</script>
 )=====";
 
+const char html_js_updatedata[] PROGMEM = R"=====(
+function updateData(jsonData) {
+   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\" 
+   for (var key in jsonData) {
+       if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {
+           var button = document.getElementById(key);
+           if (button) {
+               button.style.backgroundColor = jsonData[key] == '1' ? 'green' : 'red';
+           }
+       }
+   }
+}
+)=====";
 
 #endif
