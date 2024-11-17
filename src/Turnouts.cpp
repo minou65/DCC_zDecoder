@@ -1,31 +1,33 @@
 #include "Turnouts.h"
 
-UnCoupler::UnCoupler(int8_t Port_) :
+UnCoupler::UnCoupler(int8_t Port) :
 	accessories(3, 0, 201),
-	coil(Port_, 500) {
+	_coil(Port, 500),
+	_direction(TurnoutDirection::Closed) {
 
 	Serial.println("UnCoupler::UnCoupler");
 	off();
 }
 
-UnCoupler::UnCoupler(int8_t Port_, int8_t Address_) :
-	accessories(Address_, 0, 201),
-	coil(Port_, 500) {
+UnCoupler::UnCoupler(int8_t Port, int8_t Address) :
+	accessories(Address, 0, 201),
+	_coil(Port, 500),
+	_direction(TurnoutDirection::Closed) {
 
 	Serial.println("UnCoupler::UnCoupler");
 	off();
 }
 
-UnCoupler::UnCoupler(int8_t Port_, int8_t Address_, uint16_t PulsTime_) :
-	accessories(Address_, 0, 201),
-	coil(Port_, PulsTime_) {
+UnCoupler::UnCoupler(int8_t Port, int8_t Address, uint16_t PulsTime) :
+	accessories(Address, 0, 201),
+	_coil(Port, PulsTime) {
 
 	Serial.println("UnCoupler::UnCoupler");
 	off();
 }
 
 UnCoupler::~UnCoupler() {
-	coil.~CoilPulsed();
+	_coil.~CoilPulsed();
 }
 
 AccessoryType UnCoupler::getType() const {
@@ -33,37 +35,47 @@ AccessoryType UnCoupler::getType() const {
 	return AccessoryType::Coil;
 }
 
-void UnCoupler::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {
+void UnCoupler::notifyTurnoutAddress(uint16_t Address, uint8_t Direction, uint8_t OutputPower) {
 	
-	if ((Address_ == BaseAddress) && static_cast<bool>(OutputPower_)) {
+	if ((Address == BaseAddress) && static_cast<bool>(OutputPower)) {
 		Serial.println("UnCoupler::notifyTurnoutAddress");
-		Serial.print("    Address:     "); Serial.println(Address_, DEC);
+		Serial.print("    Address:     "); Serial.println(Address, DEC);
 		Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
-		Serial.print("    Direction: "); Serial.println(Direction_ ? "Closed" : "Thrown");
-		Serial.print("    Output: "); Serial.println(OutputPower_ ? "On" : "Off");
+		Serial.print("    Direction: "); Serial.println(Direction ? "Closed" : "Thrown");
+		Serial.print("    Output: "); Serial.println(OutputPower ? "On" : "Off");
 
-		if (static_cast<bool>(Direction_)) {
+		if (static_cast<bool>(Direction)) {
 			on();
 		}
 	}
 }
 
 void UnCoupler::process(){
-	coil.process();
-	if (IsActive && !coil.isOn()) {
+	_coil.process();
+	if ((_direction == TurnoutDirection::Thrown) && !_coil.isOn()) {
 		off();
 	}
 }
 
-void UnCoupler::on(){
+void UnCoupler::on() {
+	Thrown();
+}
+
+void UnCoupler::Thrown(){
 	accessories::on();
-	Serial.println("UnCoupler::on");
-	coil.on();
+	Serial.println("UnCoupler::Thrown");
+	_coil.on();
+	_direction = TurnoutDirection::Thrown;
 }
 
 void UnCoupler::off() {
+	Closed();
+}
+
+void UnCoupler::Closed() {
 	accessories::off();
-	Serial.println("UnCoupler::off");
+	Serial.println("UnCoupler::Closed");
+	_direction = TurnoutDirection::Closed;
 }
 
 Turnout::Turnout(int8_t RPort_, int8_t GPort_) : 

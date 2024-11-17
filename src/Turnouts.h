@@ -13,21 +13,31 @@
 #include "CoilControl.h"
 #include "ServoControl.h"
 
-class UnCoupler : public accessories {
-protected:
-	CoilPulsed coil;
+enum class TurnoutDirection {
+	Closed,
+	Thrown
+};
 
+class UnCoupler : public accessories {
 public:
 	UnCoupler() = default;
-	UnCoupler(int8_t Port_);
-	UnCoupler(int8_t Port_, int8_t Address_);
-	UnCoupler(int8_t Port_, int8_t Address_, uint16_t PulsTime_);
+	UnCoupler(int8_t Port);
+	UnCoupler(int8_t Port, int8_t Address);
+	UnCoupler(int8_t Port, int8_t Address, uint16_t PulsTime);
 	~UnCoupler();
 	AccessoryType getType() const;
-	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
+	void notifyTurnoutAddress(uint16_t Address, uint8_t Direction, uint8_t OutputPower);
 	void process();
 	void on();
+	void Thrown();
 	void off();
+
+	void Closed();
+
+private:
+	CoilPulsed _coil;
+	TurnoutDirection _direction;
+	
 };
 
 class Turnout : public accessories {
@@ -46,6 +56,9 @@ public:
 	void process();
 	void on();  // Turnout
 	void off();  // Closed
+
+private:
+	TurnoutDirection _direction;
 
 };
 
