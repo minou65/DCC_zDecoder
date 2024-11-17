@@ -190,7 +190,7 @@ function postReset() {
 
 const char html_js_updatedata[] PROGMEM = R"=====(
 function updateData(jsonData) {
-   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + \"dBm\" 
+   document.getElementById('RSSIValue').innerHTML = jsonData.rssi + "dBm" 
    for (var key in jsonData) {
        if (jsonData.hasOwnProperty(key) && (key.startsWith('output') || key.startsWith('servo'))) {
            var button = document.getElementById(key);
