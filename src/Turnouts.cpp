@@ -28,6 +28,11 @@ UnCoupler::~UnCoupler() {
 	coil.~CoilPulsed();
 }
 
+AccessoryType UnCoupler::getType() const {
+	Serial.print("UnCoupler::getType");
+	return AccessoryType::Coil;
+}
+
 void UnCoupler::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {
 	
 	if ((Address_ == BaseAddress) && static_cast<bool>(OutputPower_)) {
@@ -45,20 +50,20 @@ void UnCoupler::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint
 
 void UnCoupler::process(){
 	coil.process();
+	if (IsActive && !coil.isOn()) {
+		off();
+	}
 }
 
 void UnCoupler::on(){
 	accessories::on();
 	Serial.println("UnCoupler::on");
 	coil.on();
-	off();
-
 }
 
 void UnCoupler::off() {
 	accessories::off();
 	Serial.println("UnCoupler::off");
-
 }
 
 Turnout::Turnout(int8_t RPort_, int8_t GPort_) : 
@@ -88,6 +93,11 @@ Turnout::Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_, uint16_t PulsT
 Turnout::~Turnout() {
 	coil1.~CoilPulsed();
 	coil2.~CoilPulsed();
+}
+
+AccessoryType Turnout::getType() const {
+	Serial.print("UnCoupler::getType");
+	return AccessoryType::Coil;
 }
 
 void Turnout::notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_) {

@@ -23,6 +23,7 @@ public:
 	UnCoupler(int8_t Port_, int8_t Address_);
 	UnCoupler(int8_t Port_, int8_t Address_, uint16_t PulsTime_);
 	~UnCoupler();
+	AccessoryType getType() const;
 	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
 	void process();
 	void on();
@@ -40,6 +41,7 @@ public:
 	Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_);
 	Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_, uint16_t PulsTime_);
 	~Turnout();
+	AccessoryType getType() const;
 	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
 	void process();
 	void on();  // Turnout
