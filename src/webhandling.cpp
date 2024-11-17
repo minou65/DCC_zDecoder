@@ -410,12 +410,12 @@ void handleAPPasswordMissingPage(iotwebconf::WebRequestWrapper* webRequestWrappe
 
 void handleSSIDNotConfiguredPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
     webRequestWrapper->sendHeader("Location", "/", true);
-    webRequestWrapper->send(302, "text/plain", "");
+    webRequestWrapper->send(302, "text/plain", "SSID not configured");
 }
 
 void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper){
     webRequestWrapper->sendHeader("Location", "/", true);
-    webRequestWrapper->send(302, "text/plain", "");
+    webRequestWrapper->send(302, "text/plain", "Config saved");
 }
 
 void handleFavicon() {
