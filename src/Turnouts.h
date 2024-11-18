@@ -41,42 +41,43 @@ private:
 };
 
 class Turnout : public accessories {
-protected:
-	CoilPulsed coil1;
-	CoilPulsed coil2;
-
 public:
 	Turnout() = default;
-	Turnout(int8_t RPort_, int8_t GPort_);
-	Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_);
-	Turnout(int8_t RPort_, int8_t GPort_, uint16_t Address_, uint16_t PulsTime_);
+	Turnout(int8_t ThrownPort, int8_t ClosedPort);
+	Turnout(int8_t ThrownPort, int8_t ClosedPort, uint16_t Address);
+	Turnout(int8_t ThrownPort, int8_t ClosedPort, uint16_t Address, uint16_t PulsTime);
 	~Turnout();
 	AccessoryType getType() const;
-	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
+	void notifyTurnoutAddress(uint16_t Address, uint8_t Direction, uint8_t OutputPower);
 	void process();
 	void on();  // Turnout
+	void Thrown();
 	void off();  // Closed
+
+	void Closed();
 
 private:
 	TurnoutDirection _direction;
+	CoilPulsed _coil1;
+	CoilPulsed _coil2;
 
 };
 
 class TurnoutServo : public accessories {
-protected:
-	ServoControl servo;
-
-	void MoveServo(uint16_t percentage_, bool clockwise_);
-
 public:
 	TurnoutServo() = default;
-	TurnoutServo(int8_t ServoPort_, uint16_t Address_, int16_t limit1_, int16_t limit2_, int16_t travelTime_);
+	TurnoutServo(int8_t ServoPort, uint16_t Address, int16_t limit1, int16_t limit2, int16_t travelTime);
 	~TurnoutServo();
-	void notifyTurnoutAddress(uint16_t Address_, uint8_t Direction_, uint8_t OutputPower_);
+	void notifyTurnoutAddress(uint16_t Address, uint8_t Direction, uint8_t OutputPower);
 	void notifyDccSpeed(uint16_t Addr, uint8_t Speed, uint8_t ForwardDir, uint8_t SpeedSteps);
 	void process();
 	void on();
 	void off();
+private:
+	ServoControl _servo;
+	TurnoutDirection _direction;
+
+	void MoveServo(uint16_t percentage, bool clockwise);
 };
 
 #endif
