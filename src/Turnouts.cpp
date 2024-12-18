@@ -142,7 +142,7 @@ void Turnout::on() {
 
 void Turnout::Thrown(){
 	accessories::on();
-	Serial.println("Turnout::on");
+	Serial.println(F("Turnout::on"));
 	_coil2.off();
 	_coil1.on();
 	_direction = TurnoutDirection::Thrown;
@@ -154,7 +154,7 @@ void Turnout::off() {
 
 void Turnout::Closed(){
 	accessories::off();
-	Serial.println("Turnout::Closed");
+	Serial.println(F("Turnout::Closed"));
 	_coil1.off();
 	_coil2.on();
 	_direction = TurnoutDirection::Closed;
@@ -166,7 +166,7 @@ TurnoutServo::TurnoutServo(int8_t ServoPort_, uint16_t Address, int16_t limit1_,
 	_servo(ServoPort_, limit1_, limit2_, travelTime_, SERVO_INITL1),
 	_direction(TurnoutDirection::Closed) {
 
-	Serial.println("TurnoutServo::TurnoutServo");
+	Serial.println(F("TurnoutServo::TurnoutServo"));
 	_servo.setActive(true);
 	off();
 }
@@ -178,11 +178,11 @@ TurnoutServo::~TurnoutServo() {
 void TurnoutServo::notifyTurnoutAddress(uint16_t Address, uint8_t Direction, uint8_t OutputPower) {
 
 	if ((Address == BaseAddress) && static_cast<bool>(OutputPower)) {
-		Serial.println("TurnoutServo::notifyTurnoutAddress");
-		Serial.print("    Address:     "); Serial.println(Address, DEC);
-		Serial.print("    BaseAddress: "); Serial.println(BaseAddress, DEC);
-		Serial.print("    Direction: "); Serial.println(Direction ? "Closed" : "Thrown");
-		Serial.print("    Output: "); Serial.println(OutputPower ? "On" : "Off");
+		Serial.println(F("TurnoutServo::notifyTurnoutAddress"));
+		Serial.print(F("    Address:     ")); Serial.println(Address, DEC);
+		Serial.print(F("    BaseAddress: ")); Serial.println(BaseAddress, DEC);
+		Serial.print(F("    Direction: ")); Serial.println(Direction ? "Closed" : "Thrown");
+		Serial.print(F("    Output: ")); Serial.println(OutputPower ? "On" : "Off");
 
 		if (static_cast<bool>(Direction)) {
 			on();
@@ -206,14 +206,14 @@ void TurnoutServo::process(){
 
 void TurnoutServo::on(){
 	accessories::on();
-	Serial.println("TurnoutServo::on");
+	Serial.println(F("TurnoutServo::on"));
 
 	MoveServo(100, true);
 }
 
 void TurnoutServo::off(){
 	accessories::off();
-	Serial.println("TurnoutServo::off");
+	Serial.println(F("TurnoutServo::off"));
 
 	MoveServo(1, false);
 }
