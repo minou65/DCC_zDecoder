@@ -34,8 +34,7 @@ LED::LED(const uint8_t Channel) :
 	Serial.print("    Channel: "); Serial.println(_Channel);
 	Serial.print("    GPIO   : "); Serial.println(_GPIO);
 
-	ledcSetup(_Channel, _PWMFrequency, _PWMResolution);
-	ledcAttachPin(_GPIO, _Channel);
+	ledcAttachChannel(_GPIO, _PWMFrequency, _PWMResolution, _Channel);
 
 	off();
 }
@@ -47,7 +46,7 @@ LED::LED(const uint8_t Channel, uint8_t Brightness) :
 }
 
 LED::~LED() {
-	ledcDetachPin(_GPIO);
+	ledcDetach(_GPIO);
 }
 
 void LED::process() {}
