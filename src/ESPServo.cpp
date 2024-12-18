@@ -58,8 +58,7 @@ bool ESPServo::attach(int pin, int channel) {
     Serial.print("    Channel:    "); Serial.println(_channel);
     Serial.print("    Pin:        "); Serial.println(_pin);
 
-    ledcSetup(_channel, 50, 16); // channel X, 50 Hz, 16-bit depth
-    ledcAttachPin(_pin, _channel);
+	ledcAttachChannel(_pin, 50, 16, _channel);
     return true;
 }
 
@@ -84,8 +83,7 @@ bool ESPServo::attach_org(int pin, int channel,
     _minPulseWidth = minPulseWidth;
     _maxPulseWidth = maxPulseWidth;
 
-    ledcSetup(_channel, 50, 16); // channel X, 50 Hz, 16-bit depth
-    ledcAttachPin(_pin, _channel);
+    ledcAttachChannel(_pin, 50, 16, _channel);
     return true;
 }
 
@@ -98,7 +96,7 @@ bool ESPServo::detach() {
     if (_channel == (channel_next_free - 1))
         channel_next_free--;
 
-    ledcDetachPin(_pin);
+	ledcDetach(_pin);
     _pin = PIN_NOT_ATTACHED;
     return true;
 }
