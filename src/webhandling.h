@@ -174,7 +174,7 @@ public:
         iotwebconf::NumberParameter("Time Off (ms)", TimeOffId, TimeOffValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
 
     iotwebconf::NumberParameter MultiplierParam =
-        iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
+        iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='0' max='255' step='1'");
 
     iotwebconf::NumberParameter TimeOnFadeParam =
         iotwebconf::NumberParameter("Time On Fade (ms)", TimeOnFadeId, TimeOnFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");

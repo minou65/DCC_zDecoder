@@ -4,11 +4,7 @@
 #include <Arduino.h>
 #include <ArduinoOTA.h>
 
-#if ESP32
 #include <WiFi.h>
-#else
-#include <ESP8266WiFi.h>      
-#endif
 
 #include "webhandling.h"
 #include <IotWebConf.h>
