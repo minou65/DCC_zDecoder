@@ -45,6 +45,7 @@ void handleRoot();
 extern void zDecoderReset();
 
 // -- Callback methods.
+void convertSettings();
 void configSaved();
 void wifiConnected();
 void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper);
@@ -483,6 +484,7 @@ void websetup(){
     server.on("/favicon", HTTP_GET, handleFavicon);
     server.onNotFound([]() { iotWebConf.handleNotFound(); });
 
+	convertSettings();
 }
 
 void webloop(){
@@ -495,7 +497,12 @@ void wifiConnected() {
 
 }
 
+void convertSettings() {
+    ArduinoOTA.setHostname(iotWebConf.getThingName());
+}
+
 void configSaved(){
     ResetDCCDecoder = true;
+	convertSettings();
     Serial.println(F("Configuration was updated."));
 }
