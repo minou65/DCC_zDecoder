@@ -17,7 +17,7 @@
 // All boards support the vMicro Software Debugger which only requires 
 // the Serial interface to work
 
-static uint8_t ChannelToGPIOMapping[16] PROGMEM = {
+static uint8_t OutputIndexToPin[16] PROGMEM = {
 	GPIO_NUM_23, // O11
 	GPIO_NUM_22, // O12
 	GPIO_NUM_21, // O13
@@ -37,6 +37,8 @@ static uint8_t ChannelToGPIOMapping[16] PROGMEM = {
 	GPIO_NUM_13  // O28
 
 };
+
+const size_t MAX_OUTPUT_PINS = sizeof(OutputIndexToPin) / sizeof(OutputIndexToPin[0]);
 
 #endif
 
