@@ -18,8 +18,6 @@
 void websetup();
 void webloop();
 
-extern void handleDecoderGroup(uint8_t DecoderGroup);
-extern bool DecoderGroupIsEnabled(uint8_t DecoderGroup);
 
 class MySelectParameter : public iotwebconf::SelectParameter {
 public:
@@ -37,173 +35,134 @@ public:
     );
 };
 
-class ServoGroup : public iotwebconf::ChainedParameterGroup {
-public:
-    ServoGroup(const char* id) : ChainedParameterGroup(id, "Servo") {
-        // -- Update parameter Ids to have unique ID for all parameters within the application.
-        snprintf(DesignationId, STRING_LEN, "%s-designation", this->getId());
-        snprintf(AddressId, STRING_LEN, "%s-address", this->getId());
-        snprintf(TravelTimeId, STRING_LEN, "%s-traveltime", this->getId());
-        snprintf(MultiplierId, STRING_LEN, "%s-multiplier", this->getId());
-        snprintf(Limit1Id, STRING_LEN, "%s-limit1", this->getId());
-        snprintf(Limit2Id, STRING_LEN, "%s-limit2", this->getId());
-        snprintf(ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
-
-        // -- Add parameters to this group.
-        this->addItem(&this->DesignationParam);
-        this->addItem(&this->AddressParam);
-        this->addItem(&this->TravelTimeParam);
-        this->addItem(&this->MultiplierParam);
-        this->addItem(&this->Limit1Param);
-        this->addItem(&this->Limit2Param);
-    }
-
-    char DesignationValue[STRING_LEN];
-    char AddressValue[NUMBER_LEN];
-    char TravelTimeValue[NUMBER_LEN];
-    char MultiplierValue[NUMBER_LEN];
-    char Limit1Value[NUMBER_LEN];
-    char Limit2Value[NUMBER_LEN];
-
-    iotwebconf::TextParameter DesignationParam =
-        iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
-
-    iotwebconf::NumberParameter AddressParam =
-        iotwebconf::NumberParameter("DCC Address", AddressId, AddressValue, NUMBER_LEN, "3", "1..1024", "min='1' max='1024' step='1'");
-
-    iotwebconf::NumberParameter TravelTimeParam =
-        iotwebconf::NumberParameter("Travel time (ms)", TravelTimeId, TravelTimeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter MultiplierParam =
-        iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter Limit1Param =
-        iotwebconf::NumberParameter("Limit 1", Limit1Id, Limit1Value, NUMBER_LEN, "0", "0..180", "min='0' max='180' step='1'");
-
-    iotwebconf::NumberParameter Limit2Param =
-        iotwebconf::NumberParameter("Limit 2", Limit2Id, Limit2Value, NUMBER_LEN, "180", "1..180", "min='0' max='180' step='1'");
-
-private:
-    char DesignationId[STRING_LEN];
-    char AddressId[STRING_LEN];
-    char TravelTimeId[STRING_LEN];
-    char MultiplierId[STRING_LEN];
-    char Limit1Id[STRING_LEN];
-    char Limit2Id[STRING_LEN];
-    char ModeCustomHTML[STRING_LEN];
-
-    String getEndTemplate() override {
-
-        String result = "<script>hideClass('%s')</script>\n";
-        result.replace("%s", this->getId());
-
-        result += ChainedParameterGroup::getEndTemplate();
-
-        return result;
-
-    };
-};
-
 class OutputGroup : public iotwebconf::ChainedParameterGroup {
 public:
-    OutputGroup(const char* id) : ChainedParameterGroup(id, "Output") {
-        // -- Update parameter Ids to have unique ID for all parameters within the application.
-        snprintf(DesignationId, STRING_LEN, "%s-designation", this->getId());
-        snprintf(ModeId, STRING_LEN, "%s-mode", this->getId());
-        snprintf(NumberId, STRING_LEN, "%s-number", this->getId());
-        snprintf(AddressId, STRING_LEN, "%s-address", this->getId());
-        snprintf(TimeOnId, STRING_LEN, "%s-timeon", this->getId());
-        snprintf(TimeOffId, STRING_LEN, "%s-timeoff", this->getId());
-        snprintf(MultiplierId, STRING_LEN, "%s-multiplier", this->getId());
-        snprintf(TimeOnFadeId, STRING_LEN, "%s-onfade", this->getId());
-        snprintf(TimeOffFadeId, STRING_LEN, "%s-offfade", this->getId());
-        snprintf(BrightnessId, STRING_LEN, "%s-brightness", this->getId());
-        snprintf(ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
+    OutputGroup(const char* id)
+        : ChainedParameterGroup(id, "Output"),
+            _DesignationParam("Designation", _DesignationId, _DesignationValue, STRING_LEN),
+            _ModeParam("Mode", _ModeId, _ModeValue, sizeof(OutputModeValues[0]),
+                (char*)OutputModeValues, (char*)OutputModeNames,
+                sizeof(OutputModeValues) / sizeof(OutputModeValues[0]), sizeof(OutputModeNames[0]), nullptr, _ModeCustomHTML),
+            _NumberParam("Outputs to use", _NumberId, _NumberValue, NUMBER_LEN, "1", "1..MAX_Outputs", "min='1' max='16' step='1'"),
+            _AddressParam("DCC Address", _AddressId, _AddressValue, NUMBER_LEN, "3", "1..1024", "min='1' max='1024' step='1'"),
+            _TimeOnParam("Time On (ms)", _TimeOnId, _TimeOnValue, NUMBER_LEN, "100", "1..65535", "min='1' max='65535' step='1'"),
+            _TimeOffParam("Time Off (ms)", _TimeOffId, _TimeOffValue, NUMBER_LEN, "100", "1..65535", "min='1' max='65535' step='1'"),
+            _MultiplierParam("Multiplier", _MultiplierId, _MultiplierValue, NUMBER_LEN, "10", "1..255", "min='0' max='255' step='1'"),
+            _TimeOnFadeParam("Time On Fade (ms)", _TimeOnFadeId, _TimeOnFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'"),
+            _TimeOffFadeParam("Time Off Fade (ms)", _TimeOffFadeId, _TimeOffFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'"),
+            _BrightnessParam("Brightness", _BrightnessId, _BrightnessValue, NUMBER_LEN, "255", "0..255", "min='0' max='255' step='1'")
+    {
+        snprintf(_DesignationId, STRING_LEN, "%s-designation", this->getId());
+        snprintf(_ModeId, STRING_LEN, "%s-mode", this->getId());
+        snprintf(_NumberId, STRING_LEN, "%s-number", this->getId());
+        snprintf(_AddressId, STRING_LEN, "%s-address", this->getId());
+        snprintf(_TimeOnId, STRING_LEN, "%s-timeon", this->getId());
+        snprintf(_TimeOffId, STRING_LEN, "%s-timeoff", this->getId());
+        snprintf(_MultiplierId, STRING_LEN, "%s-multiplier", this->getId());
+        snprintf(_TimeOnFadeId, STRING_LEN, "%s-onfade", this->getId());
+        snprintf(_TimeOffFadeId, STRING_LEN, "%s-offfade", this->getId());
+        snprintf(_BrightnessId, STRING_LEN, "%s-brightness", this->getId());
+        snprintf(_ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
 
-        // -- Add parameters to this group.
-        this->addItem(&this->DesignationParam);
-        this->addItem(&this->ModeParam);
-        this->addItem(&this->NumberParam);
-        this->addItem(&this->AddressParam);
-        this->addItem(&this->TimeOnParam);
-        this->addItem(&this->TimeOffParam);
-        this->addItem(&this->MultiplierParam);
-        this->addItem(&this->TimeOnFadeParam);
-        this->addItem(&this->TimeOffFadeParam);
-        this->addItem(&this->BrightnessParam);
+        this->addItem(&_DesignationParam);
+        this->addItem(&_ModeParam);
+        this->addItem(&_NumberParam);
+        this->addItem(&_AddressParam);
+        this->addItem(&_TimeOnParam);
+        this->addItem(&_TimeOffParam);
+        this->addItem(&_MultiplierParam);
+        this->addItem(&_TimeOnFadeParam);
+        this->addItem(&_TimeOffFadeParam);
+        this->addItem(&_BrightnessParam);
     }
 
-    char DesignationValue[STRING_LEN];
-    char ModeValue[STRING_LEN];
-    char NumberValue[NUMBER_LEN];
-    char AddressValue[NUMBER_LEN];
-    char TimeOnValue[NUMBER_LEN];
-    char TimeOffValue[NUMBER_LEN];
-    char MultiplierValue[NUMBER_LEN];
-    char TimeOnFadeValue[NUMBER_LEN];
-    char TimeOffFadeValue[NUMBER_LEN];
-    char BrightnessValue[NUMBER_LEN] = "255"; // Default value for brightness
+    void applyDefaultValues() {
+        _DesignationParam.applyDefaultValue();
+        _ModeParam.applyDefaultValue();
+        _NumberParam.applyDefaultValue();
+        _AddressParam.applyDefaultValue();
+        _TimeOnParam.applyDefaultValue();
+        _TimeOffParam.applyDefaultValue();
+        _MultiplierParam.applyDefaultValue();
+        _TimeOnFadeParam.applyDefaultValue();
+        _TimeOffFadeParam.applyDefaultValue();
+        _BrightnessParam.applyDefaultValue();
+    }
 
-    iotwebconf::TextParameter DesignationParam =
-        iotwebconf::TextParameter("Designation", DesignationId, DesignationValue, STRING_LEN);
+    int getAddress() const { return atoi(_AddressValue); }
+    const char* getDesignation() const { return _DesignationValue; }
+    int getMode() const { return atoi(_ModeValue); }
+    int getNumber(int8_t mode = -1) const {
+        if (mode == -1) mode = getMode();
+        switch (mode) {
+        case 0: return 0;
+        case 51: case 202: return 2;
+        case 81: case 82: return 3;
+        case 52: case 53: case 54: case 55: case 60: case 61: case 62:
+            return atoi(_NumberValue);
+        case 70:
+            return 3;
+        case 71: case 72:
+            return 6;
+        case 73:
+            return 9;
+        default: return 1;
+        }
+    }
+    int getTimeOn() const { return atoi(_TimeOnValue); }
+    int getTimeOff() const { return atoi(_TimeOffValue); }
+    int getMultiplier() const { return atoi(_MultiplierValue); }
+    int getTimeOnFade() const { return atoi(_TimeOnFadeValue); }
+    int getTimeOffFade() const { return atoi(_TimeOffFadeValue); }
+    int getBrightness() const { return atoi(_BrightnessValue); }
 
-    MySelectParameter ModeParam =
-        MySelectParameter(
-            "Mode",
-            ModeId,
-            ModeValue,
-            STRING_LEN,
-            (char*)DecoderModeValues,
-            (char*)DecoderModeNames,
-            sizeof(DecoderModeValues) / STRING_LEN,
-            STRING_LEN,
-            nullptr,
-            ModeCustomHTML
-        );
+    // Zugriff auf NumberParam, falls benötigt
+    iotwebconf::NumberParameter& numberParam() { return _NumberParam; }
+	MySelectParameter& modeParam() { return _ModeParam; }
 
-    iotwebconf::NumberParameter NumberParam =
-        iotwebconf::NumberParameter("Number of outputs", NumberId, NumberValue, NUMBER_LEN, "1", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter AddressParam =
-        iotwebconf::NumberParameter("DCC Address", AddressId, AddressValue, NUMBER_LEN, "3", "1..1024", "min='1' max='1024' step='1'");
-
-    iotwebconf::NumberParameter TimeOnParam =
-        iotwebconf::NumberParameter("Time On (ms)", TimeOnId, TimeOnValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter TimeOffParam =
-        iotwebconf::NumberParameter("Time Off (ms)", TimeOffId, TimeOffValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter MultiplierParam =
-        iotwebconf::NumberParameter("Multiplier", MultiplierId, MultiplierValue, NUMBER_LEN, "10", "1..255", "min='0' max='255' step='1'");
-
-    iotwebconf::NumberParameter TimeOnFadeParam =
-        iotwebconf::NumberParameter("Time On Fade (ms)", TimeOnFadeId, TimeOnFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter TimeOffFadeParam =
-        iotwebconf::NumberParameter("Time Off Fade (ms)", TimeOffFadeId, TimeOffFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'");
-
-    iotwebconf::NumberParameter BrightnessParam =
-        iotwebconf::NumberParameter("Brightness", BrightnessId, BrightnessValue, NUMBER_LEN, "255", "0..255", "min='0' max='255' step='1'");
 
 private:
-    char DesignationId[STRING_LEN];
-    char ModeId[STRING_LEN];
-    char NumberId[STRING_LEN];
-    char AddressId[STRING_LEN];
-    char TimeOnId[STRING_LEN];
-    char TimeOffId[STRING_LEN];
-    char MultiplierId[STRING_LEN];
-    char TimeOnFadeId[STRING_LEN];
-    char TimeOffFadeId[STRING_LEN];
-    char BrightnessId[STRING_LEN];
-    char ModeCustomHTML[STRING_LEN];
+    char _DesignationId[STRING_LEN];
+    char _ModeId[STRING_LEN];
+    char _NumberId[STRING_LEN];
+    char _AddressId[STRING_LEN];
+    char _TimeOnId[STRING_LEN];
+    char _TimeOffId[STRING_LEN];
+    char _MultiplierId[STRING_LEN];
+    char _TimeOnFadeId[STRING_LEN];
+    char _TimeOffFadeId[STRING_LEN];
+    char _BrightnessId[STRING_LEN];
+    char _ModeCustomHTML[STRING_LEN];
+
+    char _DesignationValue[STRING_LEN]{};
+    char _ModeValue[STRING_LEN]{};
+    char _NumberValue[NUMBER_LEN]{};
+    char _AddressValue[NUMBER_LEN]{};
+    char _TimeOnValue[NUMBER_LEN]{};
+    char _TimeOffValue[NUMBER_LEN]{};
+    char _MultiplierValue[NUMBER_LEN]{};
+    char _TimeOnFadeValue[NUMBER_LEN]{};
+    char _TimeOffFadeValue[NUMBER_LEN]{};
+    char _BrightnessValue[NUMBER_LEN]{"255"};
+
+    // Parameter-Objekte
+    iotwebconf::TextParameter _DesignationParam;
+    MySelectParameter _ModeParam;
+    iotwebconf::NumberParameter _NumberParam;
+    iotwebconf::NumberParameter _AddressParam;
+    iotwebconf::NumberParameter _TimeOnParam;
+    iotwebconf::NumberParameter _TimeOffParam;
+    iotwebconf::NumberParameter _MultiplierParam;
+    iotwebconf::NumberParameter _TimeOnFadeParam;
+    iotwebconf::NumberParameter _TimeOffFadeParam;
+    iotwebconf::NumberParameter _BrightnessParam;
 
     String getEndTemplate() override {
         String result = "<script>hideClass('%s')</script>\n";
         result.replace("%s", this->getId());
         result += ChainedParameterGroup::getEndTemplate();
         return result;
-    };
+    }
 };
 
 
@@ -217,13 +176,13 @@ extern OutputGroup OutputGroup7;
 extern OutputGroup OutputGroup8;
 extern OutputGroup OutputGroup9;
 extern OutputGroup OutputGroup10;
+extern OutputGroup OutputGroup11;
+extern OutputGroup OutputGroup12;
+extern OutputGroup OutputGroup13;
+extern OutputGroup OutputGroup14;
+extern OutputGroup OutputGroup15;
+extern OutputGroup OutputGroup16;
 
-extern ServoGroup ServoGroup1;
-extern ServoGroup ServoGroup2;
-extern ServoGroup ServoGroup3;
-extern ServoGroup ServoGroup4;
-extern ServoGroup ServoGroup5;
-extern ServoGroup ServoGroup6;
 
 #endif
 
