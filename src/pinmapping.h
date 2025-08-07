@@ -40,5 +40,26 @@ static uint8_t OutputIndexToPin[16] PROGMEM = {
 
 const size_t MAX_OUTPUT_PINS = sizeof(OutputIndexToPin) / sizeof(OutputIndexToPin[0]);
 
+enum class PinGroup {
+	Output,
+	Servo,
+	Input
+};
+
+inline int getPinFromIndex(PinGroup group, size_t index) {
+	switch (group) {
+	case PinGroup::Output:
+		if (index < MAX_OUTPUT_PINS) return OutputIndexToPin[index];
+		break;
+	case PinGroup::Servo:
+		//if (index < MAX_SERVO_PINS) return ServoIndexToPin[index];
+		break;
+	case PinGroup::Input:
+		//if (index < MAX_INPUT_PINS) return InputIndexToPin[index];
+		break;
+	}
+	return -1; // Ungültiger Index oder Gruppe
+}
+
 #endif
 
