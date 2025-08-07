@@ -1,4 +1,4 @@
-#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
+﻿#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
 #define IOTWEBCONF_DEBUG_TO_SERIAL
 
 #include <Arduino.h>
@@ -13,11 +13,10 @@
 #include <IotWebRoot.h>
 #include <time.h>
 #include <DNSServer.h>
-#include <iostream>
-#include <string.h>
 #include "common.h"
 #include "html.h"
 #include "favicon.h"
+#include "ESP32_DecoderCore.h"
 
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
@@ -27,17 +26,13 @@ const char wifiInitialApPassword[] = "123456789";
 
 
 // -- Configuration specific key. The value should be modified if config structure was changed.
-#define CONFIG_VERSION "009"
+#define CONFIG_VERSION "010"
 
 // -- Status indicator pin.
 //      First it will light up (kept LOW), on Wifi connection it will blink,
 //      when connected to the Wifi it will turn off (kept HIGH).
 #define STATUS_PIN LED_BUILTIN
-#if ESP32 
 #define ON_LEVEL HIGH
-#else
-#define ON_LEVEL LOW
-#endif
 
 // -- Method declarations.
 void handleRoot();
@@ -66,13 +61,13 @@ OutputGroup OutputGroup7 = OutputGroup("og7");
 OutputGroup OutputGroup8 = OutputGroup("og8");
 OutputGroup OutputGroup9 = OutputGroup("og9");
 OutputGroup OutputGroup10 = OutputGroup("og10");
+OutputGroup OutputGroup11 = OutputGroup("og11");
+OutputGroup OutputGroup12 = OutputGroup("og12");
+OutputGroup OutputGroup13 = OutputGroup("og13");
+OutputGroup OutputGroup14 = OutputGroup("og14");
+OutputGroup OutputGroup15 = OutputGroup("og15");
+OutputGroup OutputGroup16 = OutputGroup("og16");
 
-ServoGroup ServoGroup1 = ServoGroup("sg1");
-ServoGroup ServoGroup2 = ServoGroup("sg2");
-ServoGroup ServoGroup3 = ServoGroup("sg3");
-ServoGroup ServoGroup4 = ServoGroup("sg4");
-ServoGroup ServoGroup5 = ServoGroup("sg5");
-ServoGroup ServoGroup6 = ServoGroup("sg6");
 
 IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION); 
 
@@ -121,181 +116,232 @@ protected:
             HtmlRootFormatProvider::getScriptInner() +
 			String(FPSTR(html_button_response)) +
 			String(FPSTR(html_js_updatedata));
-        s_.replace("{millisecond}", "2000");
+        s_.replace("{millisecond}", "500");
         return s_;
     }
 };
+
+bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
+    bool allValid_ = true;
+    uint8_t outputsUsed_ = 0;
+    OutputGroup* group_ = &OutputGroup1;
+
+    while (group_ != nullptr) {
+        // Reset error messages
+        group_->numberParam().errorMessage = nullptr;
+		group_->modeParam().errorMessage = nullptr;
+
+        // Build parameter IDs
+        char filenameID_[STRING_LEN];
+        snprintf(filenameID_, STRING_LEN, "%s-filename", group_->getId());
+        String filename_ = webRequestWrapper->arg(filenameID_);
+
+        char modeID_[STRING_LEN];
+        snprintf(modeID_, STRING_LEN, "%s-mode", group_->getId());
+        String modeStr_ = webRequestWrapper->arg(modeID_);
+
+        char numberID_[STRING_LEN];
+        snprintf(numberID_, STRING_LEN, "%s-number", group_->getId());
+        String numberStr_ = webRequestWrapper->arg(numberID_);
+
+        char visibleID_[STRING_LEN];
+        snprintf(visibleID_, STRING_LEN, "%sv", group_->getId());
+
+        // Skip inactive groups
+        if (webRequestWrapper->hasArg(visibleID_) && webRequestWrapper->arg(visibleID_) == "inactive") {
+            Serial.printf("Group %s is inactive, skipping validation.\n", visibleID_);
+            group_ = (OutputGroup*)group_->getNext();
+            continue;
+        }
+
+        Serial.printf("Validating group %s...\n", group_->getId());
+
+        // Output number validation
+        int mode_ = atoi(modeStr_.c_str());
+        int number_ = 0;
+        switch (mode_) {
+        case 0: // No mode
+            number_ = 0;
+            break;
+        case 52: case 53: case 54: case 55:
+        case 60: case 61: case 62:
+            number_ = atoi(numberStr_.c_str());
+            break;
+        default:
+            number_ = group_->getNumber(mode_);
+        }
+
+        bool isServo = (mode_ == 190 || mode_ == 191 || mode_ == 192 || mode_ == 193);
+        if (isServo && outputsUsed_ >= 5) {
+            group_->modeParam().errorMessage = "Fehler: Servo-Ausgänge müssen auf den ersten 5 Positionen liegen.";
+            allValid_ = false;
+        }
+
+        Serial.printf("    Mode: %d, Outputs: %d\n", mode_, number_);
+        Serial.print(F("    max outputs: ")); Serial.println(MAX_OUTPUT_PINS);
+        Serial.print(F("    Outputs used: ")); Serial.println(outputsUsed_);
+
+        if (number_ < 1) {
+            group_->numberParam().errorMessage = "Fehler: Anzahl der Ausgänge muss mindestens 1 sein.";
+            allValid_ = false;
+        }
+        else if (number_ + outputsUsed_ > MAX_OUTPUT_PINS) {
+            group_->numberParam().errorMessage = "Fehler: Nicht genügend freie Ausgänge verfügbar.";
+            allValid_ = false;
+        }
+        else {
+            outputsUsed_ += number_;
+        }
+
+        group_ = (OutputGroup*)group_->getNext();
+    }
+    return allValid_;
+}
 
 void handleRoot() {
     if (iotWebConf.handleCaptivePortal()) {
         return;
     }
 
-    std::string content_;
+    String content_;
     MyHtmlRootFormatProvider fp_;
 
-    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
-    content_ += fp_.getHtmlStyle().c_str();
-    content_ += fp_.getHtmlHeadEnd().c_str();
-    content_ += fp_.getHtmlScript().c_str();
+    content_ += fp_.getHtmlHead(iotWebConf.getThingName());
+    content_ += fp_.getHtmlStyle();
+    content_ += fp_.getHtmlHeadEnd();
+    content_ += fp_.getHtmlScript();
 
-    content_ += fp_.getHtmlTable().c_str();
-    content_ += fp_.getHtmlTableRow().c_str();
-    content_ += fp_.getHtmlTableCol().c_str();
+    content_ += fp_.getHtmlTable();
+    content_ += fp_.getHtmlTableRow();
+    content_ += fp_.getHtmlTableCol();
 
-    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
-    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
-    content_ += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n")).c_str();
+    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n"));
+    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n"));
+    content_ += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n"));
 
-    content_ += fp_.getHtmlTableEnd().c_str();
-    content_ += fp_.getHtmlFieldsetEnd().c_str();
+    content_ += fp_.getHtmlTableEnd();
+    content_ += fp_.getHtmlFieldsetEnd();
 
-    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
-    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
+    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n"));
+    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n"));
 
     uint8_t i_ = 1;
 
     OutputGroup* outputgroup_ = &OutputGroup1;
     while (outputgroup_ != nullptr) {
-        if ((outputgroup_->isActive()) && (atoi(outputgroup_->ModeValue) >= 10)) {
-            String b_ = html_button_code;
+        if ((outputgroup_->isActive()) && (outputgroup_->getMode()) >= 10) {
+
+            String b_ = html_button_toggle;
             b_.replace("[value]", String(i_));
-            b_.replace("[name]", String(outputgroup_->DesignationValue) + " (" + String(outputgroup_->ModeValue) + ")");
+            b_.replace("[name]", String(outputgroup_->getDesignation()) + " (" + String(outputgroup_->getMode()) + ")");
             b_.replace("[id]", "output" + String(i_));
-            if (DecoderGroupIsEnabled(i_ - 1)) {
+            if (decoder.isOn(i_ - 1)) {
                 b_.replace("red", "green");
             }
-
-            content_ += b_.c_str();
-            content_ += fp_.addNewLine(2).c_str();
+            content_ += b_;
+            content_ += fp_.addNewLine(2);
             i_ += 1;
         }
         outputgroup_ = (OutputGroup*)outputgroup_->getNext();
     }
 
-    ServoGroup* servogroup_ = &ServoGroup1;
-    while (servogroup_ != nullptr) {
-        if (servogroup_->isActive()) {
-            String b_ = html_button_code;
-            b_.replace("[value]", String(i_));
-            b_.replace("[name]", String(servogroup_->DesignationValue));
-            b_.replace("[id]", "servo" + String(i_));
-            if (DecoderGroupIsEnabled(i_ - 1)) {
-                b_.replace("red", "green");
-            }
+    content_ += fp_.getHtmlTableEnd();
+    content_ += fp_.getHtmlFieldsetEnd();
 
-            content_ += b_.c_str();
-            content_ += fp_.addNewLine(2).c_str();
-            i_ += 1;
-        }
-        servogroup_ = (ServoGroup*)servogroup_->getNext();
-    }
+    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n"));
+    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n"));
+	content_ += fp_.getHtmlTableRow();
+	content_ += fp_.getHtmlTableCol();
 
-    content_ += fp_.getHtmlTableEnd().c_str();
-    content_ += fp_.getHtmlFieldsetEnd().c_str();
+    String on_ = html_button_blue;
+    on_.replace(F("group"), F("all"));
+    on_.replace(F("[value]"), F("on"));
+    on_.replace(F("[name]"), F("All on"));
+    on_.replace(F("[id]"), F("allon"));
+    content_ += on_;
 
-    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n")).c_str();
-    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n")).c_str();
-	content_ += fp_.getHtmlTableRow().c_str();
-	content_ += fp_.getHtmlTableCol().c_str();
+    content_ += fp_.addNewLine(1);
 
-    String on_ = html_button_code;
-    on_.replace("group", "all");
-    on_.replace("[value]", "on");
-    on_.replace("[name]", "All on");
-    on_.replace("[id]", "allon");
-    on_.replace("red", "blue");
-	content_ += on_.c_str();
+    String off_ = html_button_blue;
+    off_.replace(F("group"), F("all"));
+    off_.replace(F("[value]"), F("off"));
+    off_.replace(F("[name]"), F("All off"));
+    off_.replace(F("[id]"), F("alloff"));
+    content_ += off_;
 
-    content_ += fp_.addNewLine(1).c_str();
+	content_ += fp_.getHtmlTableColEnd();
+	content_ += fp_.getHtmlTableRowEnd();
+	content_ += fp_.getHtmlTableEnd();
+	content_ += fp_.getHtmlFieldsetEnd();
 
-    String off_ = html_button_code;
-    off_.replace("group", "all");
-    off_.replace("[value]", "off");
-    off_.replace("[name]", "All off");
-    off_.replace("[id]", "alloff");
-    off_.replace("red", "blue");
-    content_ += off_.c_str();
+    content_ += fp_.addNewLine(2);
 
-	content_ += fp_.getHtmlTableColEnd().c_str();
-	content_ += fp_.getHtmlTableRowEnd().c_str();
-	content_ += fp_.getHtmlTableEnd().c_str();
-	content_ += fp_.getHtmlFieldsetEnd().c_str();
+    content_ += fp_.getHtmlTable();
+    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>");
+    content_ += fp_.getHtmlTableRowText("<a href = 'settings'>Overview</a>");
+    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version));
+    content_ += fp_.getHtmlTableEnd();
 
-    content_ += fp_.addNewLine(2).c_str();
-
-    content_ += fp_.getHtmlTable().c_str();
-    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
-    content_ += fp_.getHtmlTableRowText("<a href = 'settings'>Overview</a>").c_str();
-    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)).c_str();
-    content_ += fp_.getHtmlTableEnd().c_str();
-
-    content_ += fp_.getHtmlTableColEnd().c_str();
-    content_ += fp_.getHtmlTableRowEnd().c_str();
-    content_ += fp_.getHtmlTableEnd().c_str();
-    content_ += fp_.getHtmlEnd().c_str();
+    content_ += fp_.getHtmlTableColEnd();
+    content_ += fp_.getHtmlTableRowEnd();
+    content_ += fp_.getHtmlTableEnd();
+    content_ += fp_.getHtmlEnd();
 
     server.sendHeader("Content-Length", String(content_.length()));
-    server.send(200, "text/html", content_.c_str());
+    server.send(200, "text/html", content_);
 }
 
 void handleSettings() {
-    std::string content_;
+    String content_;
     MyHtmlRootFormatProvider fp_;
     uint8_t i_ = 1;
     uint8_t count_ = 0;
 
-    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
-    content_ += fp_.getHtmlStyle().c_str();
-    content_ += fp_.getHtmlHeadEnd().c_str();
-    content_ += fp_.getHtmlScript().c_str();
+    content_ += fp_.getHtmlHead(iotWebConf.getThingName());
+    content_ += fp_.getHtmlStyle();
+    content_ += fp_.getHtmlHeadEnd();
+    content_ += fp_.getHtmlScript();
 
-    content_ += fp_.getHtmlTable().c_str();
-    content_ += fp_.getHtmlTableRow().c_str();
-    content_ += fp_.getHtmlTableCol().c_str();
+    content_ += fp_.getHtmlTable();
+    content_ += fp_.getHtmlTableRow();
+    content_ += fp_.getHtmlTableCol();
 
-    // content_ += "<h2>Overview for " + String(iotWebConf.getThingName()).c_str() + "</h2>";
+    // content_ += "<h2>Overview for " + String(iotWebConf.getThingName()) + "</h2>";
 
     OutputGroup* outputgroup_ = &OutputGroup1;
     while (outputgroup_ != nullptr) {
         if (outputgroup_->isActive()) {
-            content_ += String("<div>Output group " + String(outputgroup_->DesignationValue) + "</div>").c_str();
-            content_ += "<ul>";
-            content_ += String("<li>Mode: " + String(outputgroup_->ModeValue) + "</li>").c_str();
-            content_ += String("<li>Number of outputs: " + String(outputgroup_->NumberValue) + "</li>").c_str();
-            content_ += String("<li>DCC Address: " + String(outputgroup_->AddressValue) + +"</li>").c_str();
-            content_ += "</ul>";
+            content_ += String("<div>Output group ") + outputgroup_->getDesignation() + "</div>";
+            content_ += F("<ul>");
+            content_ += "<li>Mode: " + String(outputgroup_->getMode()) + "</li>";
+            content_ += "<li>Outputs used: " + String(outputgroup_->getNumber()) + "</li>";
+            content_ += "<li>DCC Address: " + String(outputgroup_->getAddress()) + "</li>";
+            content_ += F("</ul>");
         }
         else {
-            outputgroup_->DesignationParam.applyDefaultValue();
-            outputgroup_->ModeParam.applyDefaultValue();
-            outputgroup_->NumberParam.applyDefaultValue();
-            outputgroup_->AddressParam.applyDefaultValue();
-            outputgroup_->TimeOnParam.applyDefaultValue();
-            outputgroup_->TimeOffParam.applyDefaultValue();
-            outputgroup_->TimeOnFadeParam.applyDefaultValue();
+            outputgroup_->applyDefaultValues();
         }
         outputgroup_ = (OutputGroup*)outputgroup_->getNext();
     }
 
-    content_ += fp_.getHtmlTableEnd().c_str();
-    content_ += fp_.getHtmlFieldsetEnd().c_str();
+    content_ += fp_.getHtmlTableEnd();
+    content_ += fp_.getHtmlFieldsetEnd();
 
-    content_ += fp_.addNewLine(2).c_str();
+    content_ += fp_.addNewLine(2);
 
-    content_ += fp_.getHtmlTable().c_str();
-    content_ += fp_.getHtmlTableRowText("<a href = '/'>Home</a>").c_str();
-    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>").c_str();
-    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)).c_str();
-    content_ += fp_.getHtmlTableEnd().c_str();
+    content_ += fp_.getHtmlTable();
+    content_ += fp_.getHtmlTableRowText("<a href = '/'>Home</a>");
+    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>");
+    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version));
+    content_ += fp_.getHtmlTableEnd();
 
-    content_ += fp_.getHtmlTableColEnd().c_str();
-    content_ += fp_.getHtmlTableRowEnd().c_str();
-    content_ += fp_.getHtmlTableEnd().c_str();
-    content_ += fp_.getHtmlEnd().c_str();
+    content_ += fp_.getHtmlTableColEnd();
+    content_ += fp_.getHtmlTableRowEnd();
+    content_ += fp_.getHtmlTableEnd();
+    content_ += fp_.getHtmlEnd();
 
 	server.sendHeader("Content-Length", String(content_.length()));
-    server.send(200, "text/html", content_.c_str());
+    server.send(200, "text/html", content_);
 }
 
 void handleData() {
@@ -305,20 +351,11 @@ void handleData() {
     OutputGroup* outputgroup_ = &OutputGroup1;
     while (outputgroup_ != nullptr) {
         if (outputgroup_->isActive()) {
-            json_ += ",\"output" + String(i_ + 1) + "\":" + DecoderGroupIsEnabled(i_);
+            json_ += ",\"output" + String(i_ + 1) + "\":" + decoder.isOn(i_);
+            i_ += 1;
         }
         outputgroup_ = (OutputGroup*)outputgroup_->getNext();
-        i_ += 1;
-    }
 
-    i_ = 0;
-    ServoGroup* servogroup_ = &ServoGroup1;
-    while (servogroup_ != nullptr) {
-        if (servogroup_->isActive()) {
-            json_ += ",\"servo" + String(i_ + 1) + "\"" + DecoderGroupIsEnabled(i_);
-        }
-        servogroup_ = (ServoGroup*)servogroup_->getNext();
-        i_ += 1;
     }
 
     json_ += "}";
@@ -334,75 +371,74 @@ void SendServer(int code, const char *content_type, const char *content) {
 }
 
 void handlePost() {
-	Serial.println("POST request");
+    Serial.println("POST request");
     if (server.hasArg("group")) {
-		String value_ = server.arg("group");
-		uint8_t group_ = value_.toInt() - 1;
-		Serial.println("    Toggel group: " + String(group_));
+        String value_ = server.arg("group");
+        uint8_t group_ = value_.toInt() - 1;
+        Serial.println("    Toggel group: " + String(group_));
         if (group_ < 10) {
-            handleDecoderGroup(group_);
+            decoder.toggl(group_);
 
-        } else {
-			SendServer(400, "text/plain", "Invalid group");
+        }
+        else {
+            SendServer(400, "text/plain", "Invalid group");
             return;
         }
-		
+
         server.sendHeader("Location", "/", true);
         SendServer(302, "text/plain", "redirection");
         return;
     }
 
-	if (server.hasArg("reset")) {
-		Serial.println("    Resetting decoder");
-		zDecoderReset();
+    if (server.hasArg("reset")) {
+        Serial.println("    Resetting decoder");
+        zDecoderReset();
         server.sendHeader("Location", "/", true);
-		SendServer(200, "text/plain", "Reset successful");
+        SendServer(200, "text/plain", "Reset successful");
         return;
-	}
+    }
 
-	if (server.hasArg("all")) {
-		String value_ = server.arg("all");
-		if (value_ == "on") {
+    if (server.hasArg("all")) {
+        String value_ = server.arg("all");
+        if (value_ == "on") {
             for (int i_ = 0; i_ < 10; i_++) {
-                if (!DecoderGroupIsEnabled(i_)) {
-                    handleDecoderGroup(i_);
-                }
+                decoder.on(i_);
             }
-		} else if (value_ == "off") {
-			for (int i_ = 0; i_ < 10; i_++) {
-                if (DecoderGroupIsEnabled(i_)) {
-                    handleDecoderGroup(i_);
-                }
-			}
-		} else {
-			SendServer(400, "text/plain", "Invalid value");
+        }
+        else if (value_ == "off") {
+            for (int i_ = 0; i_ < 10; i_++) {
+                decoder.off(i_);
+            }
+        }
+        else {
+            SendServer(400, "text/plain", "Invalid value");
             return;
-		}
+        }
         server.sendHeader("Location", "/", true);
-		SendServer(302, "text/plain", "redirection");
-		return;
-	}
-	SendServer(400, "text/plain", "Invalid request");
+        SendServer(302, "text/plain", "redirection");
+        return;
+    }
+    SendServer(400, "text/plain", "Invalid request");
 }
 
 void handleAPPasswordMissingPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
-    std::string content_;
+    String content_;
     MyHtmlRootFormatProvider fp_;
 
-    content_ += fp_.getHtmlHead(iotWebConf.getThingName()).c_str();
-    content_ += fp_.getHtmlStyle().c_str();
-    content_ += fp_.getHtmlHeadEnd().c_str();
+    content_ += fp_.getHtmlHead(iotWebConf.getThingName());
+    content_ += fp_.getHtmlStyle();
+    content_ += fp_.getHtmlHeadEnd();
     content_ += "<body>";
     content_ += "You should change the default AP password to continue.";
-    content_ += fp_.addNewLine(2).c_str();
+    content_ += fp_.addNewLine(2);
     content_ += "Return to <a href = ''>configuration page</a>.";
-    content_ += fp_.addNewLine(1).c_str();
+    content_ += fp_.addNewLine(1);
     content_ += "Return to <a href='/'>home page</a>.";
 	content_ += "</body>";
-	content_ += fp_.getHtmlEnd().c_str();
+	content_ += fp_.getHtmlEnd();
 
 	webRequestWrapper->sendHeader("Content-Length", String(content_.length()));
-	webRequestWrapper->send(200, "text/html", content_.c_str());
+	webRequestWrapper->send(200, "text/html", content_);
 }
 
 void handleSSIDNotConfiguredPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
@@ -430,20 +466,15 @@ void websetup(){
     OutputGroup7.setNext(&OutputGroup8);
     OutputGroup8.setNext(&OutputGroup9);
     OutputGroup9.setNext(&OutputGroup10);
+	OutputGroup10.setNext(&OutputGroup11);
+	OutputGroup11.setNext(&OutputGroup12);
+	OutputGroup12.setNext(&OutputGroup13);
+	OutputGroup13.setNext(&OutputGroup14);
+	OutputGroup14.setNext(&OutputGroup15);
+	OutputGroup15.setNext(&OutputGroup16);
 
-    ServoGroup1.setNext(&ServoGroup2);
-    ServoGroup2.setNext(&ServoGroup3);
-    ServoGroup3.setNext(&ServoGroup4);
-    ServoGroup4.setNext(&ServoGroup5);
-    ServoGroup5.setNext(&ServoGroup6);
 
     iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
-
-    iotWebConf.addParameterGroup(&ServoGroup1);
-    iotWebConf.addParameterGroup(&ServoGroup2);
-    iotWebConf.addParameterGroup(&ServoGroup3);
-    iotWebConf.addParameterGroup(&ServoGroup4);
-    iotWebConf.addParameterGroup(&ServoGroup5);
 
     iotWebConf.addParameterGroup(&OutputGroup1);
     iotWebConf.addParameterGroup(&OutputGroup2);
@@ -455,6 +486,12 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup8);
     iotWebConf.addParameterGroup(&OutputGroup9);
     iotWebConf.addParameterGroup(&OutputGroup10);
+    iotWebConf.addParameterGroup(&OutputGroup11);
+	iotWebConf.addParameterGroup(&OutputGroup12);
+	iotWebConf.addParameterGroup(&OutputGroup13);
+	iotWebConf.addParameterGroup(&OutputGroup14);
+	iotWebConf.addParameterGroup(&OutputGroup15);
+	iotWebConf.addParameterGroup(&OutputGroup16);
 
     // -- Define how to handle updateServer calls.
     iotWebConf.setupUpdateServer(
@@ -470,6 +507,8 @@ void websetup(){
     iotWebConf.setStatusPin(STATUS_PIN, ON_LEVEL);
     iotWebConf.setConfigPin(CONFIG_PIN);
     iotWebConf.getApTimeoutParameter()->visible = true;
+
+    iotWebConf.setFormValidator(&formValidator);
 
     // -- Initializing the configuration.
     iotWebConf.init();
