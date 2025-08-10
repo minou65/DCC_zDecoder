@@ -5,14 +5,13 @@
 #include <ArduinoOTA.h>
 
 #include <WiFi.h>
+#include <DNSServer.h>
+#include <IotWebConf.h>
+#include <IotWebConfAsyncClass.h>
+#include <IotWebConfAsyncUpdateServer.h>
+#include <IotWebRoot.h>
 
 #include "webhandling.h"
-#include <IotWebConf.h>
-#include <IotWebConfOptionalGroup.h>
-#include <IotWebConfESP32HTTPUpdateServer.h>
-#include <IotWebRoot.h>
-#include <time.h>
-#include <DNSServer.h>
 #include "common.h"
 #include "html.h"
 #include "favicon.h"
@@ -35,7 +34,8 @@ const char wifiInitialApPassword[] = "123456789";
 #define ON_LEVEL HIGH
 
 // -- Method declarations.
-void handleRoot();
+void onProgress(size_t prg, size_t sz);
+void handleRoot(AsyncWebServerRequest* request);
 
 extern void zDecoderReset();
 
@@ -46,8 +46,11 @@ void wifiConnected();
 void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper);
 
 DNSServer dnsServer;
-WebServer server(80);
-HTTPUpdateServer httpUpdater;
+AsyncWebServer server(80);
+AsyncWebServerWrapper asyncWebServerWrapper(&server);
+AsyncUpdateServer AsyncUpdater;
+
+IotWebConf iotWebConf(thingName, &dnsServer, &asyncWebServerWrapper, wifiInitialApPassword, CONFIG_VERSION);
 
 // -- We need to declare an instance for all OutputGroup items, that can
 //    appear in the config portal
@@ -67,9 +70,6 @@ OutputGroup OutputGroup13 = OutputGroup("og13");
 OutputGroup OutputGroup14 = OutputGroup("og14");
 OutputGroup OutputGroup15 = OutputGroup("og15");
 OutputGroup OutputGroup16 = OutputGroup("og16");
-
-
-IotWebConf iotWebConf(thingName, &dnsServer, &server, wifiInitialApPassword, CONFIG_VERSION); 
 
 MySelectParameter::MySelectParameter(
         const char* label,
@@ -154,10 +154,17 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
             continue;
         }
 
+        int mode_ = atoi(modeStr_.c_str());
+        // Skip groups with mode 0 (No mode)
+        if (mode_ == 0) {
+            Serial.printf("Group %s has mode 0, skipping validation.\n", group_->getId());
+            group_ = (OutputGroup*)group_->getNext();
+            continue;
+        }
+
         Serial.printf("Validating group %s...\n", group_->getId());
 
         // Output number validation
-        int mode_ = atoi(modeStr_.c_str());
         int number_ = 0;
         switch (mode_) {
         case 0: // No mode
@@ -198,39 +205,49 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
     return allValid_;
 }
 
-void handleRoot() {
-    if (iotWebConf.handleCaptivePortal()) {
+void onProgress(size_t prg, size_t sz) {
+    static size_t lastPrinted_ = 0;
+    size_t currentPercent_ = (prg * 100) / sz;
+
+    if (currentPercent_ % 5 == 0 && currentPercent_ != lastPrinted_) {
+        Serial.printf("Progress: %d%%\n", currentPercent_);
+        lastPrinted_ = currentPercent_;
+    }
+}
+
+void handleRoot(AsyncWebServerRequest* request) {
+    AsyncWebRequestWrapper asyncWebRequestWrapper(request);
+    if (iotWebConf.handleCaptivePortal(&asyncWebRequestWrapper)) {
         return;
     }
 
-    String content_;
+    AsyncResponseStream* response = request->beginResponseStream("text/html", 512);
+
     MyHtmlRootFormatProvider fp_;
 
-    content_ += fp_.getHtmlHead(iotWebConf.getThingName());
-    content_ += fp_.getHtmlStyle();
-    content_ += fp_.getHtmlHeadEnd();
-    content_ += fp_.getHtmlScript();
+    response->print(fp_.getHtmlHead(iotWebConf.getThingName()));
+    response->print(fp_.getHtmlStyle());
+    response->print(fp_.getHtmlHeadEnd());
+    response->print(fp_.getHtmlScript());
 
-    content_ += fp_.getHtmlTable();
-    content_ += fp_.getHtmlTableRow();
-    content_ += fp_.getHtmlTableCol();
+    response->print(fp_.getHtmlTable());
+    response->print(fp_.getHtmlTableRow());
+    response->print(fp_.getHtmlTableCol());
 
-    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n"));
-    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n"));
-    content_ += String(F("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n"));
+    response->print("<fieldset align=left style=\"border: 1px solid\">\n");
+    response->print("<table border=\"0\" align=\"center\" width=\"100%\">\n");
+    response->print("<tr><td align=\"left\"> </td></td><td align=\"right\"><span id=\"RSSIValue\">no data</span></td></tr>\n");
 
-    content_ += fp_.getHtmlTableEnd();
-    content_ += fp_.getHtmlFieldsetEnd();
+    response->print(fp_.getHtmlTableEnd());
+    response->print(fp_.getHtmlFieldsetEnd());
 
-    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n"));
-    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n"));
+    response->print("<fieldset align=left style=\"border: 1px solid\">\n");
+    response->print("<table border=\"0\" align=\"center\" width=\"100%\">\n");
 
     uint8_t i_ = 1;
-
     OutputGroup* outputgroup_ = &OutputGroup1;
     while (outputgroup_ != nullptr) {
         if ((outputgroup_->isActive()) && (outputgroup_->getMode()) >= 10) {
-
             String b_ = html_button_toggle;
             b_.replace("[value]", String(i_));
             b_.replace("[name]", String(outputgroup_->getDesignation()) + " (" + String(outputgroup_->getMode()) + ")");
@@ -238,60 +255,60 @@ void handleRoot() {
             if (decoder.isOn(i_ - 1)) {
                 b_.replace("red", "green");
             }
-            content_ += b_;
-            content_ += fp_.addNewLine(2);
+            response->print(b_);
+            response->print(fp_.addNewLine(2));
             i_ += 1;
         }
         outputgroup_ = (OutputGroup*)outputgroup_->getNext();
     }
 
-    content_ += fp_.getHtmlTableEnd();
-    content_ += fp_.getHtmlFieldsetEnd();
+    response->print(fp_.getHtmlTableEnd());
+    response->print(fp_.getHtmlFieldsetEnd());
 
-    content_ += String(F("<fieldset align=left style=\"border: 1px solid\">\n"));
-    content_ += String(F("<table border=\"0\" align=\"center\" width=\"100%\">\n"));
-	content_ += fp_.getHtmlTableRow();
-	content_ += fp_.getHtmlTableCol();
+    response->print("<fieldset align=left style=\"border: 1px solid\">\n");
+    response->print("<table border=\"0\" align=\"center\" width=\"100%\">\n");
+    response->print(fp_.getHtmlTableRow());
+    response->print(fp_.getHtmlTableCol());
 
     String on_ = html_button_blue;
-    on_.replace(F("group"), F("all"));
-    on_.replace(F("[value]"), F("on"));
-    on_.replace(F("[name]"), F("All on"));
-    on_.replace(F("[id]"), F("allon"));
-    content_ += on_;
+    on_.replace("group", "all");
+    on_.replace("[value]", "on");
+    on_.replace("[name]", "All on");
+    on_.replace("[id]", "allon");
+    response->print(on_);
 
-    content_ += fp_.addNewLine(1);
+    response->print(fp_.addNewLine(1));
 
     String off_ = html_button_blue;
-    off_.replace(F("group"), F("all"));
-    off_.replace(F("[value]"), F("off"));
-    off_.replace(F("[name]"), F("All off"));
-    off_.replace(F("[id]"), F("alloff"));
-    content_ += off_;
+    off_.replace("group", "all");
+    off_.replace("[value]", "off");
+    off_.replace("[name]", "All off");
+    off_.replace("[id]", "alloff");
+    response->print(off_);
 
-	content_ += fp_.getHtmlTableColEnd();
-	content_ += fp_.getHtmlTableRowEnd();
-	content_ += fp_.getHtmlTableEnd();
-	content_ += fp_.getHtmlFieldsetEnd();
+    response->print(fp_.getHtmlTableColEnd());
+    response->print(fp_.getHtmlTableRowEnd());
+    response->print(fp_.getHtmlTableEnd());
+    response->print(fp_.getHtmlFieldsetEnd());
 
-    content_ += fp_.addNewLine(2);
+    response->print(fp_.addNewLine(2));
 
-    content_ += fp_.getHtmlTable();
-    content_ += fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>");
-    content_ += fp_.getHtmlTableRowText("<a href = 'settings'>Overview</a>");
-    content_ += fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version));
-    content_ += fp_.getHtmlTableEnd();
+    response->print(fp_.getHtmlTable());
+    response->print(fp_.getHtmlTableRowText("<a href = 'config'>Configuration</a>"));
+    response->print(fp_.getHtmlTableRowText("<a href = 'settings'>Overview</a>"));
+    response->print(fp_.getHtmlTableRowText(fp_.getHtmlVersion(Version)));
+    response->print(fp_.getHtmlTableEnd());
 
-    content_ += fp_.getHtmlTableColEnd();
-    content_ += fp_.getHtmlTableRowEnd();
-    content_ += fp_.getHtmlTableEnd();
-    content_ += fp_.getHtmlEnd();
+    response->print(fp_.getHtmlTableColEnd());
+    response->print(fp_.getHtmlTableRowEnd());
+    response->print(fp_.getHtmlTableEnd());
+    response->print(fp_.getHtmlEnd());
 
-    server.sendHeader("Content-Length", String(content_.length()));
-    server.send(200, "text/html", content_);
+    response->addHeader("Server", "ESP Async Web Server");
+    request->send(response);
 }
 
-void handleSettings() {
+void handleSettings(AsyncWebServerRequest* request) {
     String content_;
     MyHtmlRootFormatProvider fp_;
     uint8_t i_ = 1;
@@ -340,11 +357,10 @@ void handleSettings() {
     content_ += fp_.getHtmlTableEnd();
     content_ += fp_.getHtmlEnd();
 
-	server.sendHeader("Content-Length", String(content_.length()));
-    server.send(200, "text/html", content_);
+    request->send(200, "text/html", content_);
 }
 
-void handleData() {
+void handleData(AsyncWebServerRequest* request) {
     String json_ = "{";
     json_ += "\"rssi\":\"" + String(WiFi.RSSI()) + "\"";
     uint8_t i_ = 0;
@@ -359,21 +375,16 @@ void handleData() {
     }
 
     json_ += "}";
-	server.sendHeader("Content-Length", String(json_.length()));
-    server.send(200, "application/json", json_);
+
+    request->send(200, "application/json", json_);
 
 }
 
-void SendServer(int code, const char *content_type, const char *content) {
-	server.setContentLength(strlen(content));
-	server.send(code, content_type, content);
-	Serial.println("    " + String(code) + " " + content);
-}
-
-void handlePost() {
+void handlePost(AsyncWebServerRequest* request) {
     Serial.println("POST request");
-    if (server.hasArg("group")) {
-        String value_ = server.arg("group");
+    if (request->hasParam("group", true)) {
+
+        String value_ = request->getParam("group", true)->value();
         uint8_t group_ = value_.toInt() - 1;
         Serial.println("    Toggel group: " + String(group_));
         if (group_ < 10) {
@@ -381,25 +392,27 @@ void handlePost() {
 
         }
         else {
-            SendServer(400, "text/plain", "Invalid group");
+            request->send(400, "text/plain", "Invalid group");
             return;
         }
 
-        server.sendHeader("Location", "/", true);
-        SendServer(302, "text/plain", "redirection");
+        AsyncWebServerResponse* response = request->beginResponse(302, "text/plain", "redirection");
+        response->addHeader("Location", "/");
+        request->send(response);
         return;
     }
 
-    if (server.hasArg("reset")) {
+    if (request->hasParam("reset", true)) {
         Serial.println("    Resetting decoder");
         zDecoderReset();
-        server.sendHeader("Location", "/", true);
-        SendServer(200, "text/plain", "Reset successful");
+        AsyncWebServerResponse* response = request->beginResponse(302, "text/plain", "Reset successful");
+        response->addHeader("Location", "/");
+        request->send(response);
         return;
     }
 
-    if (server.hasArg("all")) {
-        String value_ = server.arg("all");
+    if (request->hasParam("all", true)) {
+        String value_ = request->getParam("all", true)->value();
         if (value_ == "on") {
             for (int i_ = 0; i_ < 10; i_++) {
                 decoder.on(i_);
@@ -411,14 +424,15 @@ void handlePost() {
             }
         }
         else {
-            SendServer(400, "text/plain", "Invalid value");
+            request->send(400, "text/plain", "Invalid value");
             return;
         }
-        server.sendHeader("Location", "/", true);
-        SendServer(302, "text/plain", "redirection");
+        AsyncWebServerResponse* response = request->beginResponse(302, "text/plain", "redirection");
+        response->addHeader("Location", "/");
+        request->send(response);
         return;
     }
-    SendServer(400, "text/plain", "Invalid request");
+    request->send(400, "text/plain", "Invalid request");
 }
 
 void handleAPPasswordMissingPage(iotwebconf::WebRequestWrapper* webRequestWrapper) {
@@ -451,11 +465,34 @@ void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper){
     webRequestWrapper->send(302, "text/plain", "Config saved");
 }
 
-void handleFavicon() {
-    server.send_P(200, "image/x-icon", (const char*)favicon_ico, sizeof(favicon_ico));
-}
-
 void websetup(){
+
+    if (!LittleFS.begin()) {
+        Serial.println("LittleFS mount failed, versuche Formatierung...");
+        LittleFS.format();
+        if (LittleFS.begin()) {
+            Serial.println("LittleFS erfolgreich formatiert und gemountet.");
+        }
+        else {
+            Serial.println("LittleFS konnte auch nach Formatierung nicht gemountet werden!");
+        }
+    }
+
+    // Alle Dateien im LittleFS löschen
+    File root = LittleFS.open("/");
+    File file = root.openNextFile();
+    while (file) {
+        String fileName = file.name();
+        if (LittleFS.remove(fileName)) {
+            Serial.print("Datei gelöscht: ");
+            Serial.println(fileName);
+        }
+        else {
+            Serial.print("Fehler beim Löschen: ");
+            Serial.println(fileName);
+        }
+        file = root.openNextFile();
+    }
 
     OutputGroup1.setNext(&OutputGroup2);
     OutputGroup2.setNext(&OutputGroup3);
@@ -493,11 +530,6 @@ void websetup(){
 	iotWebConf.addParameterGroup(&OutputGroup15);
 	iotWebConf.addParameterGroup(&OutputGroup16);
 
-    // -- Define how to handle updateServer calls.
-    iotWebConf.setupUpdateServer(
-        [](const char* updatePath) { httpUpdater.setup(&server, updatePath); },
-        [](const char* userName, char* password) { httpUpdater.updateCredentials(userName, password); });
-
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
     iotWebConf.setConfigSavedPage(&handleConfigSavedPage);
@@ -510,18 +542,35 @@ void websetup(){
 
     iotWebConf.setFormValidator(&formValidator);
 
+    // -- Define how to handle updateServer calls.
+    iotWebConf.setupUpdateServer(
+        [](const char* updatePath) { AsyncUpdater.setup(&server, updatePath, onProgress); },
+        [](const char* userName, char* password) { AsyncUpdater.updateCredentials(userName, password); });
+
     // -- Initializing the configuration.
     iotWebConf.init();
 
+
     // -- Set up required URL handlers on the web server.
-    server.on("/", handleRoot);
-    server.on("/config", [] { iotWebConf.handleConfig(); });
-    server.on("/settings", handleSettings);
-	server.on("/data", HTTP_GET, handleData);
-	server.on("/post", HTTP_POST, handlePost);
-    server.on("/favicon.ico", HTTP_GET, handleFavicon);
-    server.on("/favicon", HTTP_GET, handleFavicon);
-    server.onNotFound([]() { iotWebConf.handleNotFound(); });
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) { handleRoot(request); });
+    server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
+        AsyncWebRequestLittleFSWrapper asyncWebRequestWrapper(request);
+        iotWebConf.handleConfig(&asyncWebRequestWrapper);
+        }
+    );
+    server.on("/settings", HTTP_GET, [](AsyncWebServerRequest* request) { handleSettings(request); });
+	server.on("/data", HTTP_GET, [](AsyncWebServerRequest* request) { handleData(request); });
+    server.on("/post", HTTP_POST, [](AsyncWebServerRequest* request) { handlePost(request); });
+    server.on("/favicon.ico", HTTP_GET, [](AsyncWebServerRequest* request) {
+        AsyncWebServerResponse* response = request->beginResponse_P(200, "image/x-icon", favicon_ico, sizeof(favicon_ico));
+        request->send(response);
+        }
+    );
+    server.onNotFound([](AsyncWebServerRequest* request) {
+        AsyncWebRequestWrapper asyncWebRequestWrapper(request);
+        iotWebConf.handleNotFound(&asyncWebRequestWrapper);
+        }
+    );
 
 	convertSettings();
 }
