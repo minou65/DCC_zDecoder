@@ -129,9 +129,9 @@ function hideClass(id) {
         { className: '-number', show: ["52", "53", "54", "55", "60", "61", "62"] },
         { className: '-timeon', show: ["1", "50", "51", "52", "53", "54", "55", "60", "81", "83", "201", "202", "203", "251", "253", "40"] },
         { className: '-timeoff', show: ["50", "51", "52", "53", "54", "55", "60", "83", "253"] },
-        { className: '-multiplier', show: ["61", "62", "201", "202", "203", "251", "252", "253"] },
-        { className: '-onfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "70"] },
-        { className: '-offfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "70"] }
+        { className: '-multiplier', show: ["61", "62", "251", "252", "253"] },
+        { className: '-onfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110"] },
+        { className: '-offfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110"] }
     ];
 
     // brightness ist eine Ausnahme: "nicht sichtbar" bei diesen Werten
@@ -182,6 +182,10 @@ function hideClass(id) {
         if (l) l.innerHTML = 'minimal glowing time (ms)';
         l = document.querySelector('label[for="' + id + '-offfade"]');
         if (l) l.innerHTML = 'maximal glowing time (ms)';
+    }
+    if (["201", "202"].includes(selectedValue)) {
+        var l = document.querySelector('label[for="' + id + '-timeon"]');
+        if (l) l.innerHTML = 'Puls time (ms)';
     }
     if (["203", "40"].includes(selectedValue)) {
         var l = document.querySelector('label[for="' + id + '-timeon"]');
