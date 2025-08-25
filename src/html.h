@@ -127,16 +127,16 @@ function hideClass(id) {
     // Definition aller Felder mit zugehörigen Sichtbarkeits-Arrays
     var fields = [
         { className: '-number', show: ["52", "53", "54", "55", "60", "61", "62"] },
-        { className: '-timeon', show: ["1", "50", "51", "52", "53", "54", "55", "60", "81", "83", "201", "202", "203", "251", "253", "40"] },
-        { className: '-timeoff', show: ["50", "51", "52", "53", "54", "55", "60", "83", "253"] },
-        { className: '-multiplier', show: ["61", "62", "251", "252", "253"] },
-        { className: '-onfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110"] },
-        { className: '-offfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110"] }
+        { className: '-timeon', show: ["1", "50", "51", "52", "53", "54", "55", "60", "81", "83", "201", "202", "203", "251", "253", "40", "190", "192"] },
+        { className: '-timeoff', show: ["50", "51", "52", "53", "54", "55", "60", "83", "253", "192"] },
+        { className: '-multiplier', show: ["61", "62", "251", "252", "253", "190", "191", "192", "193"] },
+        { className: '-onfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "190", "191", "192", "193"] },
+        { className: '-offfade', show: ["50", "51", "62", "83", "102", "103", "104", "105", "106", "110", "190", "191", "192", "193"] }
     ];
 
     // brightness ist eine Ausnahme: "nicht sichtbar" bei diesen Werten
     var brightnessClass = document.getElementsByClassName(id + '-brightness')[0];
-    var brightnessHide = ["0", "201", "202", "1"];
+    var brightnessHide = ["0", "201", "202", "1", "190", "191", "192", "193"];
     if (brightnessClass)
         brightnessClass.style.display = brightnessHide.includes(selectedValue) ? "none" : "block";
 
@@ -194,6 +194,15 @@ function hideClass(id) {
     if (["203"].includes(selectedValue)) {
         l = document.querySelector('label[for="' + id + '-brightness"]');
         if (l) l.innerHTML = 'Motor Speed';
+    }
+    if (["190", "191", "192", "193"].includes(selectedValue)) {
+        var l;
+        l = document.querySelector('label[for="' + id + '-multiplier"]');
+        if (l) l.innerHTML = 'Travel time (ms)';
+        l = document.querySelector('label[for="' + id + '-onfade"]');
+        if (l) l.innerHTML = 'Limit 1';
+        l = document.querySelector('label[for="' + id + '-offfade"]');
+        if (l) l.innerHTML = 'Limit 2';
     }
 
     // Debug-Ausgabe

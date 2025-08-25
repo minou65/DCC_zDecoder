@@ -118,6 +118,8 @@ public:
 
     // Zugriff auf NumberParam, falls benötigt
     iotwebconf::NumberParameter& numberParam() { return _NumberParam; }
+    iotwebconf::NumberParameter& TimeOnFadeParam() { return _TimeOnFadeParam; }
+    iotwebconf::NumberParameter& TimeOffFadeParam() { return _TimeOffFadeParam; }
 	MySelectParameter& modeParam() { return _ModeParam; }
 
 

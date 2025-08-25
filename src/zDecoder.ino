@@ -66,8 +66,18 @@ void zDecoderInit(void) {
 			Serial.printf("    Address: %u\n", Address_);
 			Serial.print(F("    Mode: ")); Serial.println(Mode_);
 
-			// Create accessory
-			Accessory* newAccessory_ = createOutputAccessory(Mode_, Address_, OutputIndex_, assignedPins_, TimeOn_, TimeOff_, Multiplier_, TimeOnFade_, TimeOffFade_);
+			Accessory* newAccessory_ = nullptr;
+
+			// Prüfen auf Servomode
+			if (Mode_ == 190 || Mode_ == 191 || Mode_ == 192 || Mode_ == 193) {
+				// Beispiel: ServoAccessory-Konstruktor anpassen, falls andere Parameter benötigt werden
+				// Accessory* createServoAccessory(uint16_t Mode, uint16_t Address, uint8_t ServoPort, uint16_t limit1, uint16_t limit2, uint16_t travelTime, uint16_t timeOn, uint16_t timeOff)
+				newAccessory_ = createServoAccessory(Mode_, Address_, OutputIndex_, TimeOnFade_, TimeOffFade_, Multiplier_, TimeOn_, TimeOff_);
+			}
+			else {
+				// Standard-Accessory
+				newAccessory_ = createOutputAccessory(Mode_, Address_, OutputIndex_, assignedPins_, TimeOn_, TimeOff_, Multiplier_, TimeOnFade_, TimeOffFade_);
+			}
 
 			if (newAccessory_ != nullptr) {
 				OutputIndex_ += newAccessory_->getUsedPins(); // Increase OutputIndex_ by the number of used pins

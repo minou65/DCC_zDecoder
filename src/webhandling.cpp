@@ -132,6 +132,8 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
         // Reset error messages
         group_->numberParam().errorMessage = nullptr;
 		group_->modeParam().errorMessage = nullptr;
+		group_->TimeOnFadeParam().errorMessage = nullptr;
+		group_->TimeOffFadeParam().errorMessage = nullptr;
 
         // Build parameter IDs
         char filenameID_[STRING_LEN];
@@ -184,6 +186,28 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
         if (isServo && outputsUsed_ >= 5) {
             group_->modeParam().errorMessage = "Fehler: Servo-Ausgänge müssen auf den ersten 5 Positionen liegen.";
             allValid_ = false;
+        }
+
+        // Servo-spezifische Validierung für onfade/offfade
+        if (isServo) {
+            char onfadeID_[STRING_LEN];
+            snprintf(onfadeID_, STRING_LEN, "%s-onfade", group_->getId());
+            String onfadeStr_ = webRequestWrapper->arg(onfadeID_);
+            int onfade_ = onfadeStr_.toInt();
+
+            char offfadeID_[STRING_LEN];
+            snprintf(offfadeID_, STRING_LEN, "%s-offfade", group_->getId());
+            String offfadeStr_ = webRequestWrapper->arg(offfadeID_);
+            int offfade_ = offfadeStr_.toInt();
+
+            if (onfade_ < 0 || onfade_ > 180) {
+                group_->TimeOnFadeParam().errorMessage = "Fehler: Limit 1 muss zwischen 0 und 180 liegen.";
+                allValid_ = false;
+            }
+            if (offfade_ < 0 || offfade_ > 180) {
+                group_->TimeOffFadeParam().errorMessage = "Fehler: Limit 2 muss zwischen 0 und 180 liegen.";
+                allValid_ = false;
+            }
         }
 
         Serial.printf("    Mode: %d, Outputs: %d\n", mode_, number_);
