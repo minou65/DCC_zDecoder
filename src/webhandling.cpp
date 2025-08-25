@@ -17,6 +17,8 @@
 #include "favicon.h"
 #include "ESP32_DecoderCore.h"
 
+bool ShouldReboot = false;
+
 // -- Initial name of the Thing. Used e.g. as SSID of the own Access Point.
 const char thingName[] = "zDecoder";
 
@@ -554,8 +556,8 @@ void websetup(){
     // -- Set up required URL handlers on the web server.
     server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) { handleRoot(request); });
     server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
-        AsyncWebRequestLittleFSWrapper asyncWebRequestWrapper(request);
-        iotWebConf.handleConfig(&asyncWebRequestWrapper);
+        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request);
+        iotWebConf.handleConfig(asyncWebRequestWrapper);
         }
     );
     server.on("/settings", HTTP_GET, [](AsyncWebServerRequest* request) { handleSettings(request); });
@@ -578,6 +580,11 @@ void websetup(){
 void webloop(){
     iotWebConf.doLoop();
     ArduinoOTA.handle();
+
+    if (ShouldReboot || AsyncUpdater.isFinished()) {
+        delay(1000);
+        ESP.restart();
+    }
 }
 
 void wifiConnected() {
