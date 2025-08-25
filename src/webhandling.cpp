@@ -256,6 +256,10 @@ void handleRoot(AsyncWebServerRequest* request) {
     response->print(fp_.getHtmlHeadEnd());
     response->print(fp_.getHtmlScript());
 
+    response->print("<h2 style=\"text-align:center;\">");
+    response->print(iotWebConf.getThingName());
+    response->print("</h2>");
+
     response->print(fp_.getHtmlTable());
     response->print(fp_.getHtmlTableRow());
     response->print(fp_.getHtmlTableCol());
@@ -344,6 +348,10 @@ void handleSettings(AsyncWebServerRequest* request) {
     content_ += fp_.getHtmlStyle();
     content_ += fp_.getHtmlHeadEnd();
     content_ += fp_.getHtmlScript();
+
+    content_ += "<h2 style=\"text-align:center;\">";
+    content_ += iotWebConf.getThingName();
+    content_ += "</h2>";
 
     content_ += fp_.getHtmlTable();
     content_ += fp_.getHtmlTableRow();
