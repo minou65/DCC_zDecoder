@@ -469,33 +469,6 @@ void handleConfigSavedPage(iotwebconf::WebRequestWrapper* webRequestWrapper){
 
 void websetup(){
 
-    if (!LittleFS.begin()) {
-        Serial.println("LittleFS mount failed, versuche Formatierung...");
-        LittleFS.format();
-        if (LittleFS.begin()) {
-            Serial.println("LittleFS erfolgreich formatiert und gemountet.");
-        }
-        else {
-            Serial.println("LittleFS konnte auch nach Formatierung nicht gemountet werden!");
-        }
-    }
-
-    // Alle Dateien im LittleFS löschen
-    File root = LittleFS.open("/");
-    File file = root.openNextFile();
-    while (file) {
-        String fileName = file.name();
-        if (LittleFS.remove(fileName)) {
-            Serial.print("Datei gelöscht: ");
-            Serial.println(fileName);
-        }
-        else {
-            Serial.print("Fehler beim Löschen: ");
-            Serial.println(fileName);
-        }
-        file = root.openNextFile();
-    }
-
     OutputGroup1.setNext(&OutputGroup2);
     OutputGroup2.setNext(&OutputGroup3);
     OutputGroup3.setNext(&OutputGroup4);
