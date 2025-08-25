@@ -52,8 +52,6 @@ const char OutputModeValues[][4] = {
     //"106",
     //"110",
 
-    "70",
-
 	"190", // Servo Impuls
 	"191", // Servo Flip
 	"192", // Servo Pendel
@@ -98,14 +96,13 @@ const char OutputModeNames[][50] = {
     "Lichtsignal Hauptstrasse/Fussgänger (6)", // 72
     "Lichtsignal Haupt-/Nebenstrasse/Fussgänger (9)", // 73
 
-    "Entkuppler (1)",          // 201
-    "Weiche (2)",              // 202
-
     "Servo Impuls (1)",      // 190, nach einer eingestellten Zeit geht wieder zurück in die Ausgangsposition
     "Servo Flip (1)",        // 191, wechselt zwischen zwei Positionen
     "Servo Pendel (1)",       // 192, wechsselt zwischen den positionen bis der Servo ausgeschaltet wird
     "Servo Weiche (1)",        //193
-
+    
+    "Entkuppler (1)",          // 201
+    "Weiche (2)",              // 202
     "Motor (1)"              // 203
 };
 
