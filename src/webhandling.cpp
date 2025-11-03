@@ -561,7 +561,9 @@ void websetup(){
     // -- Set up required URL handlers on the web server.
     server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) { handleRoot(request); });
     server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
-        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request);
+        // IMPORTANT: You must create the AsyncWebRequestWrapper with 'new' and do NOT delete it manually.
+        // The object will delete itself when it is no longer needed, to ensure it lives long enough.
+        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request, 98000U);
         iotWebConf.handleConfig(asyncWebRequestWrapper);
         }
     );

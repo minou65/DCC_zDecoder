@@ -88,6 +88,17 @@ void zDecoderInit(void) {
 					ledAccessory->SetMaxBrightness(Brightness_);
 				}
 
+				// add a input accessory if the output group has an input pin
+				if (outputgroup_->getInputPin() > 0) {
+					InputAccessory* inputAccessory_ = createInputAccessory(
+						outputgroup_->getInputPin() - 1,
+						newAccessory_,
+						outputgroup_->getActiveDuration(),
+						static_cast<InputAccessory::EdgeType>(outputgroup_->getEdgeType())
+					);
+					decoder.add(inputAccessory_);
+				}
+
 				decoder.add(newAccessory_);
 			}
 			totalAssignedPins_ += assignedPins_;
