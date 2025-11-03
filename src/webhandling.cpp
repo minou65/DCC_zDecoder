@@ -561,7 +561,7 @@ void websetup(){
     // -- Set up required URL handlers on the web server.
     server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) { handleRoot(request); });
     server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
-        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request);
+        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request, 90000U);
         iotWebConf.handleConfig(asyncWebRequestWrapper);
         }
     );
