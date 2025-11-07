@@ -51,31 +51,31 @@ public:
             _TimeOnFadeParam("Time On Fade (ms)", _TimeOnFadeId, _TimeOnFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'"),
             _TimeOffFadeParam("Time Off Fade (ms)", _TimeOffFadeId, _TimeOffFadeValue, NUMBER_LEN, "10", "1..255", "min='1' max='255' step='1'"),
             _BrightnessParam("Brightness", _BrightnessId, _BrightnessValue, NUMBER_LEN, "255", "0..255", "min='0' max='255' step='1'"),
-            _activeDurationParam("Active Duration (ms)", _activeDurationId, _activeDurationValue, NUMBER_LEN, "0", "1..60000", "min='0' max='60000' step='1'"),
-            _InputPinParam(
-                "Input Pin",
-                _InputPinId,
-                _InputPinValue,
-                sizeof(InputPinValues[0]),
-                (char*)InputPinValues,
-                (char*)InputPinNames,
-                sizeof(InputPinValues) / sizeof(InputPinValues[0]),
-                sizeof(InputPinNames[0]),
-                "0",
-                nullptr
-            ),
-            _EdgeTypeParam(
-                "Edge Type",
-                _EdgeTypeId,
-                _EdgeTypeValue,
-                sizeof(InputEdgeValues[0]),
-                (char*)InputEdgeValues,
-                (char*)InputEdgeNames,
-                sizeof(InputEdgeValues) / sizeof(InputEdgeValues[0]),
-                sizeof(InputEdgeNames[0]),
-                "1", // Default: Falling
-                nullptr
-            )
+            _activeDurationParam("Active Duration (ms)", _activeDurationId, _activeDurationValue, NUMBER_LEN, "0", "1..60000", "min='0' max='60000' step='1'")
+            //_InputPinParam(
+            //    "Input Pin",
+            //    _InputPinId,
+            //    _InputPinValue,
+            //    sizeof(InputPinValues[0]),
+            //    (char*)InputPinValues,
+            //    (char*)InputPinNames,
+            //    sizeof(InputPinValues) / sizeof(InputPinValues[0]),
+            //    sizeof(InputPinNames[0]),
+            //    "0",
+            //    nullptr
+            //)
+            //_EdgeTypeParam(
+            //    "Edge Type",
+            //    _EdgeTypeId,
+            //    _EdgeTypeValue,
+            //    sizeof(InputEdgeValues[0]),
+            //    (char*)InputEdgeValues,
+            //    (char*)InputEdgeNames,
+            //    sizeof(InputEdgeValues) / sizeof(InputEdgeValues[0]),
+            //    sizeof(InputEdgeNames[0]),
+            //    "1", // Default: Falling
+            //    nullptr
+            //)
     {
         snprintf(_DesignationId, STRING_LEN, "%s-designation", this->getId());
         snprintf(_ModeId, STRING_LEN, "%s-mode", this->getId());
@@ -89,8 +89,8 @@ public:
         snprintf(_BrightnessId, STRING_LEN, "%s-brightness", this->getId());
         snprintf(_ModeCustomHTML, STRING_LEN, "onchange=\"hideClass('%s')\"", this->getId());
         snprintf(_activeDurationId, STRING_LEN, "%s-activeduration", this->getId());
-        snprintf(_InputPinId, STRING_LEN, "%s-inputpin", this->getId());
-        snprintf(_EdgeTypeId, STRING_LEN, "%s-edgetype", this->getId());
+        //snprintf(_InputPinId, STRING_LEN, "%s-inputpin", this->getId());
+        //snprintf(_EdgeTypeId, STRING_LEN, "%s-edgetype", this->getId());
 
         this->addItem(&_DesignationParam);
         this->addItem(&_ModeParam);
@@ -102,7 +102,7 @@ public:
         this->addItem(&_TimeOnFadeParam);
         this->addItem(&_TimeOffFadeParam);
         this->addItem(&_BrightnessParam);
-        //this->addItem(&_activeDurationParam);
+        this->addItem(&_activeDurationParam);
         //this->addItem(&_InputPinParam);
         //this->addItem(&_EdgeTypeParam);
     }
@@ -119,8 +119,8 @@ public:
         _TimeOffFadeParam.applyDefaultValue();
         _BrightnessParam.applyDefaultValue();
         _activeDurationParam.applyDefaultValue();
-        _InputPinParam.applyDefaultValue();
-        _EdgeTypeParam.applyDefaultValue();
+        //_InputPinParam.applyDefaultValue();
+        //_EdgeTypeParam.applyDefaultValue();
     }
 
     int getAddress() const { return atoi(_AddressValue); }
@@ -150,8 +150,8 @@ public:
     int getTimeOffFade() const { return atoi(_TimeOffFadeValue); }
     int getBrightness() const { return atoi(_BrightnessValue); }
     int getActiveDuration() const { return atoi(_activeDurationValue); }
-    int getInputPin() const { return atoi(_InputPinValue); }
-    int getEdgeType() const { return atoi(_EdgeTypeValue); }
+    //int getInputPin() const { return atoi(_InputPinValue); }
+    //int getEdgeType() const { return atoi(_EdgeTypeValue); }
 
     // Zugriff auf NumberParam, falls benötigt
     iotwebconf::NumberParameter& numberParam() { return _NumberParam; }
@@ -173,8 +173,8 @@ private:
     char _BrightnessId[STRING_LEN];
     char _ModeCustomHTML[STRING_LEN];
     char _activeDurationId[STRING_LEN];
-    char _InputPinId[STRING_LEN];
-    char _EdgeTypeId[STRING_LEN];
+    //char _InputPinId[STRING_LEN];
+    //char _EdgeTypeId[STRING_LEN];
 
     char _DesignationValue[STRING_LEN]{};
     char _ModeValue[STRING_LEN]{};
@@ -187,8 +187,8 @@ private:
     char _TimeOffFadeValue[NUMBER_LEN]{};
     char _BrightnessValue[NUMBER_LEN]{"255"};
     char _activeDurationValue[NUMBER_LEN];
-    char _InputPinValue[NUMBER_LEN];
-    char _EdgeTypeValue[3];
+    //char _InputPinValue[NUMBER_LEN];
+    //char _EdgeTypeValue[3];
 
     // Parameter-Objekte
     iotwebconf::TextParameter _DesignationParam;
@@ -202,8 +202,8 @@ private:
     iotwebconf::NumberParameter _TimeOffFadeParam;
     iotwebconf::NumberParameter _BrightnessParam;
     iotwebconf::NumberParameter _activeDurationParam;
-    MySelectParameter _InputPinParam;
-    MySelectParameter _EdgeTypeParam;
+    //MySelectParameter _InputPinParam;
+    //MySelectParameter _EdgeTypeParam;
 
     String getEndTemplate() override {
         String result = "<script>hideClass('%s')</script>\n";

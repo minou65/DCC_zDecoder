@@ -66,12 +66,12 @@ OutputGroup OutputGroup7 = OutputGroup("og7");
 OutputGroup OutputGroup8 = OutputGroup("og8");
 OutputGroup OutputGroup9 = OutputGroup("og9");
 OutputGroup OutputGroup10 = OutputGroup("og10");
-OutputGroup OutputGroup11 = OutputGroup("og11");
-OutputGroup OutputGroup12 = OutputGroup("og12");
-OutputGroup OutputGroup13 = OutputGroup("og13");
-OutputGroup OutputGroup14 = OutputGroup("og14");
-OutputGroup OutputGroup15 = OutputGroup("og15");
-OutputGroup OutputGroup16 = OutputGroup("og16");
+//OutputGroup OutputGroup11 = OutputGroup("og11");
+//OutputGroup OutputGroup12 = OutputGroup("og12");
+//OutputGroup OutputGroup13 = OutputGroup("og13");
+//OutputGroup OutputGroup14 = OutputGroup("og14");
+//OutputGroup OutputGroup15 = OutputGroup("og15");
+//OutputGroup OutputGroup16 = OutputGroup("og16");
 
 MySelectParameter::MySelectParameter(
         const char* label,
@@ -149,7 +149,7 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
         String numberStr_ = webRequestWrapper->arg(numberID_);
 
         char visibleID_[STRING_LEN];
-        snprintf(visibleID_, STRING_LEN, "%sv", group_->getId());
+        snprintf(visibleID_, STRING_LEN, "%s", group_->getId());
 
         // Skip inactive groups
         if (webRequestWrapper->hasArg(visibleID_) && webRequestWrapper->arg(visibleID_) == "inactive") {
@@ -510,12 +510,12 @@ void websetup(){
     OutputGroup7.setNext(&OutputGroup8);
     OutputGroup8.setNext(&OutputGroup9);
     OutputGroup9.setNext(&OutputGroup10);
-	OutputGroup10.setNext(&OutputGroup11);
-	OutputGroup11.setNext(&OutputGroup12);
-	OutputGroup12.setNext(&OutputGroup13);
-	OutputGroup13.setNext(&OutputGroup14);
-	OutputGroup14.setNext(&OutputGroup15);
-	OutputGroup15.setNext(&OutputGroup16);
+	//OutputGroup10.setNext(&OutputGroup11);
+	//OutputGroup11.setNext(&OutputGroup12);
+	//OutputGroup12.setNext(&OutputGroup13);
+	//OutputGroup13.setNext(&OutputGroup14);
+	//OutputGroup14.setNext(&OutputGroup15);
+	//OutputGroup15.setNext(&OutputGroup16);
 
 
     iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
@@ -530,12 +530,12 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup8);
     iotWebConf.addParameterGroup(&OutputGroup9);
     iotWebConf.addParameterGroup(&OutputGroup10);
-    iotWebConf.addParameterGroup(&OutputGroup11);
-	iotWebConf.addParameterGroup(&OutputGroup12);
-	iotWebConf.addParameterGroup(&OutputGroup13);
-	iotWebConf.addParameterGroup(&OutputGroup14);
-	iotWebConf.addParameterGroup(&OutputGroup15);
-	iotWebConf.addParameterGroup(&OutputGroup16);
+ //   iotWebConf.addParameterGroup(&OutputGroup11);
+	//iotWebConf.addParameterGroup(&OutputGroup12);
+	//iotWebConf.addParameterGroup(&OutputGroup13);
+	//iotWebConf.addParameterGroup(&OutputGroup14);
+	//iotWebConf.addParameterGroup(&OutputGroup15);
+	//iotWebConf.addParameterGroup(&OutputGroup16);
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);
@@ -563,7 +563,7 @@ void websetup(){
     server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
         // IMPORTANT: You must create the AsyncWebRequestWrapper with 'new' and do NOT delete it manually.
         // The object will delete itself when it is no longer needed, to ensure it lives long enough.
-        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request, 98000U);
+        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request, 95000U);
         iotWebConf.handleConfig(asyncWebRequestWrapper);
         }
     );
