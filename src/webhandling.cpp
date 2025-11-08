@@ -509,7 +509,7 @@ void websetup(){
     OutputGroup6.setNext(&OutputGroup7);
     OutputGroup7.setNext(&OutputGroup8);
     OutputGroup8.setNext(&OutputGroup9);
-    OutputGroup9.setNext(&OutputGroup10);
+ //   OutputGroup9.setNext(&OutputGroup10);
 	//OutputGroup10.setNext(&OutputGroup11);
 	//OutputGroup11.setNext(&OutputGroup12);
 	//OutputGroup12.setNext(&OutputGroup13);
@@ -561,9 +561,7 @@ void websetup(){
     // -- Set up required URL handlers on the web server.
     server.on("/", HTTP_GET, [](AsyncWebServerRequest* request) { handleRoot(request); });
     server.on("/config", HTTP_ANY, [](AsyncWebServerRequest* request) {
-        // IMPORTANT: You must create the AsyncWebRequestWrapper with 'new' and do NOT delete it manually.
-        // The object will delete itself when it is no longer needed, to ensure it lives long enough.
-        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request, 95000U);
+        auto* asyncWebRequestWrapper = new AsyncWebRequestWrapper(request);
         iotWebConf.handleConfig(asyncWebRequestWrapper);
         }
     );
@@ -587,6 +585,7 @@ void websetup(){
 void webloop(){
     iotWebConf.doLoop();
     ArduinoOTA.handle();
+	asyncWebServerWrapper.cleanupWrappers();
 
     if (ShouldReboot || AsyncUpdater.isFinished()) {
         delay(1000);
