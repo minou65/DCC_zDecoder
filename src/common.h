@@ -98,7 +98,7 @@ const char OutputModeNames[][50] = {
 
     "Servo Impuls (1)",      // 190, nach einer eingestellten Zeit geht wieder zurück in die Ausgangsposition
     "Servo Flip (1)",        // 191, wechselt zwischen zwei Positionen
-    "Servo Pendel (1)",       // 192, wechsselt zwischen den positionen bis der Servo ausgeschaltet wird
+    "Servo Pendel (1)",       // 192, wechselt zwischen den positionen bis der Servo ausgeschaltet wird
     "Servo Weiche (1)",        //193
     
     "Entkuppler (1)",          // 201
@@ -106,17 +106,17 @@ const char OutputModeNames[][50] = {
     "Motor (1)"              // 203
 };
 
-const char InputPinValues[][4] = {
+const char InputPinValues[][5] = {
     "0", 
 	"255",
-    "101", "102", "103", "104", "105", "106", "107", "108",
-    "109", "110", "111", "112", "113", "114", "115", "116"
+    "101", "102", "103", "104", "105", "106", "107", "108"
+    //"109", "110", "111", "112", "113", "114", "115", "116"
 };
 const char InputPinNames[][12] = {
     "-",
 	"Autostart",
-    "Output1", "Output2", "Output3", "Output4", "Output5", "Output6", "Output7", "Output8",
-    "Output9", "Output10", "Output11", "Output12", "Output13", "Output14", "Output15", "Output16",
+    "Output1", "Output2", "Output3", "Output4", "Output5", "Output6", "Output7", "Output8"
+   // "Output9", "Output10", "Output11", "Output12", "Output13", "Output14", "Output15", "Output16"
 };
 
 const char InputEdgeValues[][3] = { "0", "1", "2" };
