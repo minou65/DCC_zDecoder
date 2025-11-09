@@ -89,15 +89,18 @@ void zDecoderInit(void) {
 				}
 
 				// add a input accessory if the output group has an input pin
-				//if (outputgroup_->getInputPin() > 0) {
-				//	InputAccessory* inputAccessory_ = createInputAccessory(
-				//		outputgroup_->getInputPin() - 1,
-				//		newAccessory_,
-				//		outputgroup_->getActiveDuration(),
-				//		static_cast<InputAccessory::EdgeType>(outputgroup_->getEdgeType())
-				//	);
-				//	decoder.add(inputAccessory_);
-				//}
+				if (outputgroup_->getInputPin() > 0) {
+					Serial.print("Adding input accessory for input pin: "); Serial.println(outputgroup_->getInputPin() - 1);
+					Serial.print("    with active duration: "); Serial.println(outputgroup_->getActiveDuration());
+					Serial.print("    and edge type: "); Serial.println(outputgroup_->getEdgeType());	
+					InputAccessory* inputAccessory_ = createInputAccessory(
+						outputgroup_->getInputPin() - 1,
+						newAccessory_,
+						outputgroup_->getActiveDuration(),
+						static_cast<InputAccessory::EdgeType>(outputgroup_->getEdgeType())
+					);
+					decoder.add(inputAccessory_);
+				}
 
 				decoder.add(newAccessory_);
 			}
@@ -142,7 +145,6 @@ void setup() {
 			zDecoderReset();
 		}
 	}
-
     zDecoderInit();
 	Serial.println("Decoder initalized");
 
@@ -155,7 +157,6 @@ void setup() {
 		&TaskHandle,  /* Task handle. */
 		0 /* Core where the task should run */
 	);
-
 	Serial.println("Everything has been initialized");
 }
 
