@@ -1,5 +1,6 @@
 ﻿#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
 #define IOTWEBCONF_DEBUG_TO_SERIAL
+#define IOTWEBCONFASYNC_DEBUG_TO_SERIAL 1
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
@@ -66,12 +67,12 @@ OutputGroup OutputGroup7 = OutputGroup("og7");
 OutputGroup OutputGroup8 = OutputGroup("og8");
 OutputGroup OutputGroup9 = OutputGroup("og9");
 OutputGroup OutputGroup10 = OutputGroup("og10");
-OutputGroup OutputGroup11 = OutputGroup("og11");
-OutputGroup OutputGroup12 = OutputGroup("og12");
-OutputGroup OutputGroup13 = OutputGroup("og13");
-OutputGroup OutputGroup14 = OutputGroup("og14");
-OutputGroup OutputGroup15 = OutputGroup("og15");
-OutputGroup OutputGroup16 = OutputGroup("og16");
+//OutputGroup OutputGroup11 = OutputGroup("og11");
+//OutputGroup OutputGroup12 = OutputGroup("og12");
+//OutputGroup OutputGroup13 = OutputGroup("og13");
+//OutputGroup OutputGroup14 = OutputGroup("og14");
+//OutputGroup OutputGroup15 = OutputGroup("og15");
+//OutputGroup OutputGroup16 = OutputGroup("og16");
 
 MySelectParameter::MySelectParameter(
         const char* label,
@@ -149,7 +150,7 @@ bool formValidator(iotwebconf::WebRequestWrapper* webRequestWrapper) {
         String numberStr_ = webRequestWrapper->arg(numberID_);
 
         char visibleID_[STRING_LEN];
-        snprintf(visibleID_, STRING_LEN, "%sv", group_->getId());
+        snprintf(visibleID_, STRING_LEN, "%s", group_->getId());
 
         // Skip inactive groups
         if (webRequestWrapper->hasArg(visibleID_) && webRequestWrapper->arg(visibleID_) == "inactive") {
@@ -509,13 +510,13 @@ void websetup(){
     OutputGroup6.setNext(&OutputGroup7);
     OutputGroup7.setNext(&OutputGroup8);
     OutputGroup8.setNext(&OutputGroup9);
-    OutputGroup9.setNext(&OutputGroup10);
-	OutputGroup10.setNext(&OutputGroup11);
-	OutputGroup11.setNext(&OutputGroup12);
-	OutputGroup12.setNext(&OutputGroup13);
-	OutputGroup13.setNext(&OutputGroup14);
-	OutputGroup14.setNext(&OutputGroup15);
-	OutputGroup15.setNext(&OutputGroup16);
+ //   OutputGroup9.setNext(&OutputGroup10);
+	//OutputGroup10.setNext(&OutputGroup11);
+	//OutputGroup11.setNext(&OutputGroup12);
+	//OutputGroup12.setNext(&OutputGroup13);
+	//OutputGroup13.setNext(&OutputGroup14);
+	//OutputGroup14.setNext(&OutputGroup15);
+	//OutputGroup15.setNext(&OutputGroup16);
 
 
     iotWebConf.setHtmlFormatProvider(&customHtmlFormatProvider);
@@ -530,12 +531,12 @@ void websetup(){
     iotWebConf.addParameterGroup(&OutputGroup8);
     iotWebConf.addParameterGroup(&OutputGroup9);
     iotWebConf.addParameterGroup(&OutputGroup10);
-    iotWebConf.addParameterGroup(&OutputGroup11);
-	iotWebConf.addParameterGroup(&OutputGroup12);
-	iotWebConf.addParameterGroup(&OutputGroup13);
-	iotWebConf.addParameterGroup(&OutputGroup14);
-	iotWebConf.addParameterGroup(&OutputGroup15);
-	iotWebConf.addParameterGroup(&OutputGroup16);
+ //   iotWebConf.addParameterGroup(&OutputGroup11);
+	//iotWebConf.addParameterGroup(&OutputGroup12);
+	//iotWebConf.addParameterGroup(&OutputGroup13);
+	//iotWebConf.addParameterGroup(&OutputGroup14);
+	//iotWebConf.addParameterGroup(&OutputGroup15);
+	//iotWebConf.addParameterGroup(&OutputGroup16);
 
     iotWebConf.setConfigSavedCallback(&configSaved);
     iotWebConf.setWifiConnectionCallback(&wifiConnected);

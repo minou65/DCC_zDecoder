@@ -39,6 +39,7 @@ static uint8_t OutputIndexToPin[16] PROGMEM = {
 };
 
 const size_t MAX_OUTPUT_PINS = sizeof(OutputIndexToPin) / sizeof(OutputIndexToPin[0]);
+const size_t MAX_INPUT_PINS = 0; // No input pins defined
 
 enum class PinGroup {
 	Output,
