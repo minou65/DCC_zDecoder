@@ -1,5 +1,6 @@
 ﻿#define DEBUG_WIFI(m) SERIAL_DBG.print(m)
 #define IOTWEBCONF_DEBUG_TO_SERIAL
+#define IOTWEBCONFASYNC_DEBUG_TO_SERIAL 1
 
 #include <Arduino.h>
 #include <ArduinoOTA.h>
@@ -585,7 +586,6 @@ void websetup(){
 void webloop(){
     iotWebConf.doLoop();
     ArduinoOTA.handle();
-	asyncWebServerWrapper.cleanupWrappers();
 
     if (ShouldReboot || AsyncUpdater.isFinished()) {
         delay(1000);
