@@ -18,6 +18,15 @@
 #include <IotWebConfParameter.h>
 #include "common.h"
 
+#include <ArduinoOTA.h>
+
+#include <WiFi.h>
+#include <DNSServer.h>
+#include <IotWebConf.h>
+#include <IotWebConfAsync.h>
+#include <IotWebConfAsyncUpdateServer.h>
+#include <IotWebRoot.h>
+
 void websetup();
 void webloop();
 
@@ -227,12 +236,12 @@ extern OutputGroup OutputGroup7;
 extern OutputGroup OutputGroup8;
 extern OutputGroup OutputGroup9;
 extern OutputGroup OutputGroup10;
-//extern OutputGroup OutputGroup11;
-//extern OutputGroup OutputGroup12;
-//extern OutputGroup OutputGroup13;
-//extern OutputGroup OutputGroup14;
-//extern OutputGroup OutputGroup15;
-//extern OutputGroup OutputGroup16;
+extern OutputGroup OutputGroup11;
+extern OutputGroup OutputGroup12;
+extern OutputGroup OutputGroup13;
+extern OutputGroup OutputGroup14;
+extern OutputGroup OutputGroup15;
+extern OutputGroup OutputGroup16;
 
 
 #endif
