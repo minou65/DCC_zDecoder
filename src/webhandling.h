@@ -1,4 +1,7 @@
 // webhandling.h
+#define IOTWEBCONF_DEBUG_TO_SERIAL
+#define IOTWEBCONFASYNC_DEBUG_TO_SERIAL 1
+
 #pragma once
 
 #ifndef _WEBHANDLING_h

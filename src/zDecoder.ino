@@ -4,6 +4,8 @@
  Author:	andy
 */
 
+#define IOTWEBCONFASYNC_DEBUG_TO_SERIAL 1
+
 #include <Arduino.h>
 
 #include "version.h"
