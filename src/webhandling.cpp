@@ -446,20 +446,28 @@ void handlePost(AsyncWebServerRequest* request) {
 
     if (request->hasParam("all", true)) {
         String value_ = request->getParam("all", true)->value();
-        if (value_ == "on") {
-            for (int i_ = 0; i_ < 10; i_++) {
-                decoder.on(i_);
+        
+        uint8_t i_ = 0;
+        OutputGroup* outputgroup_ = &OutputGroup1;
+        
+        while (outputgroup_ != nullptr) {
+            if (outputgroup_->isActive() && outputgroup_->getMode() >= 10) {
+                if (value_ == "on") {
+                    decoder.on(i_);
+                }
+                else if (value_ == "off") {
+                    decoder.off(i_);
+                }
+                i_++;
             }
+            outputgroup_ = (OutputGroup*)outputgroup_->getNext();
         }
-        else if (value_ == "off") {
-            for (int i_ = 0; i_ < 10; i_++) {
-                decoder.off(i_);
-            }
-        }
-        else {
+        
+        if (value_ != "on" && value_ != "off") {
             request->send(400, "text/plain", "Invalid value");
             return;
         }
+        
         AsyncWebServerResponse* response = request->beginResponse(302, "text/plain", "redirection");
         response->addHeader("Location", "/");
         request->send(response);
