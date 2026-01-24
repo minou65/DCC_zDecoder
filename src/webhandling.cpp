@@ -55,22 +55,22 @@ AsyncIotWebConf iotWebConf(thingName, &dnsServer, &asyncWebServerWrapper, wifiIn
 
 // -- We need to declare an instance for all OutputGroup items, that can
 //    appear in the config portal
-OutputGroup OutputGroup1 = OutputGroup("og1");
-OutputGroup OutputGroup2 = OutputGroup("og2");
-OutputGroup OutputGroup3 = OutputGroup("og3");
-OutputGroup OutputGroup4 = OutputGroup("og4");
-OutputGroup OutputGroup5 = OutputGroup("og5");
-OutputGroup OutputGroup6 = OutputGroup("og6");
-OutputGroup OutputGroup7 = OutputGroup("og7");
-OutputGroup OutputGroup8 = OutputGroup("og8");
-OutputGroup OutputGroup9 = OutputGroup("og9");
-OutputGroup OutputGroup10 = OutputGroup("og10");
-OutputGroup OutputGroup11 = OutputGroup("og11");
-OutputGroup OutputGroup12 = OutputGroup("og12");
-OutputGroup OutputGroup13 = OutputGroup("og13");
-OutputGroup OutputGroup14 = OutputGroup("og14");
-OutputGroup OutputGroup15 = OutputGroup("og15");
-OutputGroup OutputGroup16 = OutputGroup("og16");
+OutputGroup OutputGroup1 = OutputGroup("og1", "Output Group 1");
+OutputGroup OutputGroup2 = OutputGroup("og2", "Output Group 2");
+OutputGroup OutputGroup3 = OutputGroup("og3", "Output Group 3");
+OutputGroup OutputGroup4 = OutputGroup("og4", "Output Group 4");
+OutputGroup OutputGroup5 = OutputGroup("og5", "Output Group 5");
+OutputGroup OutputGroup6 = OutputGroup("og6", "Output Group 6");
+OutputGroup OutputGroup7 = OutputGroup("og7", "Output Group 7");
+OutputGroup OutputGroup8 = OutputGroup("og8", "Output Group 8");
+OutputGroup OutputGroup9 = OutputGroup("og9", "Output Group 9");
+OutputGroup OutputGroup10 = OutputGroup("og10", "Output Group 10");
+OutputGroup OutputGroup11 = OutputGroup("og11", "Output Group 11");
+OutputGroup OutputGroup12 = OutputGroup("og12", "Output Group 12");
+OutputGroup OutputGroup13 = OutputGroup("og13", "Output Group 13");
+OutputGroup OutputGroup14 = OutputGroup("og14", "Output Group 14");
+OutputGroup OutputGroup15 = OutputGroup("og15", "Output Group 15");
+OutputGroup OutputGroup16 = OutputGroup("og16", "Output Group 16");
 
 MySelectParameter::MySelectParameter(
         const char* label,

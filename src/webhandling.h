@@ -49,8 +49,8 @@ public:
 
 class OutputGroup : public iotwebconf::ChainedParameterGroup {
 public:
-    OutputGroup(const char* id)
-        : ChainedParameterGroup(id, "Output"),
+    OutputGroup(const char* id, const char* label)
+        : ChainedParameterGroup(id, label),
             _DesignationParam("Designation", _DesignationId, _DesignationValue, STRING_LEN),
             _ModeParam("Mode", _ModeId, _ModeValue, sizeof(OutputModeValues[0]),
                 (char*)OutputModeValues, (char*)OutputModeNames,
